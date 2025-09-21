@@ -29,23 +29,22 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Terraform Init
-        run: terraform init terraform/
+        run: terraform -chdir=terraform init
 
       - name: Import existing Resource Group
         run: |
-          terraform import -config=terraform/ azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg || echo "Resource group already imported"
+          terraform -chdir=terraform import azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg || echo "Resource group already imported"
 
       - name: Import existing Frontend App
         run: |
-          terraform import -config=terraform/ azurerm_linux_web_app.frontend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-frontend-app || echo "Frontend app already imported"
+          terraform -chdir=terraform import azurerm_linux_web_app.frontend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-frontend-app || echo "Frontend app already imported"
 
       - name: Import existing Backend App
         run: |
-          terraform import -config=terraform/ azurerm_linux_web_app.backend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-backend-app || echo "Backend app already imported"
+          terraform -chdir=terraform import azurerm_linux_web_app.backend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-backend-app || echo "Backend app already imported"
 
       - name: Terraform Plan
-        run: terraform plan -config=terraform/ -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" -var="github_pat=${{ secrets.PAT }}"
+        run: terraform -chdir=terraform plan -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" -var="github_pat=${{ secrets.PAT }}"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -config=terraform/ -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" -var="github_pat=${{ secrets.PAT }}"
-
+        run: terraform -chdir=terraform apply -auto-approve -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" -var="github_pat=${{ secrets.PAT }}"
