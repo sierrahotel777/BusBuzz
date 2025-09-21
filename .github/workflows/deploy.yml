@@ -28,7 +28,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-            - name: Terraform Init
+        - name: Terraform Init
         run: terraform init terraform/
 
       - name: Import existing Resource Group
