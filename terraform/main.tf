@@ -1,15 +1,10 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-  }
-  required_version = ">= 1.5.0"
-}
-
 provider "azurerm" {
   features {}
+
+  subscription_id = var.subscription_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  tenant_id       = var.tenant_id
 }
 
 # Resource Group
@@ -24,56 +19,56 @@ resource "azurerm_service_plan" "app_plan" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
-  sku_name            = "B1" # Basic tier, allows always_on
+  sku_name            = "B1"  # free F1 cannot use "always_on"
 }
 
-# Frontend Web App
-resource "azurerm_linux_web_app" "frontend_app" {
-  name                = "bussbuzz-frontend-app"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.app_plan.id
-
-  app_settings = {
-    "SCM_DO_BUILD_DURING_DEPLOYMENT"      = true
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = false
-  }
-
-  site_config {
-    always_on = true
-  }
-}
-
-# Backend Web App
+# Backend App
 resource "azurerm_linux_web_app" "backend_app" {
   name                = "bussbuzz-backend-app"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   service_plan_id     = azurerm_service_plan.app_plan.id
 
-  app_settings = {
-    "SCM_DO_BUILD_DURING_DEPLOYMENT"      = true
-    "WEBSITES_NODE_DEFAULT_VERSION"       = "18-lts"
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = false
+  site_config {
+    always_on = false
+    linux_fx_version = "NODE|18-lts"
   }
 
-  site_config {
-    always_on = true
+  app_settings = {
+    SCM_DO_BUILD_DURING_DEPLOYMENT      = "true"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
   }
 }
 
-# Link Frontend App to GitHub repo
-resource "azurerm_app_service_source_control" "frontend_source" {
-  app_id     = azurerm_linux_web_app.frontend_app.id
-  repo_url   = var.github_repo_url
-  branch     = "main"
+# Frontend App
+resource "azurerm_linux_web_app" "frontend_app" {
+  name                = "bussbuzz-frontend-app"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.app_plan.id
+
+  site_config {
+    always_on = false
+    linux_fx_version = "NODE|18-lts"
+  }
+
+  app_settings = {
+    SCM_DO_BUILD_DURING_DEPLOYMENT      = "true"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+  }
+}
+
+# Connect to GitHub
+resource "azurerm_app_service_source_control" "backend_source" {
+  app_id = azurerm_linux_web_app.backend_app.id
+  repo_url = var.github_repo_url
+  branch = "main"
   use_manual_integration = true
 }
 
-# Link Backend App to GitHub repo
-resource "azurerm_app_service_source_control" "backend_source" {
-  app_id     = azurerm_linux_web_app.backend_app.id
-  repo_url   = var.github_repo_url
-  branch     = "main"
+resource "azurerm_app_service_source_control" "frontend_source" {
+  app_id = azurerm_linux_web_app.frontend_app.id
+  repo_url = var.github_repo_url
+  branch = "main"
   use_manual_integration = true
 }

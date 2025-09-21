@@ -1,48 +1,34 @@
-name: Terraform CI/CD
+name: Deploy App
 
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'terraform/**'   # Ignore Terraform infra changes
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.9.0
 
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Initialize Terraform with remote backend (from backend.tf)
-      - name: Terraform Init
-        run: terraform -chdir=terraform init -input=false
+      - name: Deploy Backend
+        run: |
+          az webapp deployment source config-zip \
+            --resource-group bussbuzz-rg \
+            --name bussbuzz-backend-app \
+            --src ./backend.zip
 
-      # Terraform Plan
-      - name: Terraform Plan
-        run: terraform -chdir=terraform plan \
-             -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" \
-             -var="github_pat=${{ secrets.PAT }}" \
-             -out=tfplan
-
-      # Terraform Apply
-      - name: Terraform Apply
-        run: terraform -chdir=terraform apply -auto-approve tfplan
-
-      # Terraform Destroy
-      - name: Terraform Destroy
-        run: terraform -chdir=terraform destroy -auto-approve
+      - name: Deploy Frontend
+        run: |
+          az webapp deployment source config-zip \
+            --resource-group bussbuzz-rg \
+            --name bussbuzz-frontend-app \
+            --src ./frontend.zip
