@@ -19,6 +19,20 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Build Backend
+        run: |
+          cd backend
+          npm install
+          npm run build
+          zip -r ../backend.zip .
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          zip -r ../frontend.zip .
+          
       - name: Deploy Backend
         run: |
           az webapp deployment source config-zip \
