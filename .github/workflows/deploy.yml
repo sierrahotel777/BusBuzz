@@ -1,4 +1,4 @@
-name: BusBuzz CI/CD to Azure
+name: Terraform CI/CD
 
 on:
   push:
@@ -6,31 +6,46 @@ on:
       - main
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.0
 
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform
+
+      - name: Import existing Resource Group
+        run: |
+          terraform import azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg || echo "Resource group already imported"
+
+      # Import frontend and backend apps only if they exist
+      - name: Import existing Frontend App
+        run: |
+          terraform import azurerm_linux_web_app.frontend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-frontend-app || echo "Frontend app already imported"
+
+      - name: Import existing Backend App
+        run: |
+          terraform import azurerm_linux_web_app.backend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-backend-app || echo "Backend app already imported"
 
       - name: Terraform Plan
         run: terraform plan -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git"
-        working-directory: ./terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git"
-        working-directory: ./terraform
