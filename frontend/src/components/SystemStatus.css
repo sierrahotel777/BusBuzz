@@ -1,0 +1,79 @@
+.system-status-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+.overall-status-banner {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+    color: white;
+}
+
+.overall-status-banner h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.overall-status-banner.all-systems-operational {
+    background-color: var(--secondary-color);
+}
+
+.overall-status-banner.degraded-performance {
+    background-color: var(--secondary-color);
+}
+
+.overall-status-banner.major-outage {
+    background-color: var(--error-color);
+}
+
+.status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--surface-color);
+}
+
+.status-name {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: bold;
+}
+
+.status-icon {
+    font-size: 1.5rem;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: white;
+}
+
+.status-badge.operational {
+    background-color: var(--secondary-color);
+}
+
+.status-badge.degraded {
+    background-color: var(--secondary-color);
+}
+
+.status-badge.outage {
+    background-color: var(--error-color);
+}

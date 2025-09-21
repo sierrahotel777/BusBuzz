@@ -1,0 +1,31 @@
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.notification-container.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-container.success {
+    background-color: var(--secondary-color);
+}
+
+.notification-container.error {
+    background-color: var(--error-color);
+}
+
+.notification-container.info {
+    background-color: var(--primary-color);
+}

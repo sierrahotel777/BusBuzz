@@ -1,0 +1,37 @@
+.legal-page-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+.legal-content {
+    background-color: var(--surface-color);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.legal-content h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+.legal-content h3:first-child {
+    margin-top: 0;
+}
+
+.legal-content p, .legal-content li {
+    line-height: 1.7;
+    color: var(--text-color-light);
+}
+
+.legal-content ul {
+    padding-left: 20px;
+}
+
+.legal-content li {
+    margin-bottom: 10px;
+}

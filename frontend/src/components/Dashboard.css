@@ -1,0 +1,682 @@
+/* Main container for both dashboards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
+  padding: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header for the dashboard page */
+.dashboard-header {
+  grid-column: 1 / -1;
+  background: var(--primary-color);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  color: white;
+}
+
+.dashboard-header p {
+  margin: 5px 0 0;
+  opacity: 0.9;
+}
+
+/* General card styling */
+.dashboard-card {
+  background: var(--surface-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px var(--shadow-color);
+}
+
+/* Staggered animation for cards */
+.dashboard-grid > * {
+    animation: slideInUp 0.6s ease-out backwards;
+}
+
+.dashboard-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.dashboard-grid > *:nth-child(4) { animation-delay: 0.4s; }
+
+.dashboard-card h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* Student Dashboard Specifics */
+.announcement-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.announcement-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.announcement-list li:last-child {
+  border-bottom: none;
+}
+
+.track-bus-btn {
+  margin-top: auto; /* Pushes button to the bottom of the card */
+  padding: 10px 15px;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.track-bus-btn:hover {
+  background: var(--secondary-color-dark);
+}
+
+/* Quick Actions Styling */
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-link {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  padding: 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.action-link:hover {
+  background-color: var(--hover-bg);
+  text-decoration: none;
+}
+
+[data-theme='dark'] .action-link {
+  background-color: var(--background-color);
+}
+
+.commend-btn {
+    background-color: var(--secondary-color);
+    color: white !important;
+    border: none;
+}
+.commend-btn:hover {
+    background-color: var(--secondary-color-dark);
+}
+
+.report-btn {
+    background-color: var(--error-color);
+    color: white !important;
+    border: none;
+}
+.report-btn:hover {
+    background-color: var(--error-color-dark);
+}
+
+/* Admin Dashboard - Announcement Form */
+.announcement-textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+.post-announcement-btn {
+  padding: 10px 15px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: flex-start;
+  transition: background-color 0.2s;
+}
+
+.post-announcement-btn:hover {
+  background: var(--primary-color-dark);
+}
+
+/* Admin Dashboard - Current Announcements List */
+.admin-announcements li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.delete-announcement-btn {
+  padding: 5px 10px;
+  background-color: var(--error-color); /* Red for delete */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  flex-shrink: 0; /* Prevent button from shrinking */
+  transition: background-color 0.2s;
+}
+
+.delete-announcement-btn:hover {
+  background-color: var(--error-color-dark);
+}
+
+/* Styles for inline editing of announcements */
+.admin-announcements li span {
+  flex-grow: 1;
+  padding-right: 15px; /* Add some space between text and buttons */
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.announcement-textarea-edit {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid var(--primary-color);
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.edit-announcement-btn,
+.save-announcement-btn,
+.cancel-announcement-btn,
+.export-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.edit-announcement-btn {
+  background-color: var(--info-color);
+  color: white;
+}
+
+.save-announcement-btn {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.cancel-announcement-btn {
+  background-color: var(--text-color-light);
+  color: white;
+}
+
+/* Student Dashboard - Interactive Bus Details */
+.bus-details-interactive {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.bus-details-interactive label {
+  font-weight: bold;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+}
+
+.bus-details-interactive select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: white;
+}
+
+.eta-display {
+  margin-top: 10px;
+  background-color: var(--subtle-bg);
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.eta-display span {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Admin Dashboard Specifics */
+.stats-container {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: var(--surface-color);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.stat-card h4 {
+  margin: 0 0 10px 0;
+  color: var(--text-color-light);
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.stat-card .warning-text {
+  color: var(--error-color);
+}
+
+.full-width-card {
+  grid-column: 1 / -1;
+}
+
+.feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.feedback-table th, .feedback-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.feedback-table th {
+  background-color: var(--subtle-bg);
+}
+
+.table-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.export-btn {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.export-btn:hover {
+  background-color: var(--secondary-color-dark);
+}
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  width: 300px;
+  max-width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 66, 116, 0.15); /* Adjusted for new primary color */
+}
+
+.feedback-table .sortable-header {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection on click */
+  transition: background-color 0.2s;
+}
+
+.feedback-table .sortable-header:hover {
+  background-color: var(--hover-bg);
+}
+
+.feedback-table .status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.feedback-table .status.pending {
+  background-color: rgba(254, 193, 15, 0.2);
+  color: #b4880b;
+}
+
+.feedback-table .status.resolved {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.feedback-table .status.in-progress {
+  background-color: rgba(23, 162, 184, 0.2);
+  color: var(--info-color);
+}
+
+[data-theme='dark'] .feedback-table .status.pending {
+  background-color: rgba(214, 158, 46, 0.2);
+  color: #d69e2e;
+}
+
+[data-theme='dark'] .feedback-table .status.resolved {
+  background-color: rgba(72, 187, 120, 0.2);
+  color: #48bb78;
+}
+
+[data-theme='dark'] .feedback-table .status.in-progress {
+  background-color: rgba(66, 153, 225, 0.2);
+  color: #4299e1;
+}
+
+.feedback-table .status.unclaimed {
+  background-color: rgba(254, 193, 15, 0.2);
+  color: #b4880b;
+}
+
+.feedback-table .status.claimed {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.claim-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.high-priority-row {
+  background-color: #fff5f5;
+  border-left: 4px solid var(--error-color);
+}
+
+.high-priority-row:hover {
+  background-color: #ffebeb;
+}
+
+[data-theme='dark'] .high-priority-row {
+  background-color: rgba(227, 76, 60, 0.1);
+}
+
+/* Stat Card Icons */
+.stat-icon {
+  margin-right: 8px;
+}
+
+/* Style for the student's feedback card to place it at the top */
+.my-feedback-card {
+  order: -1; /* This makes it the first item in the grid */
+}
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.pagination-container button {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination-container button:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.pagination-container button:disabled {
+  color: #aaa;
+  cursor: not-allowed;  
+  background-color: var(--disabled-bg);
+}
+
+.pagination-container span {
+  font-weight: bold;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+  margin: 0 10px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .stats-container {
+    gap: 15px;
+  }
+
+  /* Responsive Table for Admin Dashboard */
+  .feedback-table thead {
+    display: none;
+  }
+
+  .feedback-table, .feedback-table tbody, .feedback-table tr, .feedback-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .feedback-table tr {
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .feedback-table td {
+    display: flex;
+    justify-content: space-between;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 10px;
+  }
+
+  .feedback-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .feedback-table td::before {
+    content: attr(data-label);
+    text-align: left;
+    font-weight: bold;
+    color: var(--text-color);
+    padding-right: 10px;
+  }
+}
+
+[data-theme='dark'] .action-link {
+  background-color: var(--background-color);
+}
+
+[data-theme='dark'] .pagination-container button:disabled {
+  color: var(--text-color-light);
+  background-color: var(--surface-color);
+}
+
+/* Found Items List on Student Dashboard */
+.found-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.found-items-list li {
+  padding: 0;
+  border: none;
+}
+
+.found-items-list p {
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-color-light);
+}
+
+.view-all-link {
+  margin-top: auto;
+  padding-top: 15px;
+  font-weight: bold;
+}
+
+/* Leaderboard styles */
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.leaderboard-list li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.leaderboard-rank {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text-color-light);
+    width: 40px;
+}
+.leaderboard-route {
+    flex-grow: 1;
+    font-weight: bold;
+}
+.leaderboard-count {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+/* Chart Container Styles */
+.chart-container {
+  position: relative;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* What's New Card */
+.whats-new-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.whats-new-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.whats-new-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 0;
+  border: none;
+}
+
+.whats-new-icon {
+  font-size: 1.8rem;
+  background-color: var(--subtle-bg);
+  border-radius: 8px;
+  padding: 8px;
+  line-height: 1;
+}
+
+.whats-new-content h4 {
+  margin: 0 0 5px 0;
+  color: var(--text-color);
+}
+
+.whats-new-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-color-light);
+}
+
+/* Chart Controls */
+.chart-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.chart-controls label {
+  font-weight: bold;
+  color: var(--text-color-light);
+}
+
+.chart-controls select {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}

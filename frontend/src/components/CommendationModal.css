@@ -1,0 +1,67 @@
+.commendation-modal {
+    max-width: 550px;
+    text-align: left;
+    animation: modalPopIn 0.3s ease-out;
+}
+
+.commendation-modal h3 {
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.commendation-modal .form-group {
+    margin-bottom: 20px;
+}
+
+.commendation-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color-light);
+}
+
+.commendation-modal select,
+.commendation-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+.praise-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.praise-tag {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-color-light);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+}
+
+.praise-tag:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--primary-color);
+}
+
+.praise-tag.selected {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.commendation-modal .modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
