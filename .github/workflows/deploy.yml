@@ -28,14 +28,21 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Initialize Terraform with remote backend (from backend.tf)
       - name: Terraform Init
-        run: terraform -chdir=terraform init
+        run: terraform -chdir=terraform init -input=false
 
+      # Terraform Plan
       - name: Terraform Plan
         run: terraform -chdir=terraform plan \
              -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" \
              -var="github_pat=${{ secrets.PAT }}" \
              -out=tfplan
 
+      # Terraform Apply
       - name: Terraform Apply
         run: terraform -chdir=terraform apply -auto-approve tfplan
+
+      # Terraform Destroy
+      - name: Terraform Destroy
+        run: terraform -chdir=terraform destroy -auto-approve
