@@ -25,5 +25,5 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="github_repo_url=${{ secrets.REPO_URL }}"
+        run: terraform apply -auto-approve -var="github_repo_url=${{ github.repository_url }}"
         working-directory: ./terraform
