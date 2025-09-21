@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    container_name: bussbuzz-frontend
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    container_name: bussbuzz-backend

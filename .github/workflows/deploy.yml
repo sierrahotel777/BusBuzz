@@ -31,17 +31,19 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=terraform init
 
-      - name: Import existing Resource Group
+      - name: Import existing resources if not in state
         run: |
-          terraform -chdir=terraform import azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg || echo "Resource group already imported"
+          # Import Resource Group if not managed
+          terraform -chdir=terraform state list | grep -q '^azurerm_resource_group.rg$' || \
+            terraform -chdir=terraform import azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg
 
-      - name: Import existing Frontend App
-        run: |
-          terraform -chdir=terraform import azurerm_linux_web_app.frontend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-frontend-app || echo "Frontend app already imported"
+          # Import Frontend App if not managed
+          terraform -chdir=terraform state list | grep -q '^azurerm_linux_web_app.frontend_app$' || \
+            terraform -chdir=terraform import azurerm_linux_web_app.frontend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-frontend-app
 
-      - name: Import existing Backend App
-        run: |
-          terraform -chdir=terraform import azurerm_linux_web_app.backend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-backend-app || echo "Backend app already imported"
+          # Import Backend App if not managed
+          terraform -chdir=terraform state list | grep -q '^azurerm_linux_web_app.backend_app$' || \
+            terraform -chdir=terraform import azurerm_linux_web_app.backend_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/bussbuzz-rg/providers/Microsoft.Web/sites/bussbuzz-backend-app
 
       - name: Terraform Plan
         run: terraform -chdir=terraform plan -var="github_repo_url=https://github.com/sierrahotel777/BusBuzz.git" -var="github_pat=${{ secrets.PAT }}"
