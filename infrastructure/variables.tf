@@ -1,19 +1,47 @@
-# infrastructure/variables.tf
+# variables.tf
+
+# --- Resource Group and Location Variables ---
 
 variable "resource_group_name" {
-  description = "The name of the resource group"
+  description = "The name of the resource group (busbuzz-rec-rg)."
   type        = string
-  default     = "busbuzz-rg"
+  default     = "busbuzz-rec-rg"
 }
 
-variable "location" {
-  description = "The Azure region to deploy to"
+variable "backend_location" {
+  description = "The Azure region for the App Service components (East US)."
   type        = string
-  default     = "East US"
+  default     = "East US" 
 }
 
-variable "app_service_sku" {
-  description = "The SKU for the App Service Plan (e.g., F1, B1, S1). Use 'F1' for Free tier."
+variable "frontend_location" {
+  description = "The Azure region for the Static Web App (West US 2)."
   type        = string
-  default     = "S1" 
+  default     = "West US 2"
+}
+
+variable "db_location" {
+  description = "The Azure region for the Cosmos DB cluster and Resource Group (West US 2)."
+  type        = string
+  default     = "West US 2"
+}
+
+# --- SKU and Sizing Variables ---
+
+variable "backend_sku" {
+  description = "The SKU for the App Service Plan (B1)."
+  type        = string
+  default     = "B1"
+}
+
+variable "acr_sku" {
+  description = "The SKU for the Azure Container Registry (Basic)."
+  type        = string
+  default     = "Basic"
+}
+
+variable "swa_sku" {
+  description = "The SKU for the Static Web App."
+  type        = string
+  default     = "Standard"
 }
