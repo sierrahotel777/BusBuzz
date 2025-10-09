@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, registerUser, getAllUsers } from '../services/api';
+import { registerUser, getAllUsers } from '../services/api'; // Removed loginUser
 
 const AuthContext = createContext(null);
 

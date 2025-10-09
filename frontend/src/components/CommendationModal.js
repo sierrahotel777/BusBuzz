@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNotification } from './NotificationContext';
 import './CommendationModal.css';
 import { routeNames } from './routeData';
-import { useAuth } from './AuthContext';
 
 const praiseTags = ["Safe Driving", "Helpful & Courteous", "On-Time Champion", "Clean Bus"];
 
