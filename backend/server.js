@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const feedbackRoutes = require('./routes/feedback'); // Assuming you will create this
 const { connectToDatabase } = require('./db/mongo');
 const authRoutes = require('./routes/auth');
 
@@ -16,10 +17,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('BusBuzz Backend API is running!');
 });
-//
-// Use the authentication routes
+
+// API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', authRoutes); // To handle /api/users, /api/feedback etc.
+app.use('/api/feedback', feedbackRoutes); // Example for feedback routes
 
 // Start the server only after the database connection is successful
 async function startServer() {
