@@ -1,0 +1,71 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content.confirmation-modal {
+  background: var(--surface-color);
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  animation: modalPopIn 0.3s ease-out;
+}
+
+.confirmation-modal h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+.confirmation-modal p {
+  margin: 15px 0 25px 0;
+  line-height: 1.5;
+  color: var(--text-color-light);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-actions button {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.modal-actions button:active {
+    transform: scale(0.98);
+}
+
+.btn-cancel {
+  background-color: var(--text-color-light);
+  color: white;
+}
+
+.btn-cancel:hover {
+    opacity: 0.9;
+}
+
+.btn-confirm-delete {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.btn-confirm-delete:hover {
+    background-color: var(--error-color-dark);
+}

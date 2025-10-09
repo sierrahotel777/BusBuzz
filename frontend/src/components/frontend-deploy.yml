@@ -1,0 +1,36 @@
+name: Deploy Frontend to Azure Static Web Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations
+          action: "upload"
+          ###### App Settings ######
+          app_location: "/frontend" # App source code path
+          api_location: "" # API source code path - leave empty if backend is separate
+          output_location: "build" # Built app content directory
+          ###### End of App Settings ######
+
+# Note on AZURE_STATIC_WEB_APPS_API_TOKEN:
+# This secret is automatically created in your GitHub repo when you create the
+# Azure Static Web App resource through the Azure Portal and link it to GitHub.

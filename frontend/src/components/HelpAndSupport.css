@@ -1,0 +1,151 @@
+.help-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+.faq-section {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.faq-item {
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: background-color 0.2s;
+}
+
+.faq-question:hover {
+    background-color: var(--hover-bg);
+}
+
+.faq-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease-in-out;
+}
+
+.faq-icon.open {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+.faq-answer.open {
+    max-height: 200px; /* Adjust as needed */
+    padding: 0 20px 20px 20px;
+}
+
+.faq-answer p {
+    margin: 0;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    line-height: 1.6;
+    color: var(--text-color-light);
+}
+
+.contact-section {
+    margin-top: 50px;
+    padding: 30px;
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.contact-section h3 {
+    margin-top: 0;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.contact-section > p {
+    text-align: center;
+    color: var(--text-color-light);
+    margin-bottom: 30px;
+}
+
+.contact-section .form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.contact-section .form-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.contact-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color-light);
+}
+
+.contact-section input,
+.contact-section textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.contact-section input:focus,
+.contact-section textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.contact-section button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.contact-section button:hover:not(:disabled) {
+    background: var(--primary-color-dark);
+}
+
+.contact-section button:disabled {
+    background-color: var(--disabled-bg);
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .contact-section .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

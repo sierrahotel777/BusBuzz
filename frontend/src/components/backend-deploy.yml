@@ -1,0 +1,51 @@
+name: Deploy Backend to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: 'your-backend-app-name' # Replace with your App Service name
+  AZURE_WEBAPP_PACKAGE_PATH: './backend'
+  NODE_VERSION: '18.x'
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      # You can add your test running step here
+      # - name: Run tests
+      #   run: npm test
+      #   working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }} # See note below
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+
+# Note on AZURE_PUBLISH_PROFILE:
+# For simpler authentication, you can use a publish profile.
+# 1. In your Azure App Service, go to the "Overview" page and click "Get publish profile".
+# 2. This will download a `.PublishSettings` file.
+# 3. Open the file, copy its entire content, and create a new GitHub secret named `AZURE_PUBLISH_PROFILE`.
+# 4. The Service Principal (AZURE_CREDENTIALS) is more powerful but the publish profile is simpler for just deploying to one app.
+#    If you use the publish profile, you don't need the AZURE_CREDENTIALS secret for this workflow.

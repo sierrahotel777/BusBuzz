@@ -1,0 +1,58 @@
+.user-form-modal {
+    max-width: 500px;
+    padding: 25px;
+}
+.user-form-modal {
+    animation: modalPopIn 0.3s ease-out;
+}
+
+.user-form-modal h3 {
+    margin-top: 0;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.user-form-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.user-form-modal label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color-light);
+}
+
+.user-form-modal input,
+.user-form-modal select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+.user-form-modal input:focus,
+.user-form-modal select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.user-form-modal .modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.user-form-modal .btn-save {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.user-form-modal .btn-cancel {
+    background-color: var(--text-color-light);
+}

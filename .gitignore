@@ -1,0 +1,40 @@
+# User-specific ignores
+frontend_OG/
+
+# IDE and editor configuration
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+# We specify them here to ensure they are ignored even if sub-project .gitignore is missing
+/backend/node_modules
+/frontend/node_modules
+
+# Environment variables - DO NOT COMMIT THESE
+.env
+.env.*.local
+.env.local
+
+# Terraform state files
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+*.zip

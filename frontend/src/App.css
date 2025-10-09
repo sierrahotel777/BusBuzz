@@ -1,0 +1,86 @@
+/* Global CSS Variables for a consistent theme */
+:root {
+  --primary-color: #6a1b9a;       /* Deep Purple */
+  --primary-color-dark: #4a148c;   /* Darker Purple */
+  --secondary-color: #fec10f;    /* Vibrant Yellow/Gold */
+  --secondary-color-dark: #d8a400;   /* Darker Yellow/Gold */
+  --info-color: #17a2b8;          /* A calming teal for info */
+  --background-color: #f7f7f7;    /* A very light gray for the background */
+  --surface-color: #ffffff;
+  --text-color: #212529;          /* Almost black for high contrast */
+  --text-color-light: #6c757d;    /* A standard gray for secondary text */
+  --border-color: #dee2e6;        /* A light, subtle border */
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --error-bg: #f8d7da;
+  --error-border: #f5c6cb;
+  --error-color: #dc3545;
+  --error-color-dark: #c82333;
+  --error-text: #721c24;
+  --disabled-bg: #bdc3c7;
+  --subtle-bg: #f8f9fa;
+  --hover-bg: #e9ecef;
+  --success-bg: #d4edda;
+  --success-border: #c3e6cb;
+  --success-text: #155724;
+}
+
+[data-theme='dark'] {
+  --primary-color: #ab47bc;       /* A brighter purple for dark mode */
+  --primary-color-dark: #8e24aa;
+  --secondary-color: #fdd835;    /* A slightly brighter yellow for dark mode */
+  --secondary-color-dark: #fbc02d;
+  --info-color: #17a2b8;
+  --background-color: #0d1117;    /* A deep, near-black for the background */
+  --surface-color: #161b22;       /* A slightly lighter surface for cards */
+  --text-color: #c9d1d9;          /* A soft white for main text */
+  --text-color-light: #8b949e;    /* A dimmer gray for secondary text */
+  --border-color: #30363d;        /* Subtle borders that stand out on dark bg */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --disabled-bg: #4a5568;
+  --subtle-bg: #161b22;
+  --hover-bg: #21262d;
+  --success-bg: rgba(72, 187, 120, 0.2);
+  --success-border: #48bb78;
+  --success-text: #48bb78;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-content-wrapper {
+  flex-grow: 1;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.app-wrapper.exiting {
+  animation: fadeOut 0.5s ease-out forwards;
+}
