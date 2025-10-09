@@ -1,158 +1,173 @@
-import React, { useState, useRef } from 'react';
-import Papa from 'papaparse';
+import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { importUsers, exportUsers } from '../services/api';
-import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
-import './UserManagement.css';
+import './UserManagement.css'; // We will create this file next
 
 function UserManagement() {
-    const { users, deleteUser, user: currentUser, refetchUsers } = useAuth();
+    const { users, updateUser, deleteUser, register, refetchUsers } = useAuth();
     const { showNotification } = useNotification();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState(null);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState(null); // The user object being edited
+    const [editedData, setEditedData] = useState({});
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'student' });
+    const [isAdding, setIsAdding] = useState(false);
+
     const [userToDelete, setUserToDelete] = useState(null);
-    const [isImporting, setIsImporting] = useState(false);
-    const [isExporting, setIsExporting] = useState(false);
-    const fileInputRef = useRef(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    const handleOpenModal = (user = null) => {
+    const handleEdit = (user) => {
         setEditingUser(user);
-        setIsModalOpen(true);
+        setEditedData(user);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleCancel = () => {
         setEditingUser(null);
+        setEditedData({});
     };
 
-    const handleOpenDeleteModal = (user) => {
-        if (user.id === currentUser.id) {
-            showNotification("You cannot delete your own account.", "error");
+    const handleSave = () => {
+        // In a real app, you would call an API here.
+        // The updateUser function in AuthContext is a placeholder.
+        updateUser(editedData);
+        showNotification(`User ${editedData.name} updated successfully!`);
+        handleCancel();
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditedData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleNewUserChange = (e) => {
+        const { name, value } = e.target;
+        setNewUser(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddUser = async (e) => {
+        e.preventDefault();
+        if (!newUser.name || !newUser.email || !newUser.password) {
+            showNotification('Name, email, and password are required.', 'error');
             return;
         }
-        setUserToDelete(user);
-        setIsDeleteModalOpen(true);
-    };
-
-    const handleCloseDeleteModal = () => {
-        setUserToDelete(null);
-        setIsDeleteModalOpen(false);
-    };
-
-    const handleDeleteConfirm = () => {
-        deleteUser(userToDelete.id);
-        showNotification(`User "${userToDelete.name}" has been deleted.`, 'info');
-        handleCloseDeleteModal();
-    };
-
-    const handleExport = async () => {
-        setIsExporting(true);
         try {
-            await exportUsers();
-            showNotification('User data export started.', 'info');
+            await register(newUser);
+            showNotification('User added successfully!', 'success');
+            setNewUser({ name: '', email: '', password: '', role: 'student' }); // Reset form
+            setIsAdding(false); // Hide form
+            refetchUsers(); // Refetch users to show the new one
         } catch (error) {
-            console.error('Export failed:', error);
-            showNotification(`Export failed: ${error.message}`, 'error');
-        } finally {
-            setIsExporting(false);
+            showNotification(error.message || 'Failed to add user.', 'error');
         }
     };
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setIsImporting(true);
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: async (results) => {
-                    try {
-                        const response = await importUsers(results.data);
-                        let message = response.message;
-                        if (response.errors && response.errors.length > 0) {
-                            message += ` ${response.errors.length} rows had errors.`;
-                        }
-                        showNotification(message, 'info');
-                        refetchUsers(); // Refresh the user list
-                    } catch (error) {
-                        console.error('Import failed:', error);
-                        showNotification(`Import failed: ${error.message}`, 'error');
-                    } finally {
-                        setIsImporting(false);
-                        if(fileInputRef.current) fileInputRef.current.value = "";
-                    }
-                },
-                error: (error) => {
-                    console.error('CSV parsing error:', error);
-                    showNotification(`Error parsing CSV: ${error.message}`, 'error');
-                    setIsImporting(false);
-                }
-            });
-        }
+    const openDeleteModal = (user) => {
+        setUserToDelete(user);
+        setShowDeleteModal(true);
     };
 
-    const triggerFileInput = () => {
-        fileInputRef.current?.click();
+    const closeDeleteModal = () => {
+        setUserToDelete(null);
+        setShowDeleteModal(false);
+    };
+
+    const confirmDelete = () => {
+        // In a real app, you would call an API here.
+        // The deleteUser function in AuthContext is a placeholder.
+        deleteUser(userToDelete.id);
+        showNotification(`User ${userToDelete.name} has been deleted.`, 'info');
+        closeDeleteModal();
     };
 
     return (
         <div className="user-management-container">
             <div className="dashboard-header">
                 <h2>User Management</h2>
-                <p>Add, edit, or remove user accounts.</p>
+                <p>Add, edit, or remove users from the system.</p>
             </div>
-            <div className="dashboard-card">
-                <div className="table-header">
-                    <h3>All Users ({users.length})</h3>
-                    <div className="header-actions">
-                        <input
-                            type="file"
-                            accept=".csv"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            style={{ display: 'none' }}
-                        />
-                        <button onClick={triggerFileInput} className="import-btn" disabled={isImporting}>
-                            {isImporting ? 'Importing...' : 'Import CSV'}
-                        </button>
-                        <button onClick={handleExport} className="export-btn" disabled={isExporting}>
-                            {isExporting ? 'Exporting...' : 'Export CSV'}
-                        </button>
-                        <button onClick={() => handleOpenModal()} className="add-user-btn">Add New User</button>
-                    </div>
+
+            {!isAdding && (
+                <div className="user-actions">
+                    <button onClick={() => setIsAdding(true)} className="add-user-btn">
+                        + Add New User
+                    </button>
                 </div>
-                <table className="user-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>College ID</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr key={user.id}>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td><span className={`role-badge ${user.role}`}>{user.role}</span></td>
-                                <td>{user.collegeId}</td>
-                                <td className="action-cell">
-                                    <button onClick={() => handleOpenModal(user)} className="edit-btn">Edit</button>
-                                    <button onClick={() => handleOpenDeleteModal(user)} className="delete-btn">Delete</button>
-                                </td>
+            )}
+
+            {isAdding && (
+                <div className="dashboard-card">
+                    <h3>Add New User</h3>
+                    <form onSubmit={handleAddUser} className="add-user-form">
+                        <input type="text" name="name" placeholder="Full Name" value={newUser.name} onChange={handleNewUserChange} required />
+                        <input type="email" name="email" placeholder="Email Address" value={newUser.email} onChange={handleNewUserChange} required />
+                        <input type="password" name="password" placeholder="Password" value={newUser.password} onChange={handleNewUserChange} required />
+                        <select name="role" value={newUser.role} onChange={handleNewUserChange}>
+                            <option value="student">Student</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div className="form-actions">
+                            <button type="submit">Save User</button>
+                            <button type="button" onClick={() => setIsAdding(false)}>Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            )}
+
+            <div className="dashboard-card full-width-card">
+                <h3>All Users</h3>
+                <div className="table-responsive">
+                    <table className="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user.id || user.email}>
+                                    {editingUser?.id === user.id ? (
+                                        <>
+                                            <td><input type="text" name="name" value={editedData.name} onChange={handleChange} /></td>
+                                            <td>{user.email}</td>
+                                            <td>
+                                                <select name="role" value={editedData.role} onChange={handleChange}>
+                                                    <option value="student">Student</option>
+                                                    <option value="admin">Admin</option>
+                                                </select>
+                                            </td>
+                                            <td className="action-cell">
+                                                <button onClick={handleSave} className="save-btn">Save</button>
+                                                <button onClick={handleCancel} className="cancel-btn">Cancel</button>
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td data-label="Name">{user.name}</td>
+                                            <td data-label="Email">{user.email}</td>
+                                            <td data-label="Role"><span className={`role-badge role-${user.role}`}>{user.role}</span></td>
+                                            <td className="action-cell">
+                                                <button onClick={() => handleEdit(user)} className="edit-btn">Edit</button>
+                                                <button onClick={() => openDeleteModal(user)} className="delete-btn">Remove</button>
+                                            </td>
+                                        </>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <UserFormModal isOpen={isModalOpen} onClose={handleCloseModal} user={editingUser} />
-            <ConfirmationModal show={isDeleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleDeleteConfirm} title="Confirm User Deletion" message={`Are you sure you want to delete the user "${userToDelete?.name}"? This action cannot be undone.`} />
+
+            <ConfirmationModal
+                show={showDeleteModal}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
+                title="Confirm User Deletion"
+                message={`Are you sure you want to remove ${userToDelete?.name}? This action cannot be undone.`}
+            />
         </div>
     );
 }

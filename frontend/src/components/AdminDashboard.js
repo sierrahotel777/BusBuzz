@@ -140,6 +140,7 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
             <Link to="/admin/bus-details" className="action-link">Manage Buses</Link>
             <Link to="/admin/route-details" className="action-link">Manage Routes</Link>
             <Link to="/admin/feedback" className="action-link">Manage Feedback</Link>
+            <Link to="/admin/user-management" className="action-link">Manage Users</Link>
             <Link to="/admin/lost-and-found" className="action-link">Manage Lost & Found</Link>
         </div>
       </div>

@@ -1,28 +1,23 @@
 .user-management-container {
+    padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 25px;
 }
 
-.table-header {
+.user-actions {
+    margin-bottom: 1.5rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.table-header h3 {
-    margin: 0;
+    justify-content: flex-end;
 }
 
 .add-user-btn {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
     cursor: pointer;
+    font-weight: 600;
     transition: background-color 0.2s;
 }
 
@@ -30,64 +25,90 @@
     background-color: var(--primary-color-dark);
 }
 
+.add-user-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.add-user-form input,
+.add-user-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.add-user-form .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.add-user-form button {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    border: none;
+}
+
+.add-user-form button[type="submit"] {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.add-user-form button[type="button"] {
+    background-color: var(--secondary-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
 .user-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 1rem;
 }
 
-.user-table th, .user-table td {
-    padding: 12px 15px;
+.user-table th,
+.user-table td {
+    padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
 
 .user-table th {
-    background-color: var(--subtle-bg);
-    font-weight: bold;
+    background-color: var(--secondary-bg-color);
 }
 
-.user-table tbody tr:hover {
-    background-color: var(--hover-bg);
+.user-table input,
+.user-table select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-color);
 }
 
 .role-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 1rem;
     font-size: 0.8rem;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: capitalize;
 }
 
-.role-badge.admin {
-    background-color: rgba(220, 53, 69, 0.2);
-    color: var(--error-color);
+.role-admin {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
 }
 
-.role-badge.student {
-    background-color: rgba(66, 153, 225, 0.2);
-    color: var(--info-color);
-}
-
-.action-cell {
-    display: flex;
-    gap: 10px;
-}
-
-.action-cell button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: bold;
-    transition: background-color 0.2s;
-    color: white;
-}
-
-.edit-btn {
-    background-color: var(--info-color);
-}
-
-.delete-btn {
-    background-color: var(--error-color);
+.role-student {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
 }
