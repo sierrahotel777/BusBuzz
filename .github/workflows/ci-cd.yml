@@ -47,6 +47,8 @@ jobs:
       with:
         app-name: ${{ secrets.AZURE_WEBAPP_NAME }} # Using AZURE_WEBAPP_NAME secret
         images: ${{ secrets.ACR_LOGIN_SERVER }}/busbuzz-backend:${{ github.sha }}
+      env:
+          AZURE_WEBAPP_NAME: 'busbuzz-api-live-wus2'
 
   # ----------------------------------------------------------------------
   # 2. FRONTEND DEPLOYMENT (SWA) - Runs After Backend
@@ -93,5 +95,4 @@ jobs:
           app_location: "/frontend"   
           api_location: ""            
           output_location: "build"
-        env:
-          AZURE_WEBAPP_NAME: 'busbuzz-api-live-wus2'
+        
