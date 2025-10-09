@@ -1,0 +1,4 @@
+routeName,stops,assignedBuses
+S5,"Main St,Oak Ave,Elm St,Pine St",B101,B102
+N2,"Central Ave,North Blvd,West End",B201
+E1,"Eastwood Dr,Sunrise Blvd",B301

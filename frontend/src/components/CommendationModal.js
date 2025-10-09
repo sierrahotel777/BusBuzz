@@ -10,8 +10,7 @@ function CommendationModal({ isOpen, onClose, setCommendations }) {
     const [selectedRoute, setSelectedRoute] = useState('');
     const [selectedPraise, setSelectedPraise] = useState('');
     const [message, setMessage] = useState('');
-    const { showNotification } = useNotification();
-    const { awardPoints } = useAuth();
+    const { showNotification } = useNotification();;
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -29,7 +28,6 @@ function CommendationModal({ isOpen, onClose, setCommendations }) {
         };
 
         setCommendations(prev => [newCommendation, ...prev]);
-        awardPoints(10);
         showNotification("Thank you for your positive feedback!");
         onClose();
     };
@@ -68,7 +66,7 @@ function CommendationModal({ isOpen, onClose, setCommendations }) {
                         <label htmlFor="message">Add an optional message</label>
                         <textarea id="message" rows="3" placeholder="e.g., The driver was very helpful today." value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
                     </div>
-                    <div className="modal-actions">
+                    <div className="form-actions">
                         <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
                         <button type="submit" className="btn-save">Submit Praise</button>
                     </div>

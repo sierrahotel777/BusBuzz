@@ -66,7 +66,9 @@ function HelpAndSupport() {
                     <div key={index} className="faq-item">
                         <div className="faq-question" onClick={() => toggleFAQ(index)}>
                             <span>{faq.question}</span>
-                            <span className={`faq-icon ${openIndex === index ? 'open' : ''}`}>+</span>
+                            <span className={`faq-icon ${openIndex === index ? 'open' : ''}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                            </span>
                         </div>
                         <div className={`faq-answer ${openIndex === index ? 'open' : ''}`}>
                             <p>{faq.answer}</p>

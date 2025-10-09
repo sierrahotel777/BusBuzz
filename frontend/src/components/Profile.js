@@ -80,18 +80,23 @@ function Profile() {
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <div className="profile-avatar">
-          <img src={`https://i.pravatar.cc/150?u=${user.email}`} alt="User Avatar" />
-          {isEditing && (
-            <div className="avatar-upload">
-              <label htmlFor="avatar-input">Change</label>
-              <input id="avatar-input" type="file" accept="image/*" />
-            </div>
-          )}
+        <div className="profile-header">
+          <div className="profile-avatar">
+            <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=007bff,1abc9c,3498db,9b59b6,e74c3c&backgroundType=gradientLinear`} alt="User Avatar" />
+            {isEditing && (
+              <div className="avatar-upload">
+                <label htmlFor="avatar-input">Change</label> {/* Avatar upload is a mock-up */}
+                <input id="avatar-input" type="file" accept="image/*" disabled />
+              </div>
+            )}
+          </div>
+          <div className="profile-title">
+            <h2>My Profile</h2>
+            <p>View and manage your personal information and preferences.</p>
+          </div>
         </div>
-        <h2>My Profile</h2>
         <div className="profile-details">
-          <div className="profile-field">
+          <div className="profile-field half-width">
             <label>Name</label>
             {isEditing ? (
               <input
@@ -101,20 +106,20 @@ function Profile() {
                 onChange={handleChange}
               />
             ) : (
-              <p>{profileData.name}</p>
+              <p>{profileData.name || user.name}</p>
             )}
           </div>
-          <div className="profile-field">
+          <div className="profile-field half-width">
             <label>College Email</label>
             {/* Email is often a unique ID and not editable */}
             <p>{profileData.email}</p>
           </div>
-          <div className="profile-field">
+          <div className="profile-field half-width">
             <label>College ID</label>
             {/* College ID should not be editable */}
-            <p>{profileData.collegeId}</p>
+            <p>{profileData.collegeId || user.collegeId}</p>
           </div>
-          <div className="profile-field">
+          <div className="profile-field half-width">
             <label>Role</label>
             {/* Role is typically not user-editable */}
             <p>{profileData.role}</p>
@@ -127,10 +132,10 @@ function Profile() {
                 {routeNames.map(route => <option key={route} value={route}>{route}</option>)}
               </select>
             ) : (
-              <p>{profileData.busRoute || 'Not Assigned'}</p>
+              <p>{profileData.busRoute || user.busRoute || 'Not Assigned'}</p>
             )}
           </div>
-          <div className="profile-field">
+          <div className="profile-field full-width">
             <label>Favorite Bus Stop</label>
             {isEditing ? (
               <select name="favoriteStop" value={profileData.favoriteStop} onChange={handleChange} disabled={!profileData.busRoute}>
@@ -140,17 +145,10 @@ function Profile() {
                 ))}
               </select>
             ) : (
-              <p>{profileData.favoriteStop || 'Not Set'}</p>
+              <p>{profileData.favoriteStop || user.favoriteStop || 'Not Set'}</p>
             )}
           </div>
-          <div className="profile-field">
-            <label>Community Points</label>
-            <p className="points-field">
-              <span className="points-icon">⭐</span>
-              {user.points || 0} Points
-            </p>
-          </div>
-          <div className="profile-field">
+          <div className="profile-field half-width">
             <label>Last Active</label>
             <p className="status-field">
               <span className="status-indicator active"></span>{formatTimeAgo(user.lastActive)}
@@ -164,7 +162,7 @@ function Profile() {
               <button onClick={handleCancelClick} className="cancel-btn">Cancel</button>
             </>
           ) : (
-            <button onClick={handleEditClick}>Edit Profile</button>
+            <button onClick={handleEditClick} className="edit-btn">Edit Profile</button>
           )}
         </div>
       </div>

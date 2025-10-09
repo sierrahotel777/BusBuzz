@@ -4,7 +4,7 @@ import { useNotification } from './NotificationContext';
 import './LostAndFound.css';
 
 function LostAndFound({ items, setItems }) {
-    const { user, awardPoints } = useAuth();
+    const { user } = useAuth();
     const { showNotification } = useNotification();
     const [formData, setFormData] = useState({ type: 'lost', item: '', route: '', description: '' });
     const [lostSearchTerm, setLostSearchTerm] = useState('');
@@ -52,9 +52,6 @@ function LostAndFound({ items, setItems }) {
         };
 
         setItems(prev => [newItem, ...prev]);
-        if (newItem.type === 'found') {
-            awardPoints(20);
-        }
         showNotification(`Your ${formData.type} item report has been posted!`);
         setFormData({ type: 'lost', item: '', route: '', description: '' }); // Reset form
     };

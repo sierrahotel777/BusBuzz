@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useMemo } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./Form.css";
+import "./Feedback.css";
 import { useNotification } from "./NotificationContext";
 
-function Feedback({ setFeedbackData }) {
+function Feedback({ feedbackData, setFeedbackData }) {
   const [route, setRoute] = useState("");
   const [busNo, setBusNo] = useState("");
   const [driverBehavior, setDriverBehavior] = useState("");
@@ -17,6 +18,11 @@ function Feedback({ setFeedbackData }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showNotification } = useNotification();
+
+  const myFeedback = useMemo(() =>
+    (feedbackData || []).filter(fb => fb.user === user.name)
+      .sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)),
+    [feedbackData, user.name]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,10 +84,15 @@ function Feedback({ setFeedbackData }) {
   };
 
   return (
-    <div className="form-container">
-      <h2>Submit Feedback</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
+    <>
+    <div className="feedback-page-container">
+      <div className="dashboard-header">
+        <h2>Submit Feedback</h2>
+        <p>Report an issue or share your experience with us.</p>
+      </div>
+      <div className="form-container">
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
           <label htmlFor="route">Route Number</label>
           <input
             id="route"
@@ -91,8 +102,8 @@ function Feedback({ setFeedbackData }) {
             onChange={(e) => setRoute(e.target.value)}
             required
           />
-        </div>
-        <div className="form-group">
+          </div>
+          <div className="form-group">
           <label htmlFor="busNo">Bus Number</label>
           <input
             id="busNo"
@@ -102,9 +113,9 @@ function Feedback({ setFeedbackData }) {
             onChange={(e) => setBusNo(e.target.value)}
             required
           />
-        </div>
+          </div>
 
-        <div className="form-group">
+          <div className="form-group">
           <label htmlFor="issueCategory">Primary Issue Category</label>
           <select id="issueCategory" value={issueCategory} onChange={(e) => setIssueCategory(e.target.value)} required>
             <option value="" disabled>Select a category</option>
@@ -116,10 +127,10 @@ function Feedback({ setFeedbackData }) {
             <option value="Safety Concern">Safety Concern</option>
             <option value="Other">Other</option>
           </select>
-        </div>
+          </div>
 
-        <fieldset className="rating-group">
-          <legend>Rate Your Experience</legend>
+          <fieldset className="rating-group">
+            <legend>Rate Your Experience</legend>
           <div className="form-group">
             <label>Driver Behavior</label>
             <select value={driverBehavior} onChange={(e) => setDriverBehavior(e.target.value)} required>
@@ -149,10 +160,10 @@ function Feedback({ setFeedbackData }) {
               <option value="Dirty">Dirty</option>
             </select>
           </div>
-        </fieldset>
+          </fieldset>
 
-        <div className="form-group">
-          <label htmlFor="comments">Additional Comments</label>
+          <div className="form-group">
+            <label htmlFor="comments">Additional Comments</label>
           <textarea
             id="comments"
             rows="4"
@@ -160,23 +171,56 @@ function Feedback({ setFeedbackData }) {
             value={comments}
             onChange={(e) => setComments(e.target.value)}
           ></textarea>
-        </div>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="attachment">Attach Photo/Video</label>
+          <div className="form-group">
+            <label htmlFor="attachment">Attach Photo/Video</label>
           <div className="file-input-wrapper">
             <input type="file" id="attachment" name="attachment" onChange={handleFileChange} accept="image/*,video/*" required />
             <span className="file-input-label">
               {attachmentName || 'Choose a file...'}
             </span>
           </div>
-        </div>
+          </div>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-        </button>
-      </form>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+          </button>
+        </form>
+      </div>
     </div>
+    <div className="feedback-history-container">
+        <div className="dashboard-card full-width-card">
+            <h3>My Feedback History</h3>
+            {myFeedback.length > 0 ? (
+            <table className="feedback-table">
+                <thead>
+                <tr>
+                    <th>Submitted On</th>
+                    <th>Route</th>
+                    <th>Issue</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {myFeedback.map(fb => (
+                    <tr key={fb.id} className="clickable-row" onClick={() => navigate(`/feedback/${fb.id}`)}>
+                    <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
+                    <td data-label="Route">{fb.route}</td>
+                    <td data-label="Issue">{fb.issue}</td>
+                    <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
+                    <td data-label="Action"><Link to={`/feedback/${fb.id}`}>View</Link></td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+            ) : (
+            <p>You have not submitted any feedback yet.</p>
+            )}
+        </div>
+    </div>
+    </>
   );
 }
 

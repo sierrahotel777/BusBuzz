@@ -445,6 +445,10 @@
   background-color: rgba(227, 76, 60, 0.1);
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
 /* Stat Card Icons */
 .stat-icon {
   margin-right: 8px;

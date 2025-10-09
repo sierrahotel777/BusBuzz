@@ -7,7 +7,7 @@ import CommendationModal from './CommendationModal';
 import { routeData, routeNames } from './routeData';
 
 function StudentDashboard({ feedbackData, announcements, setCommendations, lostAndFoundItems, crowdednessData, setCrowdednessData, users }) {
-  const { user, awardPoints } = useAuth();
+  const { user } = useAuth();
   const { showNotification } = useNotification();
   // Filter to get only this student's feedback
   const myFeedback = (feedbackData || []).filter(fb => fb.user === user.name);
@@ -22,6 +22,11 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const initialStop = user.favoriteStop && stopsForInitialRoute[user.favoriteStop]
     ? user.favoriteStop
     : Object.keys(stopsForInitialRoute)[0];
+
+  const myLostAndFoundItems = useMemo(() => 
+    (lostAndFoundItems || []).filter(item => item.user === user.name)
+      .sort((a, b) => new Date(b.date) - new Date(a.date)),
+    [lostAndFoundItems, user.name]);
 
   const [selectedRoute, setSelectedRoute] = useState(initialRoute);
   const [selectedStop, setSelectedStop] = useState(initialStop);
@@ -56,7 +61,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     // To keep the demo simple, we'll just add the new report.
     // A real implementation would likely replace old reports from the same user.
     setCrowdednessData(prev => [newReport, ...prev]);
-    awardPoints(5);
     showNotification(`Thank you for reporting the bus status as "${level}"!`, 'info');
   };
 
@@ -68,7 +72,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     };
     // In a real app, this would be sent to a backend.
     setCrowdednessData(prev => [newReport, ...prev]);
-    awardPoints(5);
     showNotification(`Overcrowding reported for route ${selectedRoute}. Thank you for helping!`, 'info');
   };
 
@@ -127,13 +130,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     { icon: '📊', title: 'New Feedback Categories', description: 'Submitting feedback is now more detailed with new categories to choose from.' },
   ];
 
-  const topContributors = useMemo(() => {
-    return [...(users || [])]
-      .filter(u => u.role === 'student')
-      .sort((a, b) => (b.points || 0) - (a.points || 0))
-      .slice(0, 3);
-  }, [users]);
-
   return (
     <div className="dashboard-grid">
       <div className="dashboard-header">
@@ -165,6 +161,34 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
           </table>
         ) : (
           <p>You have not submitted any feedback yet.</p>
+        )}
+      </div>
+
+      <div className="dashboard-card full-width-card">
+        <h3>My Lost & Found Reports</h3>
+        {myLostAndFoundItems.length > 0 ? (
+          <table className="feedback-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myLostAndFoundItems.map(item => (
+                <tr key={item.id}>
+                  <td data-label="Date">{new Date(item.date).toLocaleDateString()}</td>
+                  <td data-label="Item">{item.item}</td>
+                  <td data-label="Type"><span className={`status ${item.type}`}>{item.type}</span></td>
+                  <td data-label="Status">{item.status ? <span className={`status ${item.status}`}>{item.status}</span> : 'N/A'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>You have not reported any lost or found items.</p>
         )}
       </div>
 
@@ -238,23 +262,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="dashboard-card">
-        <h3>⭐ Top Community Contributors</h3>
-        {topContributors.length > 0 ? (
-          <ul className="leaderboard-list">
-            {topContributors.map((contributor, index) => (
-              <li key={contributor.id}>
-                <span className="leaderboard-rank">{index + 1}</span>
-                <span className="leaderboard-route">{contributor.name}</span>
-                <span className="leaderboard-count">{contributor.points || 0} pts</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Be the first to contribute!</p>
-        )}
       </div>
 
       <div className="dashboard-card">

@@ -1,0 +1,169 @@
+.bus-management-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bus-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.import-csv-btn, .download-template-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.import-csv-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.import-csv-btn:hover {
+    background-color: var(--primary-color-hover);
+}
+
+.download-template-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.download-template-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+body[data-theme='dark'] .download-template-btn {
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-color);
+}
+
+body[data-theme='dark'] .download-template-btn:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.import-csv-btn svg, .download-template-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.bus-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bus-table th, .bus-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body[data-theme='dark'] .bus-table th,
+body[data-theme='dark'] .bus-table td {
+    border-bottom-color: var(--dark-border-color);
+}
+
+.bus-table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-color-secondary);
+}
+
+body[data-theme='dark'] .bus-table th {
+    color: var(--dark-text-color-secondary);
+}
+
+.bus-table input, .bus-table select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+body[data-theme='dark'] .bus-table input,
+body[data-theme='dark'] .bus-table select {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-color);
+}
+
+.status-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.status-on-route { background-color: var(--success-bg); color: var(--success-text); }
+.status-idle { background-color: rgba(254, 193, 15, 0.2); color: #b4880b; }
+.status-maintenance { background-color: var(--error-bg); color: var(--error-text); }
+```
+
+### 5. Update `AdminDashboard.js`
+
+I'll add a new "System Management" card to provide easy navigation to the new Bus Management page and other admin sections.
+
+```diff
+--- a/c:\Users\RUTHWIK V\Desktop\BusBuzz\frontend\src\components\AdminDashboard.js
++++ b/c:\Users\RUTHWIK V\Desktop\BusBuzz\frontend\src\components\AdminDashboard.js
+@@ -302,6 +302,16 @@
+         </div>
+       </div>
+ 
++      <div className="dashboard-card">
++        <h3>System Management</h3>
++        <div className="quick-actions">
++            <Link to="/admin/bus-details" className="action-link">Manage Buses</Link>
++            <Link to="/admin/user-management" className="action-link">Manage Users</Link>
++            <Link to="/admin/analytics" className="action-link">View Analytics</Link>
++        </div>
++      </div>
++
+       <div className="dashboard-card full-width-card">
+         <h3>Feedback Overview</h3>
+         <div className="chart-controls">
+```
+
+### 6. Update `Navbar.js`
+
+Let's add a direct link to the "Bus Management" page in the navbar for admins.
+
+```diff
+--- a/c:\Users\RUTHWIK V\Desktop\BusBuzz\frontend\src\components\Navbar.js
++++ b/c:\Users\RUTHWIK V\Desktop\BusBuzz\frontend\src\components\Navbar.js
+@@ -66,6 +66,9 @@
+                                 <NavLink to="/admin/user-management" className="nav-link" onClick={closeMenu}>
+                                     User Management
+                                 </NavLink>
++                            </li>
++                            <li className="nav-item">
++                                <NavLink to="/admin/bus-details" className="nav-link" onClick={closeMenu}>Bus Management</NavLink>
+                             </li>
+                             <li className="nav-item">
+                                 <NavLink to="/admin/analytics" className="nav-link" onClick={closeMenu}>
+```
+
+This completes the implementation of your new Bus Fleet Management page. You can now manage bus details, assign drivers, and import data from a CSV file, all from a dedicated and professional-looking interface.
+
+<!--
+[PROMPT_SUGGESTION]Add a search bar to the bus management table.[/PROMPT_SUGGESTION]
+[PROMPT_SUGGESTION]Can you make the tables on the admin pages sortable?[/PROMPT_SUGGESTION]
+-->

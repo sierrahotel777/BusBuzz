@@ -61,14 +61,31 @@ export const AuthProvider = ({ children }) => {
     }, [user]); // Re-run when user object changes
 
     const login = (email, password) => {
-        return loginUser(email, password)
-            .then(data => {
-                setUser({ ...data.user, lastActive: new Date().toISOString() });
-                return data.user;
-            })
-            .catch(error => {
-                throw error;
-            });
+        return new Promise((resolve, reject) => {
+            setTimeout(() => { // Simulate network delay
+                if (email === 'admin@test.com' && password === 'password') {
+                    const user = {
+                        id: 'dummy-admin-01',
+                        name: 'Admin User',
+                        email: 'admin@test.com',
+                        role: 'admin',
+                    };
+                    setUser({ ...user, lastActive: new Date().toISOString() });
+                    resolve(user);
+                } else if (email === 'student@test.com' && password === 'password') {
+                    const user = {
+                        id: 'dummy-student-01',
+                        name: 'Student User',
+                        email: 'student@test.com',
+                        role: 'student',
+                    };
+                    setUser({ ...user, lastActive: new Date().toISOString() });
+                    resolve(user);
+                } else {
+                    reject(new Error('Invalid credentials. Please use dummy accounts.'));
+                }
+            }, 500);
+        });
     };
 
     const logout = () => {

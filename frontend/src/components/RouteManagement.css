@@ -1,0 +1,144 @@
+.route-management-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.route-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.import-csv-btn, .download-template-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.import-csv-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.import-csv-btn:hover {
+    background-color: var(--primary-color-hover);
+}
+
+.download-template-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.download-template-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+body[data-theme='dark'] .download-template-btn {
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-color);
+}
+
+body[data-theme='dark'] .download-template-btn:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.import-csv-btn svg, .download-template-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.route-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.route-table th, .route-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body[data-theme='dark'] .route-table th,
+body[data-theme='dark'] .route-table td {
+    border-bottom-color: var(--dark-border-color);
+}
+
+.route-table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-color-secondary);
+}
+
+body[data-theme='dark'] .route-table th {
+    color: var(--dark-text-color-secondary);
+}
+
+.route-table input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+/* Bus Assignment Dropdown */
+.bus-assignment-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    text-align: left;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--glass-shadow);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.bus-assignment-dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu label {
+    display: block;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-menu label:hover {
+    background-color: var(--hover-bg);
+}
+
+.dropdown-menu input {
+    margin-right: 8px;
+}

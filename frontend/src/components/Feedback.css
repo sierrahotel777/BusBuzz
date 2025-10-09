@@ -1,0 +1,13 @@
+.feedback-page-container {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.feedback-history-container {
+    margin-top: 2rem;
+}
+
+.feedback-history-container .dashboard-card {
+    padding: 2rem;
+}

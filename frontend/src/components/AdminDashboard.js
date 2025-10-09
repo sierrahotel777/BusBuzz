@@ -6,7 +6,7 @@ import { useNotification } from "./NotificationContext";
 import FeedbackChart from "./FeedbackChart";
 import CountUp from "./CountUp";
 
-function AdminDashboard({ feedbackData, announcements, setAnnouncements, commendations, lostAndFoundItems, setLostAndFoundItems }) {
+function AdminDashboard({ feedbackData, announcements, setAnnouncements, commendations }) {
   const [newAnnouncement, setNewAnnouncement] = useState("");
   const [editingAnnId, setEditingAnnId] = useState(null);
   const [editingAnnText, setEditingAnnText] = useState("");
@@ -14,8 +14,6 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   const [announcementToDelete, setAnnouncementToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // You can adjust this number
-  const [sortConfig, setSortConfig] = useState({ key: 'submittedOn', direction: 'descending' });
-  const [searchTerm, setSearchTerm] = useState("");
   const [chartRouteFilter, setChartRouteFilter] = useState('All');
   const { showNotification } = useNotification();
 
@@ -48,101 +46,8 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
           .slice(0, 5); // Top 5
   }, [commendationCounts]);
 
-  // --- Search/Filter Logic ---
-  const filteredFeedback = useMemo(() => {
-    if (!searchTerm) {
-      return feedbackData;
-    }
-    const lowercasedTerm = searchTerm.toLowerCase();
-    return feedbackData.filter(item =>
-      Object.values(item).some(val =>
-        String(val).toLowerCase().includes(lowercasedTerm)
-      )
-    );
-  }, [feedbackData, searchTerm]);
-
-  // --- Sorting Logic (now uses filtered data) ---
-  const sortedFeedback = useMemo(() => {
-    let sortableItems = [...filteredFeedback];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableItems;
-  }, [filteredFeedback, sortConfig]);
-
-  // --- Pagination Logic (now uses sorted data) ---
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentFeedback = sortedFeedback.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedFeedback.length / itemsPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on new search
-  };
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-    setCurrentPage(1); // Reset to the first page when sorting changes
-  };
-
-  // Bonus Feature: Handle clicks on chart segments to filter the table
-  const handleChartSegmentClick = (category) => {
-    setSearchTerm(category);
-    showNotification(`Filtering table for category: "${category}"`, 'info');
-  };
-
   // Get unique routes for the filter dropdown
   const uniqueRoutes = useMemo(() => ['All', ...new Set(feedbackData.map(fb => fb.route))], [feedbackData]);
-
-  const handleMarkAsClaimed = (itemId) => {
-    setLostAndFoundItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId ? { ...item, status: 'claimed' } : item
-      )
-    );
-    showNotification("Item status updated to 'Claimed'.");
-  };
-
-  const handleExport = () => {
-    const headers = ["ID", "User", "College ID", "Route", "Bus No", "Issue", "Status", "Submitted On", "Comments"];
-    const rows = sortedFeedback.map(fb => [
-      fb.id,
-      `"${fb.user}"`,
-      `"${fb.collegeId}"`,
-      `"${fb.route}"`,
-      `"${fb.busNo}"`,
-      `"${fb.issue}"`,
-      `"${fb.status}"`,
-      `"${new Date(fb.submittedOn).toLocaleString()}"`,
-      `"${fb.comments.replace(/"/g, '""')}"` // Handle quotes in comments
-    ].join(','));
-
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "feedback_export.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   const handlePostAnnouncement = () => {
     if (newAnnouncement.trim() === "") return; // Prevent empty posts
@@ -226,37 +131,17 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
             {uniqueRoutes.map(route => <option key={route} value={route}>{route}</option>)}
           </select>
         </div>
-        <FeedbackChart feedbackData={chartFilteredData} onSegmentClick={handleChartSegmentClick} />
+        <FeedbackChart feedbackData={chartFilteredData} />
       </div>
 
       <div className="dashboard-card full-width-card">
-        <h3>Manage Found Items</h3>
-        <table className="feedback-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Route</th>
-              <th>Posted On</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(lostAndFoundItems || []).filter(i => i.type === 'found').map(item => (
-              <tr key={item.id}>
-                <td data-label="Item">{item.item}</td>
-                <td data-label="Route">{item.route}</td>
-                <td data-label="Posted On">{new Date(item.date).toLocaleDateString()}</td>
-                <td data-label="Status"><span className={`status ${item.status}`}>{item.status}</span></td>
-                <td data-label="Action">
-                  {item.status === 'unclaimed' && (
-                    <button onClick={() => handleMarkAsClaimed(item.id)} className="claim-btn">Mark as Claimed</button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <h3>System Management</h3>
+        <div className="quick-actions">
+            <Link to="/admin/bus-details" className="action-link">Manage Buses</Link>
+            <Link to="/admin/route-details" className="action-link">Manage Routes</Link>
+            <Link to="/admin/feedback" className="action-link">Manage Feedback</Link>
+            <Link to="/admin/lost-and-found" className="action-link">Manage Lost & Found</Link>
+        </div>
       </div>
 
       <div className="dashboard-card">
@@ -323,62 +208,6 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
         </ul>
       </div>
 
-      <div className="dashboard-card full-width-card">
-        <h3>Recent Feedback Submissions</h3>
-        <div className="table-controls">
-          <button onClick={handleExport} className="export-btn">
-            Export to CSV
-          </button>
-          <input
-            type="text"
-            placeholder="Search feedback..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="search-input"
-          />
-        </div>
-        <table className="feedback-table">
-          <thead>
-            <tr>
-              <th onClick={() => requestSort('user')} className="sortable-header">
-                User {sortConfig.key === 'user' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
-              </th>
-              <th onClick={() => requestSort('route')} className="sortable-header">
-                Route {sortConfig.key === 'route' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
-              </th>
-              <th onClick={() => requestSort('issue')} className="sortable-header">
-                Issue Category {sortConfig.key === 'issue' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
-              </th>
-              <th onClick={() => requestSort('status')} className="sortable-header">
-                Status {sortConfig.key === 'status' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
-              </th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentFeedback.map(fb => (
-              <tr key={fb.id} className={fb.issue === 'Safety Concern' ? 'high-priority-row' : ''}>
-                <td data-label="User">{fb.user}</td>
-                <td data-label="Route">{fb.route}</td>
-                <td data-label="Issue Category">{fb.issue}</td>
-                <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
-                <td data-label="Action"><Link to={`/admin/feedback/${fb.id}`}>View</Link></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {totalPages > 1 && (
-          <div className="pagination-container">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-              &laquo; Previous
-            </button>
-            <span>Page {currentPage} of {totalPages}</span>
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-              Next &raquo;
-            </button>
-          </div>
-        )}
-      </div>
       <ConfirmationModal
         show={showDeleteModal}
         onClose={closeDeleteModal}

@@ -176,6 +176,32 @@
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
+/* Status Badges for Admin Table */
+.status-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.status-lost, .status-reported {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+}
+
+.status-found, .status-unclaimed {
+    background-color: rgba(254, 193, 15, 0.2);
+    color: #b4880b;
+}
+
+.status-claimed {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+
+
 @media (max-width: 600px) {
     .form-group-inline {
         flex-direction: column;
