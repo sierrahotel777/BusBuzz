@@ -2,7 +2,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const feedbackRoutes = require('./routes/feedback'); // Assuming you will create this
 const { connectToDatabase } = require('./db/mongo');
 const authRoutes = require('./routes/auth');
 
@@ -20,7 +19,6 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/feedback', feedbackRoutes); // Example for feedback routes
 
 // Start the server only after the database connection is successful
 async function startServer() {
