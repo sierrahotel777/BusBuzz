@@ -93,3 +93,5 @@ jobs:
           app_location: "/frontend"   
           api_location: ""            
           output_location: "build"
+        env:
+          AZURE_WEBAPP_NAME: 'busbuzz-api-live-wus2'
