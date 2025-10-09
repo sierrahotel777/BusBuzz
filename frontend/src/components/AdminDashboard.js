@@ -12,8 +12,6 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   const [editingAnnText, setEditingAnnText] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // You can adjust this number
   const [chartRouteFilter, setChartRouteFilter] = useState('All');
   const { showNotification } = useNotification();
 
