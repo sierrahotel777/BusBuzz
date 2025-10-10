@@ -39,7 +39,7 @@ jobs:
       with:
         context: ./backend
         push: true
-        tags: ${{ secrets.ACR_LOGIN_SERVER }}/busbuzz-backend:${{ github.sha }}
+        tags: ${{ secrets.ACR_LOGIN_SERVER }}/busbuzz-backend:${{ github.sha }} # The tag for the Docker image
         file: ./backend/Dockerfile
         
     - name: 'Configure App Service (Web App) to use new image'
