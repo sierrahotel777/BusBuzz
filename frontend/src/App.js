@@ -25,7 +25,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import FeedbackManagement from "./components/FeedbackManagement";
 import BusManagement from "./components/BusManagement";
-import { getBuses, getFeedback } from "./services/api";
+require('dotenv').config();
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 import "./App.css";
 
 
@@ -54,25 +55,18 @@ const AppContent = () => {
   const { user, users, isLoading, isExiting } = useAuth();
   
   useEffect(() => {
-    const fetchData = async () => {
-      if (user?.token) {
-        try {
-          // Fetch both in parallel for efficiency
-          const [feedbackRes, busesRes] = await Promise.all([
-            getFeedback(user.token),
-            getBuses(user.token)
-          ]);
-          setFeedbackData(feedbackRes);
-          setBusData(busesRes);
-        } catch (error) {
-          console.error("Failed to fetch initial data:", error);
-          // Optionally show a notification to the user
-        }
+    const fetchFeedback = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/feedback');
+        const data = await response.json();
+        setFeedbackData(data);
+      } catch (error) {
+        console.error("Failed to fetch feedback:", error);
       }
     };
 
-    fetchData();
-  }, [user]); // Re-run when the user logs in
+    fetchFeedback();
+  }, []);
   
   // We don't want to show the Navbar on the Login or Signup pages
   const noNavbarRoutes = ['/', '/forgot-password', '/reset-password'];
