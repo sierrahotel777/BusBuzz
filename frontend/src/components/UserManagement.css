@@ -1,55 +1,43 @@
-.table-actions-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.table-search-and-add {
+.user-management-actions {
     display: flex;
     gap: 1rem;
-    align-items: center;
 }
 
-.table-search-and-add .search-input {
-    width: auto;
-    flex-grow: 1;
-    max-width: 400px;
-    min-width: 250px;
-}
-
-.role-cell {
-    text-transform: capitalize;
-}
-
-.action-cell {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.edit-btn, .delete-btn {
-    padding: 0.4rem 0.8rem;
+.add-new-btn {
+    background-color: var(--primary-color);
+    color: white;
     border: none;
-    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: 500;
-    color: #fff;
+    transition: background-color 0.2s;
 }
 
-.edit-btn {
-    background-color: var(--secondary-color);
+.add-new-btn:hover {
+    background-color: var(--primary-color-dark);
 }
 
-.delete-btn {
-    background-color: var(--error-text);
+.status-badge.status-admin {
+    background-color: var(--secondary-color-light);
+    color: var(--secondary-color-dark);
+    border: 1px solid var(--secondary-color);
 }
 
-.edit-btn:hover { background-color: var(--secondary-color-dark); }
-.delete-btn:hover { background-color: #c82333; }
+.status-badge.status-student {
+    background-color: var(--info-bg);
+    color: var(--info-text);
+    border: 1px solid var(--info-border);
+}
 
-.status-badge.active { background-color: var(--success-bg); color: var(--success-text); }
-.status-badge.inactive { background-color: var(--warning-bg); color: var(--warning-text); }
-.status-badge.suspended { background-color: var(--error-bg); color: var(--error-text); }
+.status-badge.status-active {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.status-badge.status-inactive {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+}

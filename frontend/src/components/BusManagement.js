@@ -92,9 +92,9 @@ function BusManagement({ busData, setBusData, users }) {
     const drivers = users.filter(u => u.role === 'driver').map(d => d.name);
 
     return (
-        <div className="admin-page-container">
+        <div className="dashboard-grid"> {/* Use dashboard-grid for consistent padding and layout */}
             <div className="dashboard-header">
-                <h2>Bus Fleet Management</h2>
+                <h2>Bus Management</h2>
                 <p>View, edit, and import bus details for the entire fleet.</p>
             </div>
 

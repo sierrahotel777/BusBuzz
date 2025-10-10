@@ -36,15 +36,15 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     async function fetchFeedback() {
       setIsLoadingFeedback(true);
       try {
-        const feedbacks = await getMyFeedback(user.id);
+        const feedbacks = await getMyFeedback(user.id); // Pass user.id for query param
         setMyFeedback(feedbacks);
       } catch (error) {
         showNotification(error.message || "Failed to load feedback.", "error");
       }
       setIsLoadingFeedback(false);
     }
-    if (user?.id) fetchFeedback();
-  }, [user?.id, showNotification]);
+    if (user?.id) fetchFeedback(); // Only fetch if user.id is available
+  }, [user?.id, showNotification]); // Depend on user.id
   const [selectedStop, setSelectedStop] = useState(initialStop);
   const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
   const [notificationSent, setNotificationSent] = useState(false);

@@ -26,10 +26,9 @@ function Feedback({ setFeedbackData }) {
     const fetchMyFeedback = async () => {
       if (user?.token) {
         try {
-          const data = await getMyFeedback(user.token); // Pass token for auth
-          // Filter feedback to show only items submitted by the current user
-          const userFeedback = data.filter(fb => fb.userId === user.id);
-          setMyFeedback(userFeedback.sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)));
+          // Fetch user-specific feedback using userId as query param
+          const data = await getMyFeedback(user.id);
+          setMyFeedback(data.sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)));
         } catch (error) {
           showNotification("Failed to fetch your feedback history.", "error");
         }
@@ -37,7 +36,7 @@ function Feedback({ setFeedbackData }) {
       setIsLoading(false);
     };
     fetchMyFeedback();
-  }, [user, showNotification]);
+  }, [user?.id, showNotification]); // Depend on user.id
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,13 +63,15 @@ function Feedback({ setFeedbackData }) {
       userName: user.name,
     };
     try {
-      const data = await submitFeedback(newFeedback, user.token);
+      const data = await submitFeedback(newFeedback); // No token needed
 
       // Update the global state with the new feedback from the server response
       if (setFeedbackData) {
-        setFeedbackData(prevData => [data.feedback, ...prevData]);
+        // Ensure the new feedback object includes the _id from the server response
+        setFeedbackData(prevData => [{ ...data.feedback, _id: data.feedback._id }, ...prevData]);
       }
-      setMyFeedback(prev => [data.feedback, ...prev]);
+      // Also update the local state for the feedback history on this page
+      setMyFeedback(prev => [{ ...data.feedback, _id: data.feedback._id }, ...prev]);
 
       showNotification("Feedback submitted successfully!", "success");
       navigate('/student');

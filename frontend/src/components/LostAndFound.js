@@ -123,7 +123,7 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
 
     if (isAdminPage) {
         return (
-            <div className="admin-page-container">
+            <div className="dashboard-grid">
                 <div className="dashboard-header">
                     <h2>Manage Lost & Found</h2>
                     <p>Review, update, and manage all reported items.</p>
@@ -222,7 +222,7 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         </div>
     );
     return (
-        <div className="lost-found-container">
+        <div className="dashboard-grid">
             <div className="dashboard-header">
                 <h2>Lost & Found</h2>
                 <p>Report or find lost items on the bus.</p>

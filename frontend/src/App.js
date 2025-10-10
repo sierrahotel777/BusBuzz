@@ -84,17 +84,19 @@ const AppContent = () => {
   const { user, users, isLoading, isExiting } = useAuth();
   
   useEffect(() => {
-    const fetchFeedback = async () => {
+    const fetchAllFeedback = async () => {
+      console.log("App.js: Attempting to fetch all feedback for admin panel...");
       try {
+        // Fetch all feedback, as there's no role-based filtering on the frontend anymore
         const data = await getFeedback();
+        console.log("App.js: Fetched feedback data:", data);
         setFeedbackData(data);
-      } catch (error) {
-        console.error("Failed to fetch feedback:", error);
-      }
+        } catch (error) {
+          console.error("Failed to fetch feedback:", error);
+        }
     };
-
-    fetchFeedback();
-  }, []);
+    fetchAllFeedback();
+  }, []); // Fetch once on component mount, no user dependency needed for fetching all
   
   // We don't want to show the Navbar on the Login or Signup pages
   const noNavbarRoutes = ['/', '/forgot-password', '/reset-password'];
@@ -154,7 +156,7 @@ const AppContent = () => {
             element={<ProtectedRoute role="student"><Feedback setFeedbackData={setFeedbackData} /></ProtectedRoute>}
           />
           <Route 
-            path="/admin/feedback/:feedbackId" 
+            path="/admin/feedback/:feedbackId"
             element={<ProtectedRoute role="admin"><FeedbackDetail feedbackData={feedbackData} setFeedbackData={setFeedbackData} /></ProtectedRoute>} 
           />
         </Routes>

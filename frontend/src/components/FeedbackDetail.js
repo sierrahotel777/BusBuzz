@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom'; // useParams is CRITICAL
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext'; // Assuming this hook exists
-import { getFeedbackDetail } from '../services/api'; 
+import { getFeedbackById, updateFeedbackStatus } from '../services/api'; 
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
     // 1. Get the ID from the URL path, as defined in App.js route
-    const { id } = useParams(); // <-- Change from feedbackId to id
+    const { feedbackId } = useParams();
     const { user } = useAuth();
     const { showNotification } = useNotification();
     
@@ -19,14 +19,14 @@ function FeedbackDetail() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (!id || !user?.token) {
+        if (!feedbackId) { // No user token check needed if middleware is removed
             setIsLoading(false);
             return;
         }
         const fetchDetails = async () => {
             try {
                 setIsLoading(true);
-                const data = await getFeedbackDetail(id, user.token);
+                const data = await getFeedbackById(feedbackId); // No token needed
                 setFeedback({ ...data, id: data._id });
             } catch (error) {
                 showNotification(error.message || "Could not load feedback details.", 'error');
@@ -36,15 +36,13 @@ function FeedbackDetail() {
             }
         };
         fetchDetails();
-    }, [id, user, showNotification]);
+    }, [feedbackId, showNotification]); // No user dependency
 
     const handleStatusChange = async (newStatus) => {
-        if (!user || !user.token) return;
-
         setIsSubmitting(true);
         try {
             // Placeholder: Call the API service to update the status (similar to getFeedbackDetail)
-            // await updateFeedbackStatus(feedbackId, newStatus, internalNote, user.token); 
+            await updateFeedbackStatus(feedbackId, newStatus, internalNote); // No token needed
             
             showNotification(`Status updated to ${newStatus}. (Simulation)`, 'success');
             
@@ -53,7 +51,7 @@ function FeedbackDetail() {
                 ...prev, 
                 status: newStatus,
                 resolution: newStatus === 'Resolved' ? {
-                    resolvedBy: user.user.name, // Use user.user.name if stored that way
+                    resolvedBy: "Admin", // Hardcode or get from local storage if no auth
                     resolvedOn: new Date().toISOString(),
                     notes: internalNote || 'Issue marked as resolved.'
                 } : prev.resolution
@@ -88,7 +86,7 @@ function FeedbackDetail() {
     return (
         <div className="feedback-detail-container">
             <div className="feedback-detail-header">
-                <h2>Feedback Details (ID: {id})</h2>
+                <h2>Feedback Details (ID: {feedbackId})</h2>
                 <Link to="/admin/feedback-management" className="back-link">← Back to Management</Link>
             </div>
 

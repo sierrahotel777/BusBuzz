@@ -1,67 +1,63 @@
-// feedbackRoutes.js
 const express = require('express');
-const { getDb } = require('../db/mongo');
-const router = express.Router();
-const authMiddleware = require('../middleware/auth'); // <-- Add this line
-
 const { ObjectId } = require('mongodb');
+const { getDb } = require('../db/mongo');
+
+const router = express.Router();
+
+// A function to get the 'Feedback' collection from the database
 const getFeedbackCollection = () => getDb().collection('Feedback');
 
-// GET /api/auth/feedback?userId=xxx
-router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
-  const { userId } = req.query;
+// Get all feedback
+router.get('/', async (req, res) => {
   try {
-    const feedbacks = await Feedback.find(userId ? { userId } : {});
-    res.json(feedbacks);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch feedback.' });
+    const feedbackCollection = getFeedbackCollection();
+    const feedback = await feedbackCollection.find({}).sort({ submittedOn: -1 }).toArray();
+    // Map _id to id for frontend compatibility
+    const formattedFeedback = feedback.map(item => ({ ...item, id: item._id }));
+    res.status(200).json(formattedFeedback);
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    res.status(500).json({ message: 'An error occurred while fetching feedback.' });
   }
 });
 
-// GET /api/auth/feedback/:id
-router.get('/:feedbackId', authMiddleware(['admin', 'student', 'staff']), async (req, res) => {
-    const { feedbackId } = req.params;
-    
-    // Check if the ID is a valid MongoDB format
-    if (!ObjectId.isValid(feedbackId)) {
-        return res.status(400).json({ message: 'Invalid Feedback ID format.' });
-    }
-
-    try {
-        const feedbackCollection = getFeedbackCollection();
-        const { userId, role } = req.user; 
-
-        // Base query targets the specific document by its MongoDB _id
-        const query = { _id: new ObjectId(feedbackId) };
-
-        // ENFORCE SECURITY: If user is not an admin/staff, they must be the owner.
-        if (role !== 'admin' && role !== 'staff') {
-            query.userId = new ObjectId(userId);
-        }
-
-        const feedback = await feedbackCollection.findOne(query);
-
-        if (!feedback) {
-            return res.status(404).json({ message: 'Feedback item not found or unauthorized access.' });
-        }
-        
-        // Return the document
-        res.status(200).json(feedback);
-    } catch (err) {
-        console.error('Error fetching feedback detail:', err);
-        res.status(500).json({ message: 'Failed to fetch feedback due to a server error.' });
-    }
+// Submit new feedback
+router.post('/', async (req, res) => {
+  try {
+    const feedbackCollection = getFeedbackCollection();
+    const newFeedback = {
+      ...req.body,
+      submittedOn: new Date(),
+      status: 'Pending',
+    };
+    const result = await feedbackCollection.insertOne(newFeedback);
+    res.status(201).json({ message: 'Feedback submitted successfully!', feedback: { ...newFeedback, id: result.insertedId } });
+  } catch (error)
+  {
+    console.error('Error submitting feedback:', error);
+    res.status(500).json({ message: 'An error occurred while submitting feedback.' });
+  }
 });
 
+// Update feedback (for admin)
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status, resolution } = req.body;
 
-// POST /api/auth/feedback
-router.post('/', /*authMiddleware(['student']),*/ async (req, res) => {
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid feedback ID.' });
+  }
+
   try {
-    const feedback = new Feedback(req.body);
-    await feedback.save();
-    res.status(201).json(feedback);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to submit feedback.' });
+    const feedbackCollection = getFeedbackCollection();
+    const result = await feedbackCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status, resolution } });
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'Feedback not found.' });
+    }
+    res.status(200).json({ message: 'Feedback updated successfully.' });
+  } catch (error) {
+    console.error('Error updating feedback:', error);
+    res.status(500).json({ message: 'An error occurred while updating feedback.' });
   }
 });
 
