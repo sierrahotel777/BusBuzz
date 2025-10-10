@@ -43,16 +43,13 @@ function UserFormModal({ isOpen, onClose, user }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // The form modal's responsibility is to call the appropriate context function
-        // and then close itself. The context handles the state update.
         if (isEditing) {
             const dataToUpdate = { ...formData };
             // If password field is empty, don't update the password
             if (!dataToUpdate.password) {
                 delete dataToUpdate.password;
             }
-            // Pass the original user ID along with the updated form data
-            updateUser({ id: user.id, ...dataToUpdate });
+            updateUser({ ...user, ...dataToUpdate });
             showNotification('User updated successfully!');
         } else {
             addUser(formData);

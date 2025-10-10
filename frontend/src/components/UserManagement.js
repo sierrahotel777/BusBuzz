@@ -220,6 +220,7 @@ const UserManagement = () => {
             <UserFormModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
+                onSave={handleSaveUser}
                 user={currentUser}
             />
             <ConfirmationModal

@@ -118,12 +118,6 @@ export const AuthProvider = ({ children }) => {
         setUsers(currentUsers => currentUsers.filter(u => u.id !== userId));
     };
 
-    const addUser = (newUserData) => {
-        const newUser = { ...newUserData, id: `USR${Date.now()}`, status: 'active' }; // Add default status
-        setUsers(currentUsers => [newUser, ...currentUsers]);
-        // In a real app, you'd also have an API call here to add the user to the DB
-    };
-
     const awardPoints = (pointsToAward) => {
         if (user) {
             const updatedUser = { ...user, points: (user.points || 0) + pointsToAward };
@@ -133,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     };
 
 
-    const value = { user, users, login, logout, register, isLoading, isExiting, updateUser, deleteUser, addUser, awardPoints, refetchUsers: fetchUsers };
+    const value = { user, users, login, logout, register, isLoading, isExiting, updateUser, deleteUser, awardPoints, refetchUsers: fetchUsers };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

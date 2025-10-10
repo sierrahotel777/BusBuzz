@@ -54,33 +54,6 @@ export const getAllUsers = async () => {
 };
 
 /**
- * Deletes a bus by its ID.
- * @param {string} busId - The ID of the bus to delete.
- * @param {string} token - The user's JWT token for authorization.
- * @returns {Promise<Object>} A confirmation message.
- */
-export const deleteBus = async (busId, token) => {
-  try {
-    const response = await fetch(`${API_URL}/buses/${busId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Pass JWT for authorization
-      },
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || 'Failed to delete bus.');
-    }
-
-    return { message: 'Bus deleted successfully.' }; // Or parse JSON if backend returns it
-  } catch (error) {
-    console.error('API Error (Delete Bus):', error);
-    throw error;
-  }
-};
-
-/**
  * Triggers a download of all users as a CSV file.
  */
 export const exportUsers = async () => {

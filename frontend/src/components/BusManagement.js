@@ -1,18 +1,12 @@
 import React, { useState, useRef } from 'react';
 import Papa from 'papaparse';
 import { useNotification } from './NotificationContext';
-import { useAuth } from './AuthContext';
 import BusFormModal from './BusFormModal';
-import ConfirmationModal from './ConfirmationModal';
-import { deleteBus } from './api'; // Import the deleteBus function
 import './BusManagement.css';
 
 function BusManagement({ busData, setBusData, users }) {
     const { showNotification } = useNotification();
-    const { user } = useAuth(); // Get auth context for the token
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [busToDelete, setBusToDelete] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [currentBus, setCurrentBus] = useState(null);
     const fileInputRef = useRef(null);
@@ -84,28 +78,6 @@ function BusManagement({ busData, setBusData, users }) {
         handleCloseModal();
     };
 
-    const openDeleteModal = (bus) => {
-        setBusToDelete(bus);
-        setIsDeleteModalOpen(true);
-    };
-
-    const closeDeleteModal = () => {
-        setIsDeleteModalOpen(false);
-        setBusToDelete(null);
-    };
-
-    const confirmDeleteBus = async () => {
-        if (!busToDelete) return;
-        try {
-            await deleteBus(busToDelete.busNo, user.token); // Assuming busNo is the ID and token is in user object
-            setBusData(prev => prev.filter(b => b.busNo !== busToDelete.busNo));
-            showNotification(`Bus "${busToDelete.busNo}" has been deleted.`, 'info');
-        } catch (error) {
-            showNotification(error.message, 'error');
-        }
-        closeDeleteModal();
-    };
-
     // --- Pagination Logic ---
     const itemsPerPage = 10;
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -170,7 +142,6 @@ function BusManagement({ busData, setBusData, users }) {
                                 <td data-label="Status"><span className={`status-badge status-${bus.status?.toLowerCase().replace(' ', '-')}`}>{bus.status}</span></td>
                                 <td className="action-cell">
                                     <button onClick={() => handleOpenModal(bus)} className="edit-btn">Edit</button>
-                                    <button onClick={() => openDeleteModal(bus)} className="delete-btn">Delete</button>
                                 </td>
                             </tr>
                         ))}
@@ -196,13 +167,6 @@ function BusManagement({ busData, setBusData, users }) {
                 onSave={handleSaveBus}
                 bus={currentBus}
                 drivers={drivers}
-            />
-            <ConfirmationModal
-                show={isDeleteModalOpen}
-                onClose={closeDeleteModal}
-                onConfirm={confirmDeleteBus}
-                title="Confirm Bus Deletion"
-                message={`Are you sure you want to delete bus "${busToDelete?.busNo}"? This action cannot be undone.`}
             />
         </div>
     );
