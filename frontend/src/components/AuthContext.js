@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, getAllUsers } from '../services/api'; // Removed loginUser
+import { loginUser, registerUser, getAllUsers } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -60,32 +60,18 @@ export const AuthProvider = ({ children }) => {
         }
     }, [user]); // Re-run when user object changes
 
-    const login = (email, password) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => { // Simulate network delay
-                if (email === 'admin@test.com' && password === 'password') {
-                    const user = {
-                        id: 'dummy-admin-01',
-                        name: 'Admin User',
-                        email: 'admin@test.com',
-                        role: 'admin',
-                    };
-                    setUser({ ...user, lastActive: new Date().toISOString() });
-                    resolve(user);
-                } else if (email === 'student@test.com' && password === 'password') {
-                    const user = {
-                        id: 'dummy-student-01',
-                        name: 'Student User',
-                        email: 'student@test.com',
-                        role: 'student',
-                    };
-                    setUser({ ...user, lastActive: new Date().toISOString() });
-                    resolve(user);
-                } else {
-                    reject(new Error('Invalid credentials. Please use dummy accounts.'));
-                }
-            }, 500);
-        });
+    const login = async (email, password) => {
+        try {
+            const data = await loginUser(email, password);
+            const loggedInUser = data.user;
+            setUser({ ...loggedInUser, lastActive: new Date().toISOString() });
+            // The navigate logic is handled by the RootRedirect component upon state change.
+            return loggedInUser;
+        } catch (error) {
+            console.error("Login failed:", error);
+            // Re-throw the error to be caught by the calling component (e.g., Login.js)
+            throw error;
+        }
     };
 
     const logout = () => {

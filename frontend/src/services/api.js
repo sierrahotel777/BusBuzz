@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live.azurewebsites.net/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
 
 /**
  * Registers a new user.
@@ -49,6 +49,47 @@ export const getAllUsers = async () => {
     return data;
   } catch (error) {
     console.error('API Error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches all feedback submitted by the currently logged-in user.
+ * @param {string} userId - The ID of the user.
+ * @returns {Promise<Array>} An array of the user's feedback objects.
+ */
+export const getMyFeedback = async (userId) => {
+  try {
+    // The user ID is passed in the URL to fetch specific feedback.
+    const response = await fetch(`${API_URL}/feedback/my-feedback/${userId}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch your feedback.');
+    }
+    return data;
+  } catch (error) {
+    console.error('API Error (getMyFeedback):', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches all feedback from the backend (for admin).
+ * @returns {Promise<Array>} A list of all feedback items.
+ */
+export const getFeedback = async () => {
+  try {
+    const response = await fetch(`${API_URL}/feedback`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch feedback.');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API Error (getFeedback):', error);
     throw error;
   }
 };
@@ -128,4 +169,26 @@ export const updateFeedbackStatus = async (feedbackId, newStatus, notes, token) 
     console.error('API Error (Update Feedback):', error);
     throw error;
   }
+};
+
+/**
+ * Submits new feedback from a user.
+ * @param {Object} feedbackData - The feedback data from the form.
+ * @param {string} token - The user's JWT for authorization.
+ * @returns {Promise<Object>} The server response, including the newly created feedback.
+ */
+export const submitFeedback = async (feedbackData, token) => {
+  const response = await fetch(`${API_URL}/feedback`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // If you implement JWT, the token will be passed here
+      // 'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(feedbackData),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to submit feedback.');
+  return data;
 };

@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./Form.css";
 import "./Feedback.css";
 import { useNotification } from "./NotificationContext";
+import { submitFeedback, getMyFeedback } from "../services/api";
 
-function Feedback({ feedbackData, setFeedbackData }) {
+function Feedback({ setFeedbackData }) {
   const [route, setRoute] = useState("");
   const [busNo, setBusNo] = useState("");
   const [driverBehavior, setDriverBehavior] = useState("");
@@ -14,15 +15,27 @@ function Feedback({ feedbackData, setFeedbackData }) {
   const [issueCategory, setIssueCategory] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
   const [comments, setComments] = useState("");
+  const [myFeedback, setMyFeedback] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showNotification } = useNotification();
 
-  const myFeedback = useMemo(() =>
-    (feedbackData || []).filter(fb => fb.user === user.name)
-      .sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)),
-    [feedbackData, user.name]);
+  useEffect(() => {
+    const fetchMyFeedback = async () => {
+      if (user?.id) {
+        try {
+          const data = await getMyFeedback(user.id);
+          setMyFeedback(data);
+        } catch (error) {
+          showNotification("Failed to fetch your feedback history.", "error");
+        }
+      }
+      setIsLoading(false);
+    };
+    fetchMyFeedback();
+  }, [user, showNotification]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,36 +50,27 @@ function Feedback({ feedbackData, setFeedbackData }) {
     const newFeedback = {
       route,
       busNo,
-      comments,
-      user: user.name,
-      collegeId: user.collegeId,
+      comments,      
       issue: issueCategory,
       details: {
         punctuality,
         driverBehavior,
         cleanliness,
       },
-      attachmentName: attachmentName,
+      attachmentName: attachmentName, // In a real app, this would be a URL after upload
+      userId: user.id, // Pass user ID for association
+      userName: user.name,
     };
     try {
-      const response = await fetch('http://localhost:5000/api/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newFeedback),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to submit feedback.');
-      }
-
+      // Use the centralized API service instead of a hardcoded fetch
+      const data = await submitFeedback(newFeedback);
 
       // Update the global state with the new feedback from the server response
-      setFeedbackData(prevData => [data.feedback, ...prevData]);
-      showNotification("Feedback submitted successfully!");
+      if (setFeedbackData) {
+        setFeedbackData(prevData => [data.feedback, ...prevData]);
+      }
+      setMyFeedback(prev => [data.feedback, ...prev]); // Update local history
+      showNotification("Feedback submitted successfully!", "success");
       navigate('/student');
       } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -192,7 +196,9 @@ function Feedback({ feedbackData, setFeedbackData }) {
     <div className="feedback-history-container">
         <div className="dashboard-card full-width-card">
             <h3>My Feedback History</h3>
-            {myFeedback.length > 0 ? (
+            {isLoading ? (
+              <p>Loading feedback history...</p>
+            ) : myFeedback.length > 0 ? (
             <table className="feedback-table">
                 <thead>
                 <tr>

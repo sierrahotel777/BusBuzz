@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import { NotificationProvider } from "./components/NotificationContext";
+import { getFeedback } from "./services/api";
 import { ThemeProvider } from "./components/ThemeContext";
 import Navbar from "./components/Navbar";
 import Login from "./components/Login";
@@ -85,8 +86,7 @@ const AppContent = () => {
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/feedback');
-        const data = await response.json();
+        const data = await getFeedback();
         setFeedbackData(data);
       } catch (error) {
         console.error("Failed to fetch feedback:", error);
@@ -151,7 +151,7 @@ const AppContent = () => {
           />
           <Route 
             path="/feedback" 
-            element={<ProtectedRoute role="student"><Feedback setFeedbackData={setFeedbackData} /></ProtectedRoute>} 
+            element={<ProtectedRoute role="student"><Feedback setFeedbackData={setFeedbackData} /></ProtectedRoute>}
           />
           <Route 
             path="/admin/feedback/:feedbackId" 
