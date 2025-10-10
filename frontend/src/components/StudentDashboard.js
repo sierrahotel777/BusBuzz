@@ -5,6 +5,8 @@ import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import CommendationModal from './CommendationModal';
 import { routeData, routeNames } from './routeData';
+import AIAssistant from './AIAssistant'; // Import the new component
+import './AIAssistant.css'; // Import the new CSS
 
 function StudentDashboard({ feedbackData, announcements, setCommendations, lostAndFoundItems, crowdednessData, setCrowdednessData, users }) {
   const { user } = useAuth();
@@ -33,6 +35,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
   const [notificationSent, setNotificationSent] = useState(false);
   const [isCommendationModalOpen, setIsCommendationModalOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
   const unclaimedFoundItems = useMemo(() => 
     (lostAndFoundItems || []).filter(item => item.type === 'found' && item.status === 'unclaimed'), 
@@ -288,6 +291,14 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
         onClose={() => setIsCommendationModalOpen(false)}
         setCommendations={setCommendations}
       />
+
+      {/* AI Assistant FAB and Modal */}
+      {!isAssistantOpen && (
+        <button className="ai-assistant-fab" onClick={() => setIsAssistantOpen(true)} title="Ask AI Assistant">
+          🤖
+        </button>
+      )}
+      <AIAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} user={user} />
     </div>
   );
 }

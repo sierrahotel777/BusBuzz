@@ -5,11 +5,11 @@ import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import './UserManagement.css';
 import Papa from 'papaparse';
-import { exportUsers, importUsers } from '../services/api';
+import { exportUsers, importUsers } from './api';
 
 
 const UserManagement = () => {
-    const { users, setUsers } = useAuth();
+    const { users, updateUser, deleteUser } = useAuth();
     const { showNotification } = useNotification();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,23 +35,6 @@ const UserManagement = () => {
         setCurrentUser(null);
     };
 
-    const handleSaveUser = (formData, isEditing) => {
-        if (isEditing) {
-            setUsers(prevUsers => prevUsers.map(u => u.id === formData.id ? { ...u, ...formData } : u));
-            showNotification(`User "${formData.name}" updated successfully.`);
-        } else {
-            const userExists = users.some(u => u.collegeId === formData.collegeId);
-            if (userExists) {
-                showNotification(`User with College ID ${formData.collegeId} already exists.`, 'error');
-                return;
-            }
-            const newUser = { ...formData, id: `USR${Date.now()}` };
-            setUsers(prevUsers => [newUser, ...prevUsers]);
-            showNotification(`User "${formData.name}" created successfully.`, 'success');
-        }
-        handleCloseModal();
-    };
-
     const openDeleteModal = (user) => {
         setUserToDelete(user);
         setIsDeleteModalOpen(true);
@@ -59,7 +42,7 @@ const UserManagement = () => {
 
     const confirmDeleteUser = () => {
         if (!userToDelete) return;
-        setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
+        deleteUser(userToDelete.id);
         showNotification(`User "${userToDelete.name}" has been deleted.`, 'info');
         setIsDeleteModalOpen(false);
         setUserToDelete(null);
@@ -220,7 +203,6 @@ const UserManagement = () => {
             <UserFormModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                onSave={handleSaveUser}
                 user={currentUser}
             />
             <ConfirmationModal
