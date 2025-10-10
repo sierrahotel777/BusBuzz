@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useNotification } from './NotificationContext';
 import './FeedbackManagement.css';
 
 const FeedbackManagement = ({ feedbackData }) => {
@@ -8,7 +7,6 @@ const FeedbackManagement = ({ feedbackData }) => {
     const itemsPerPage = 10;
     const [sortConfig, setSortConfig] = useState({ key: 'submittedOn', direction: 'descending' });
     const [searchTerm, setSearchTerm] = useState('');
-    const { showNotification } = useNotification();
 
     // --- Search/Filter Logic ---
     const filteredFeedback = useMemo(() => {

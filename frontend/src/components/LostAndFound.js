@@ -17,7 +17,7 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
 
     // --- Admin View State ---
     const [adminSearchTerm, setAdminSearchTerm] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
+    const [sortConfig] = useState({ key: 'date', direction: 'descending' });
 
     // --- Data Filtering and Sorting ---
     const filteredAndSortedItems = useMemo(() => {
