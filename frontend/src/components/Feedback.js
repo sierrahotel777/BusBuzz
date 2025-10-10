@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./Form.css";
 import "./Feedback.css";
 import { useNotification } from "./NotificationContext";
-import { submitFeedback, getMyFeedback } from "../services/api";
+import { submitFeedback } from "../services/api";
 
 function Feedback({ setFeedbackData }) {
   const [route, setRoute] = useState("");
@@ -15,28 +15,10 @@ function Feedback({ setFeedbackData }) {
   const [issueCategory, setIssueCategory] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
   const [comments, setComments] = useState("");
-  const [myFeedback, setMyFeedback] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showNotification } = useNotification();
-
-  useEffect(() => {
-    const fetchMyFeedback = async () => {
-      if (user?.token) {
-        try {
-          // Fetch user-specific feedback using userId as query param
-          const data = await getMyFeedback(user.id);
-          setMyFeedback(data.sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)));
-        } catch (error) {
-          showNotification("Failed to fetch your feedback history.", "error");
-        }
-      }
-      setIsLoading(false);
-    };
-    fetchMyFeedback();
-  }, [user?.id, showNotification]); // Depend on user.id
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,8 +52,6 @@ function Feedback({ setFeedbackData }) {
         // Ensure the new feedback object includes the _id from the server response
         setFeedbackData(prevData => [{ ...data.feedback, _id: data.feedback._id }, ...prevData]);
       }
-      // Also update the local state for the feedback history on this page
-      setMyFeedback(prev => [{ ...data.feedback, _id: data.feedback._id }, ...prev]);
 
       showNotification("Feedback submitted successfully!", "success");
       navigate('/student');

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom'; // useParams is CRITICAL
-import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext'; // Assuming this hook exists
 import { getFeedbackById, updateFeedbackStatus } from '../services/api'; 
 import './FeedbackDetail.css';
@@ -10,7 +9,6 @@ import './FeedbackDetail.css';
 function FeedbackDetail() {
     // 1. Get the ID from the URL path, as defined in App.js route
     const { feedbackId } = useParams();
-    const { user } = useAuth();
     const { showNotification } = useNotification();
     
     const [feedback, setFeedback] = useState(null);
@@ -105,7 +103,9 @@ function FeedbackDetail() {
                     <p><strong>Bus No:</strong> {feedback.busNo}</p>
                     <p><strong>Issue:</strong> {feedback.issue}</p>
                     {feedback.attachmentName && (
-                        <p><strong>Attachment:</strong> <a href="#" className="attachment-link">{feedback.attachmentName}</a></p>
+                        <p><strong>Attachment:</strong> 
+                            <button onClick={() => alert('Attachment download/view logic goes here.')} className="attachment-link">{feedback.attachmentName}</button>
+                        </p>
                     )}
                 </div>
 
@@ -138,8 +138,27 @@ function FeedbackDetail() {
 
                 {feedback.status !== 'Resolved' && (
                     <div className="detail-card admin-actions full-width-card">
-                        {/* Action buttons using isSubmitting state */}
-                        {/* ... */}
+                        <h3>Admin Actions</h3>
+                        <div className="action-form">
+                            <textarea
+                                value={internalNote}
+                                onChange={(e) => setInternalNote(e.target.value)}
+                                placeholder="Add internal notes before changing status..."
+                                rows="3"
+                            />
+                            <div className="action-buttons">
+                                {feedback.status === 'Pending' && (
+                                    <button onClick={() => handleStatusChange('In Progress')} disabled={isSubmitting} className="btn-progress">
+                                        {isSubmitting ? 'Updating...' : 'Mark as In Progress'}
+                                    </button>
+                                )}
+                                {feedback.status !== 'Resolved' && (
+                                    <button onClick={() => handleStatusChange('Resolved')} disabled={isSubmitting} className="btn-resolve">
+                                        {isSubmitting ? 'Updating...' : 'Mark as Resolved'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
