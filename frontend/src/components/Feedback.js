@@ -24,10 +24,12 @@ function Feedback({ setFeedbackData }) {
 
   useEffect(() => {
     const fetchMyFeedback = async () => {
-      if (user?.id) {
+      if (user?.token) {
         try {
-          const data = await getMyFeedback(user.id);
-          setMyFeedback(data);
+          const data = await getMyFeedback(user.token); // Pass token for auth
+          // Filter feedback to show only items submitted by the current user
+          const userFeedback = data.filter(fb => fb.userId === user.id);
+          setMyFeedback(userFeedback.sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)));
         } catch (error) {
           showNotification("Failed to fetch your feedback history.", "error");
         }
@@ -62,15 +64,13 @@ function Feedback({ setFeedbackData }) {
       userName: user.name,
     };
     try {
-      const data = await submitFeedback(newFeedback);
+      const data = await submitFeedback(newFeedback, user.token);
 
       // Update the global state with the new feedback from the server response
       if (setFeedbackData) {
         setFeedbackData(prevData => [data.feedback, ...prevData]);
       }
-      // Re-fetch feedback history to ensure it's up-to-date
-      const updatedHistory = await getMyFeedback(user.id);
-      setMyFeedback(updatedHistory);
+      setMyFeedback(prev => [data.feedback, ...prev]);
 
       showNotification("Feedback submitted successfully!", "success");
       navigate('/student');
@@ -194,39 +194,6 @@ function Feedback({ setFeedbackData }) {
           </button>
         </form>
       </div>
-    </div>
-    <div className="feedback-history-container">
-        <div className="dashboard-card full-width-card">
-            <h3>My Feedback History</h3>
-            {isLoading ? (
-              <p>Loading feedback history...</p>
-            ) : myFeedback.length > 0 ? (
-            <table className="feedback-table">
-                <thead>
-                <tr>
-                    <th>Submitted On</th>
-                    <th>Route</th>
-                    <th>Issue</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {myFeedback.map(fb => (
-                    <tr key={fb.id} className="clickable-row" onClick={() => navigate(`/feedback/${fb.id}`)}>
-                    <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
-                    <td data-label="Route">{fb.route}</td>
-                    <td data-label="Issue">{fb.issue}</td>
-                    <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
-                    <td data-label="Action"><Link to={`/feedback/${fb.id}`}>View</Link></td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-            ) : (
-            <p>You have not submitted any feedback yet.</p>
-            )}
-        </div>
     </div>
     </>
   );

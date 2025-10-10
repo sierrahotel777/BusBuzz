@@ -4,9 +4,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { connectToDatabase } = require('./db/mongo');
-const authRoutes = require('./routes/auth');
-const feedbackRoutes = require('./routes/feedback');
-
 const app = express();
 // Use port 5000 inside the container, as configured in Azure App Settings (WEBSITES_PORT=5000)
 const port = process.env.PORT || 5000; 
@@ -32,9 +29,8 @@ app.get('/', (req, res) => {
   res.send('BusBuzz Backend API is running!');
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/feedback', feedbackRoutes);
-
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/feedback', require('./routes/feedback'));
 // --- Server Startup ---
 async function startServer() {
   try {
@@ -47,5 +43,6 @@ async function startServer() {
     process.exit(1);
   }
 }
+
 
 startServer();

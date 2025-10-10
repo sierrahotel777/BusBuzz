@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './FeedbackManagement.css';
 
 const FeedbackManagement = ({ feedbackData }) => {
@@ -7,6 +7,7 @@ const FeedbackManagement = ({ feedbackData }) => {
     const itemsPerPage = 10;
     const [sortConfig, setSortConfig] = useState({ key: 'submittedOn', direction: 'descending' });
     const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
 
     // --- Search/Filter Logic ---
     const filteredFeedback = useMemo(() => {
@@ -106,7 +107,7 @@ const FeedbackManagement = ({ feedbackData }) => {
                     </thead>
                     <tbody>
                         {currentFeedback.map(fb => (
-                            <tr key={fb.id} className={fb.issue === 'Safety Concern' ? 'high-priority-row' : ''}>
+                            <tr key={fb._id} className={fb.issue === 'Safety Concern' ? 'high-priority-row' : ''}>
                                 <td data-label="User">{fb.user}</td>
                                 <td data-label="Route">{fb.route}</td>
                                 <td data-label="Issue">{fb.issue}</td>
@@ -115,7 +116,9 @@ const FeedbackManagement = ({ feedbackData }) => {
                                 </td>
                                 <td data-label="Date">{new Date(fb.submittedOn).toLocaleDateString()}</td>
                                 <td data-label="Action">
-                                    <Link to={`/admin/feedback/${fb.id}`} className="view-link">View Details</Link>
+                                    <button onClick={() => navigate(`/admin/feedback/${fb._id}`)}>
+                                        View Details
+                                    </button>
                                 </td>
                             </tr>
                         ))}

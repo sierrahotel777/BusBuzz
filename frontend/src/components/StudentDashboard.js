@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Dashboard.css'; // Re-using the dashboard styles
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import CommendationModal from './CommendationModal';
+import { getMyFeedback } from '../services/api';
 import { routeData, routeNames } from './routeData';
 
 function StudentDashboard({ feedbackData, announcements, setCommendations, lostAndFoundItems, crowdednessData, setCrowdednessData, users }) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
-  // Filter to get only this student's feedback
-  const myFeedback = (feedbackData || []).filter(fb => fb.user === user.name)
-    .sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn));
+  const navigate = useNavigate();
+  const [myFeedback, setMyFeedback] = useState([]);
+  const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
 
   // State for the interactive bus details card
   const initialRoute = user.busRoute && routeData[user.busRoute] 
@@ -30,6 +31,20 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     [lostAndFoundItems, user.name]);
 
   const [selectedRoute, setSelectedRoute] = useState(initialRoute);
+
+  useEffect(() => {
+    async function fetchFeedback() {
+      setIsLoadingFeedback(true);
+      try {
+        const feedbacks = await getMyFeedback(user.id);
+        setMyFeedback(feedbacks);
+      } catch (error) {
+        showNotification(error.message || "Failed to load feedback.", "error");
+      }
+      setIsLoadingFeedback(false);
+    }
+    if (user?.id) fetchFeedback();
+  }, [user?.id, showNotification]);
   const [selectedStop, setSelectedStop] = useState(initialStop);
   const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
   const [notificationSent, setNotificationSent] = useState(false);
@@ -141,7 +156,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       {/* Live display of the student's raised tickets */}
       <div className="dashboard-card full-width-card my-feedback-card">
         <h3>My Submitted Feedback</h3>
-        {myFeedback.length > 0 ? (
+        {isLoadingFeedback ? <p>Loading feedback...</p> : myFeedback.length > 0 ? (
           <table className="feedback-table">
             <thead>
               <tr>
@@ -152,7 +167,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
             </thead>
             <tbody>
               {myFeedback.map(fb => (
-                <tr key={fb.id}>
+                <tr key={fb.id} onClick={() => navigate(`/feedback/${fb.id}`)} className="clickable-row">
                   <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
                   <td data-label="Route">{fb.route}</td>
                   <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>

@@ -59,7 +59,7 @@ export const getAllUsers = async () => {
  * @returns {Promise<Array>} An array of the user's feedback objects.
  */
 export const getMyFeedback = async (userId) => {
-  const response = await fetch(`${API_URL}/feedback/user/${userId}`);
+  const response = await fetch(`${API_URL}/auth/feedback?userId=${userId}`);
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to fetch your feedback.');
   return data;
@@ -69,9 +69,14 @@ export const getMyFeedback = async (userId) => {
  * Fetches all feedback from the backend (for admin).
  * @returns {Promise<Array>} A list of all feedback items.
  */
-export const getFeedback = async () => {
+export const getFeedback = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/auth/feedback`);
+    const response = await fetch(`${API_URL}/auth/feedback`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
     const data = await response.json();
 
     if (!response.ok) {
@@ -168,16 +173,53 @@ export const updateFeedbackStatus = async (feedbackId, newStatus, notes, token) 
  * @param {string} token - The user's JWT for authorization.
  * @returns {Promise<Object>} The server response, including the newly created feedback.
  */
-export const submitFeedback = async (feedbackData, token) => {
-  const response = await fetch(`${API_URL}/feedback`, {
+export const submitFeedback = async (feedbackData) => {
+  const response = await fetch(`${API_URL}/auth/feedback`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(feedbackData),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to submit feedback.');
   return data;
+};
+
+/**
+ * Fetches feedback details by ID.
+ * @param {string} id - The ID of the feedback to fetch.
+ * @returns {Promise<Object>} The feedback details.
+ */
+export const getFeedbackById = async (id) => {
+  const response = await fetch(`${API_URL}/feedback/${id}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to fetch feedback.');
+  return data;
+};
+
+/**
+ * Fetches a single feedback item by ID (used for the detail view).
+ * @param {string} feedbackId - MongoDB ObjectId of the feedback item.
+ * @param {string} token - User's JWT token.
+ * @returns {Promise<Object>} The single feedback document.
+ */
+export const getFeedbackDetail = async (feedbackId, token) => {
+    try {
+        const response = await fetch(`${API_URL}/api/feedback/${feedbackId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || `Failed to fetch detail for ID: ${feedbackId}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('API Error (Get Detail):', error);
+        throw error;
+    }
 };
