@@ -1,26 +1,41 @@
 // server.js
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { connectToDatabase } = require('./db/mongo');
 const authRoutes = require('./routes/auth');
+const feedbackRoutes = require('./routes/feedback'); 
 
 const app = express();
-const port = process.env.PORT || 5000;
+// Use port 5000 inside the container, as configured in Azure App Settings (WEBSITES_PORT=5000)
+const port = process.env.PORT || 5000; 
 
-// Middleware
-app.use(cors());
+// --- Configuration ---
+// Configure CORS to allow access from local host and deployed frontend
+const allowedOrigins = [
+    'http://localhost:3000', 
+    // Add your live SWA URL here for production testing
+    'https://agreeable-beach-05cde621e.1.azurestaticapps.net' 
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+    credentials: true, 
+}));
+
 app.use(express.json());
 
-// A simple test route to check if the server is running
+// --- Routes ---
 app.get('/', (req, res) => {
   res.send('BusBuzz Backend API is running!');
 });
 
-// API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
-// Start the server only after the database connection is successful
+// --- Server Startup ---
 async function startServer() {
   try {
     await connectToDatabase();

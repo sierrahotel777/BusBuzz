@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 
 const connectionString = process.env.MONGO_DB_CONNECTION_STRING;
 if (!connectionString) {
+  // We throw an error if the connection string is missing in the Azure App Service configuration
   throw new Error("MONGO_DB_CONNECTION_STRING is not set in the environment variables.");
 }
 
@@ -17,7 +18,7 @@ async function connectToDatabase() {
     console.log(`Successfully connected to MongoDB database: ${databaseName}`);
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
-    process.exit(1);
+    throw error; // Throwing error will cause server to fail gracefully
   }
 }
 

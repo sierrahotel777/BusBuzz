@@ -1,1 +1,0 @@
-npm install express cors dotenv @azure/cosmos bcrypt mongodb json2csv
