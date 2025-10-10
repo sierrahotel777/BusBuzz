@@ -4,7 +4,7 @@ import { useNotification } from './NotificationContext';
 import { useAuth } from './AuthContext';
 import BusFormModal from './BusFormModal';
 import ConfirmationModal from './ConfirmationModal';
-import { deleteBus } from './api'; // Import the deleteBus function
+import { getBuses, createBus, updateBus, deleteBus } from '../services/api';
 import './BusManagement.css';
 
 function BusManagement({ busData, setBusData, users }) {
@@ -61,27 +61,32 @@ function BusManagement({ busData, setBusData, users }) {
         setCurrentBus(null);
     };
 
-    const handleSaveBus = (formData, isEditing) => {
-        if (isEditing) {
-            // Update existing bus
-            setBusData(prevData =>
-                prevData.map(bus =>
-                    bus.busNo === formData.busNo ? { ...bus, ...formData } : bus
-                )
-            );
-            showNotification(`Bus ${formData.busNo} updated successfully!`);
-        } else {
-            // Add new bus
-            const busExists = busData.some(bus => bus.busNo === formData.busNo);
-            if (busExists) {
-                showNotification(`Bus with number ${formData.busNo} already exists.`, 'error');
-                return;
-            }
-            const newBus = { ...formData, capacity: parseInt(formData.capacity, 10) || 0 };
-            setBusData(prevData => [newBus, ...prevData]);
-            showNotification(`Bus ${formData.busNo} added successfully!`, 'success');
+    const refetchBuses = async () => {
+        try {
+            const buses = await getBuses(user.token);
+            setBusData(buses);
+        } catch (error) {
+            showNotification("Could not refresh bus data.", "error");
         }
-        handleCloseModal();
+    };
+
+    const handleSaveBus = async (formData, isEditing) => {
+        try {
+            const busPayload = { ...formData, capacity: parseInt(formData.capacity, 10) || 0 };
+
+            if (isEditing) {
+                await updateBus(formData.busNo, busPayload, user.token);
+                showNotification(`Bus ${formData.busNo} updated successfully!`);
+            } else {
+                await createBus(busPayload, user.token);
+                showNotification(`Bus ${formData.busNo} added successfully!`, 'success');
+            }
+            refetchBuses();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        } finally {
+            handleCloseModal();
+        }
     };
 
     const openDeleteModal = (bus) => {
@@ -97,8 +102,8 @@ function BusManagement({ busData, setBusData, users }) {
     const confirmDeleteBus = async () => {
         if (!busToDelete) return;
         try {
-            await deleteBus(busToDelete.busNo, user.token); // Assuming busNo is the ID and token is in user object
-            setBusData(prev => prev.filter(b => b.busNo !== busToDelete.busNo));
+            await deleteBus(busToDelete.busNo, user.token);
+            refetchBuses();
             showNotification(`Bus "${busToDelete.busNo}" has been deleted.`, 'info');
         } catch (error) {
             showNotification(error.message, 'error');

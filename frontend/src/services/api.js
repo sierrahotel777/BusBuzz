@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
+export const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
 
 /**
  * Registers a new user.
@@ -157,6 +157,94 @@ export const deleteUser = async (userId, token) => {
   if (response.status !== 204 && response.status !== 200) {
     throw new Error('Failed to delete user.');
   }
+};
+
+/**
+ * Fetches all buses from the backend.
+ * @param {string} token - The user's JWT for authorization.
+ * @returns {Promise<Array>} A list of all buses.
+ */
+export const getBuses = async (token) => {
+  const response = await fetch(`${API_URL}/buses`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to fetch buses.');
+  return data;
+};
+
+/**
+ * Creates a new bus.
+ * @param {Object} busData - The new bus's data.
+ * @param {string} token - The admin's JWT for authorization.
+ * @returns {Promise<Object>} The newly created bus object.
+ */
+export const createBus = async (busData, token) => {
+  const response = await fetch(`${API_URL}/buses`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(busData),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to create bus.');
+  return data;
+};
+
+/**
+ * Updates an existing bus's data.
+ * @param {string} busId - The ID of the bus to update.
+ * @param {Object} busData - The updated bus data.
+ * @param {string} token - The admin's JWT for authorization.
+ * @returns {Promise<Object>} The updated bus object.
+ */
+export const updateBus = async (busId, busData, token) => {
+  const response = await fetch(`${API_URL}/buses/${busId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(busData),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to update bus.');
+  return data;
+};
+
+/**
+ * Deletes a bus.
+ * @param {string} busId - The ID of the bus to delete.
+ * @param {string} token - The admin's JWT for authorization.
+ */
+export const deleteBus = async (busId, token) => {
+  const response = await fetch(`${API_URL}/buses/${busId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || 'Failed to delete bus.');
+  }
+  if (response.status !== 204 && response.status !== 200) {
+    throw new Error('Failed to delete bus.');
+  }
+};
+
+/**
+ * Fetches all feedback from the backend.
+ * @param {string} token - The user's JWT for authorization.
+ * @returns {Promise<Array>} A list of all feedback items.
+ */
+export const getFeedback = async (token) => {
+  const response = await fetch(`${API_URL}/feedback`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to fetch feedback.');
+  return data;
 };
 
 /**
