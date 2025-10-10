@@ -39,14 +39,12 @@ export const loginUser = async (email, password) => {
  */
 export const getAllUsers = async () => {
   try {
-    // Assuming token is needed for this protected route
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/users`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const response = await fetch(`${API_URL}/auth/users`);
     const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch users.');
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch users.');
+    }
 
     return data;
   } catch (error) {
@@ -56,94 +54,12 @@ export const getAllUsers = async () => {
 };
 
 /**
- * Submits new feedback from a user.
- * @param {Object} feedbackData - The feedback data from the form.
- * @param {string} token - The user's JWT for authorization.
- * @returns {Promise<Object>} The server response, including the newly created feedback.
- */
-export const submitFeedback = async (feedbackData, token) => {
-  const response = await fetch(`${API_URL}/feedback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(feedbackData),
-  });
-
-  if (!response.ok) {
-    let errorData;
-    try {
-      // The backend might send a JSON object with a specific error message
-      errorData = await response.json();
-    } catch (e) {
-      // If not, the response was not JSON (e.g., an HTML error page from the server)
-      throw new Error(`Request failed with status ${response.status}. Please check the server logs.`);
-    }
-    // Use the backend's specific error message if available
-    throw new Error(errorData.message || 'Failed to submit feedback.');
-  }
-  return await response.json();
-};
-
-/**
- * Fetches all feedback from the backend.
- * @param {string} token - The user's JWT for authorization.
- * @returns {Promise<Array>} A list of all feedback items.
- */
-export const getFeedback = async (token) => {
-  const response = await fetch(`${API_URL}/feedback`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Failed to fetch feedback.');
-  return data;
-};
-
-/**
- * Fetches all feedback submitted by the currently authenticated user.
- * @param {string} token - The user's JWT for authorization.
- * @returns {Promise<Array>} A list of the user's feedback items.
- */
-export const getMyFeedback = async (token) => {
-  const response = await fetch(`${API_URL}/feedback/my`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Failed to fetch your feedback.');
-  return data;
-};
-
-/**
- * Fetches a single feedback item by its ID.
- * @param {string} feedbackId - The ID of the feedback to fetch.
- * @param {string} token - The user's JWT for authorization.
- * @returns {Promise<Object>} The feedback item.
- */
-export const getFeedbackById = async (feedbackId, token) => {
-  const response = await fetch(`${API_URL}/feedback/${feedbackId}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Failed to fetch feedback details.');
-  }
-  return data;
-};
-
-/**
  * Triggers a download of all users as a CSV file.
  */
-export const exportUsers = async (token) => {
+export const exportUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/users/export`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
+    const response = await fetch(`${API_URL}/auth/users/export`);
+
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.message || 'Failed to export users.');
@@ -171,13 +87,10 @@ export const exportUsers = async (token) => {
  * @param {Array<Object>} users - An array of user objects to import.
  * @returns {Promise<Object>} The result of the import operation.
  */
-export const importUsers = async (users, token) => {
-  const response = await fetch(`${API_URL}/users/import`, {
+export const importUsers = async (users) => {
+  const response = await fetch(`${API_URL}/auth/users/import`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ users }),
   });
   const data = await response.json();
@@ -192,7 +105,7 @@ export const importUsers = async (users, token) => {
  * @returns {Promise<Object>} The newly created user object.
  */
 export const createUser = async (userData, token) => {
-  const response = await fetch(`${API_URL}/users`, {
+  const response = await fetch(`${API_URL}/auth/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -213,7 +126,7 @@ export const createUser = async (userData, token) => {
  * @returns {Promise<Object>} The updated user object.
  */
 export const updateUser = async (userId, userData, token) => {
-  const response = await fetch(`${API_URL}/users/${userId}`, {
+  const response = await fetch(`${API_URL}/auth/users/${userId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -232,7 +145,7 @@ export const updateUser = async (userId, userData, token) => {
  * @param {string} token - The admin's JWT for authorization.
  */
 export const deleteUser = async (userId, token) => {
-  const response = await fetch(`${API_URL}/users/${userId}`, {
+  const response = await fetch(`${API_URL}/auth/users/${userId}`, {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${token}` },
   });
@@ -247,33 +160,6 @@ export const deleteUser = async (userId, token) => {
 };
 
 /**
- * Deletes a bus by its ID.
- * @param {string} busId - The ID of the bus to delete.
- * @param {string} token - The user's JWT token for authorization.
- * @returns {Promise<Object>} A confirmation message.
- */
-export const deleteBus = async (busId, token) => {
-  try {
-    const response = await fetch(`${API_URL}/buses/${busId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Pass JWT for authorization
-      },
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || 'Failed to delete bus.');
-    }
-
-    return await response.json(); // Or handle 204 No Content status
-  } catch (error) {
-    console.error('API Error (Delete Bus):', error);
-    throw error;
-  }
-};
-
-/**
  * Updates the status of a specific feedback item with admin notes.
  * @param {string} feedbackId - The MongoDB ObjectId of the feedback item.
  * @param {string} newStatus - The new status ('In Progress' or 'Resolved').
@@ -284,7 +170,7 @@ export const deleteBus = async (busId, token) => {
 export const updateFeedbackStatus = async (feedbackId, newStatus, notes, token) => {
   try {
     const response = await fetch(`${API_URL}/feedback/${feedbackId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`, // Pass JWT for authorization
