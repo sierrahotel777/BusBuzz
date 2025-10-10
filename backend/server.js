@@ -9,11 +9,11 @@ const app = express();
 const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://agreeable-beach-05cde621e.1.azurestaticapps.net'],
+    origin: '*',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH'],
 }));
-app.options('*', cors()); 
 app.use(express.json());
 
 // A simple test route to check if the server is running
