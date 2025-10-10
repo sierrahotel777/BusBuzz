@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, getAllUsers, loginUser } from '../services/api';
+import { registerUser, getAllUsers, loginUser, updateUser as apiUpdateUser, deleteUser as apiDeleteUser, createUser as apiCreateUser } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -91,23 +91,24 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const updateUser = (updatedUserData) => {
-        setUsers(currentUsers => currentUsers.map(u => u.id === updatedUserData.id ? { ...u, ...updatedUserData } : u));
-        // also update the currently logged in user if they are the one being edited
+    const updateUser = async (userId, updatedUserData) => {
+        const updatedUser = await apiUpdateUser(userId, updatedUserData, user.token);
+        setUsers(currentUsers => currentUsers.map(u => u.id === updatedUser.id ? updatedUser : u));
         if (user && user.id === updatedUserData.id) {
             setUser(currentUser => ({ ...currentUser, ...updatedUserData }));
         }
-        // In a real app, you'd also have an API call here to update the user in the DB
+        return updatedUser;
     };
 
-    const deleteUser = (userId) => {
+    const deleteUser = async (userId) => {
+        await apiDeleteUser(userId, user.token);
         setUsers(currentUsers => currentUsers.filter(u => u.id !== userId));
     };
 
-    const addUser = (newUserData) => {
-        const newUser = { ...newUserData, id: `USR${Date.now()}`, status: 'active' }; // Add default status
+    const addUser = async (newUserData) => {
+        const newUser = await apiCreateUser(newUserData, user.token);
         setUsers(currentUsers => [newUser, ...currentUsers]);
-        // In a real app, you'd also have an API call here to add the user to the DB
+        return newUser;
     };
 
     const awardPoints = (pointsToAward) => {
