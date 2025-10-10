@@ -23,6 +23,8 @@ import Notification from "./components/Notification";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
+import FeedbackManagement from "./components/FeedbackManagement";
+import BusManagement from "./components/BusManagement";
 
 import "./App.css";
 
@@ -38,6 +40,13 @@ const initialCommendations = [
     { id: 2, route: 'S5: TIRUVOTRIYUR', praise: 'Helpful & Courteous', message: '', date: '2023-11-09' },
     { id: 3, route: 'S1: VALASARAVAKKAM', praise: 'On-Time Champion', message: 'Always on time!', date: '2023-11-08' },
 ];
+
+const initialBusData = [
+    { busNo: 'TN01A1234', route: 'S1: VALASARAVAKKAM', capacity: 50, driver: 'Ramesh Kumar', status: 'On Route' },
+    { busNo: 'TN02B5678', route: 'S5: TIRUVOTRIYUR', capacity: 55, driver: 'Suresh Singh', status: 'Idle' },
+    { busNo: 'TN03C9012', route: 'S2: Porur', capacity: 45, driver: 'Anitha Devi', status: 'Maintenance' },
+];
+
 //
 const initialLostAndFound = [
     { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
@@ -69,6 +78,7 @@ const AppContent = () => {
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [commendations, setCommendations] = useState(initialCommendations);
   const [lostAndFoundItems, setLostAndFoundItems] = useState(initialLostAndFound);
+  const [busData, setBusData] = useState(initialBusData);
   const [crowdednessData, setCrowdednessData] = useState(initialCrowdednessData);
   const { user, users, isLoading, isExiting } = useAuth();
   
@@ -117,11 +127,23 @@ const AppContent = () => {
           />
           <Route 
             path="/admin" 
-            element={<ProtectedRoute role="admin"><AdminDashboard feedbackData={feedbackData} announcements={announcements} setAnnouncements={setAnnouncements} commendations={commendations} lostAndFoundItems={lostAndFoundItems} setLostAndFoundItems={setLostAndFoundItems} /></ProtectedRoute>} 
+            element={<ProtectedRoute role="admin"><AdminDashboard feedbackData={feedbackData} announcements={announcements} setAnnouncements={setAnnouncements} commendations={commendations} lostAndFoundItems={lostAndFoundItems} setLostAndFoundItems={setLostAndFoundItems} /></ProtectedRoute>}
           />
           <Route 
-            path="/admin/users" 
+            path="/admin/user-management" 
             element={<ProtectedRoute role="admin"><UserManagement /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/admin/bus-details" 
+            element={<ProtectedRoute role="admin"><BusManagement busData={busData} setBusData={setBusData} users={users} /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/admin/lost-and-found" 
+            element={<ProtectedRoute role="admin"><LostAndFound items={lostAndFoundItems} setItems={setLostAndFoundItems} isAdminPage={true} /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/admin/feedback" 
+            element={<ProtectedRoute role="admin"><FeedbackManagement feedbackData={feedbackData} /></ProtectedRoute>} 
           />
           <Route 
             path="/admin/analytics" 

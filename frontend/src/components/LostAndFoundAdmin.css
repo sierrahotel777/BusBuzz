@@ -1,0 +1,87 @@
+/* Re-using styles from FeedbackManagement.css for consistency */
+.admin-page-container .table-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.admin-page-container .search-input {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    width: 300px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+.admin-page-container .table-wrapper {
+    overflow-x: auto;
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table th {
+    background-color: var(--subtle-bg);
+    font-weight: 600;
+    color: var(--text-color-light);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.admin-table tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.item-type-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: capitalize;
+}
+
+.item-type-badge.lost {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+}
+
+.item-type-badge.found {
+    background-color: var(--info-bg);
+    color: var(--info-text);
+}
+
+.admin-table .action-cell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-table .claim-btn {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.admin-table .delete-btn {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+}

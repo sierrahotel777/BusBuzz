@@ -1,13 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import './Dashboard.css'; // Re-using styles
+import { useNotification } from './NotificationContext';
+import './FeedbackManagement.css';
 
-function FeedbackManagement({ feedbackData }) {
+const FeedbackManagement = ({ feedbackData }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const [sortConfig, setSortConfig] = useState({ key: 'submittedOn', direction: 'descending' });
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
+    const { showNotification } = useNotification();
 
+    // --- Search/Filter Logic ---
     const filteredFeedback = useMemo(() => {
         if (!searchTerm) {
             return feedbackData;
@@ -20,6 +23,7 @@ function FeedbackManagement({ feedbackData }) {
         );
     }, [feedbackData, searchTerm]);
 
+    // --- Sorting Logic ---
     const sortedFeedback = useMemo(() => {
         let sortableItems = [...filteredFeedback];
         if (sortConfig !== null) {
@@ -36,6 +40,7 @@ function FeedbackManagement({ feedbackData }) {
         return sortableItems;
     }, [filteredFeedback, sortConfig]);
 
+    // --- Pagination Logic ---
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentFeedback = sortedFeedback.slice(indexOfFirstItem, indexOfLastItem);
@@ -59,15 +64,18 @@ function FeedbackManagement({ feedbackData }) {
         setCurrentPage(1);
     };
 
-    return (
-        <div className="bus-management-container">
-            <div className="dashboard-header">
-                <h2>Feedback Management</h2>
-                <p>View, sort, and search all user feedback.</p>
-            </div>
+    const getSortIndicator = (key) => {
+        if (sortConfig.key !== key) return '';
+        return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
+    };
 
+    return (
+        <div className="admin-page-container">
+            <div className="dashboard-header">
+                <h2>Manage Feedback</h2>
+                <p>Review, search, and manage all user feedback submissions.</p>
+            </div>
             <div className="dashboard-card full-width-card">
-                <h3>All Feedback Submissions</h3>
                 <div className="table-controls">
                     <input
                         type="text"
@@ -77,20 +85,23 @@ function FeedbackManagement({ feedbackData }) {
                         className="search-input"
                     />
                 </div>
-                <table className="feedback-table">
+                <table className="admin-table">
                     <thead>
                         <tr>
                             <th onClick={() => requestSort('user')} className="sortable-header">
-                                User {sortConfig.key === 'user' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
+                                User {getSortIndicator('user')}
                             </th>
                             <th onClick={() => requestSort('route')} className="sortable-header">
-                                Route {sortConfig.key === 'route' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
+                                Route {getSortIndicator('route')}
                             </th>
                             <th onClick={() => requestSort('issue')} className="sortable-header">
-                                Issue Category {sortConfig.key === 'issue' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
+                                Issue {getSortIndicator('issue')}
                             </th>
                             <th onClick={() => requestSort('status')} className="sortable-header">
-                                Status {sortConfig.key === 'status' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}
+                                Status {getSortIndicator('status')}
+                            </th>
+                            <th onClick={() => requestSort('submittedOn')} className="sortable-header">
+                                Date {getSortIndicator('submittedOn')}
                             </th>
                             <th>Action</th>
                         </tr>
@@ -100,9 +111,14 @@ function FeedbackManagement({ feedbackData }) {
                             <tr key={fb.id} className={fb.issue === 'Safety Concern' ? 'high-priority-row' : ''}>
                                 <td data-label="User">{fb.user}</td>
                                 <td data-label="Route">{fb.route}</td>
-                                <td data-label="Issue Category">{fb.issue}</td>
-                                <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
-                                <td data-label="Action"><Link to={`/admin/feedback/${fb.id}`}>View</Link></td>
+                                <td data-label="Issue">{fb.issue}</td>
+                                <td data-label="Status">
+                                    <span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span>
+                                </td>
+                                <td data-label="Date">{new Date(fb.submittedOn).toLocaleDateString()}</td>
+                                <td data-label="Action">
+                                    <Link to={`/admin/feedback/${fb.id}`} className="view-link">View Details</Link>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -121,6 +137,6 @@ function FeedbackManagement({ feedbackData }) {
             </div>
         </div>
     );
-}
+};
 
 export default FeedbackManagement;

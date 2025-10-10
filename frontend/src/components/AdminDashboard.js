@@ -6,7 +6,7 @@ import { useNotification } from "./NotificationContext";
 import FeedbackChart from "./FeedbackChart";
 import CountUp from "./CountUp";
 
-function AdminDashboard({ feedbackData, announcements, setAnnouncements, commendations }) {
+function AdminDashboard({ feedbackData, announcements, setAnnouncements, commendations, lostAndFoundItems, setLostAndFoundItems }) {
   const [newAnnouncement, setNewAnnouncement] = useState("");
   const [editingAnnId, setEditingAnnId] = useState(null);
   const [editingAnnText, setEditingAnnText] = useState("");
@@ -46,6 +46,15 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
 
   // Get unique routes for the filter dropdown
   const uniqueRoutes = useMemo(() => ['All', ...new Set(feedbackData.map(fb => fb.route))], [feedbackData]);
+
+  const handleMarkAsClaimed = (itemId) => {
+    setLostAndFoundItems(prevItems => 
+      prevItems.map(item => 
+        item.id === itemId ? { ...item, status: 'claimed' } : item
+      )
+    );
+    showNotification("Item status updated to 'Claimed'.");
+  };
 
   const handlePostAnnouncement = () => {
     if (newAnnouncement.trim() === "") return; // Prevent empty posts
@@ -133,12 +142,52 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
       </div>
 
       <div className="dashboard-card full-width-card">
+        <h3>Manage Found Items</h3>
+        <table className="feedback-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Route</th>
+              <th>Posted On</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(lostAndFoundItems || []).filter(i => i.type === 'found').slice(0, 5).map(item => (
+              <tr key={item.id}>
+                <td data-label="Item">{item.item}</td>
+                <td data-label="Route">{item.route}</td>
+                <td data-label="Posted On">{new Date(item.date).toLocaleDateString()}</td>
+                <td data-label="Status"><span className={`status ${item.status}`}>{item.status}</span></td>
+                <td data-label="Action">
+                  {item.status === 'unclaimed' ? (
+                    <button onClick={() => handleMarkAsClaimed(item.id)} className="claim-btn">Mark Claimed</button>
+                  ) : (
+                    <span className="claimed-text">Claimed</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {lostAndFoundItems.filter(i => i.type === 'found').length === 0 && (
+            <p className="no-data-message">No found items have been reported.</p>
+        )}
+        <div className="view-all-container">
+            <Link to="/admin/lost-and-found" className="view-all-link">
+                View All Lost & Found Items &rarr;
+            </Link>
+        </div>
+      </div>
+
+      <div className="dashboard-card full-width-card">
         <h3>System Management</h3>
         <div className="quick-actions">
             <Link to="/admin/bus-details" className="action-link">Manage Buses</Link>
             <Link to="/admin/route-details" className="action-link">Manage Routes</Link>
             <Link to="/admin/feedback" className="action-link">Manage Feedback</Link>
-            <Link to="/admin/user-management" className="action-link">Manage Users</Link>
+            <Link to="/admin/user-management" className="action-link">Manage Users</Link> 
             <Link to="/admin/lost-and-found" className="action-link">Manage Lost & Found</Link>
         </div>
       </div>

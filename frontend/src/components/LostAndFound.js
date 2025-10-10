@@ -1,39 +1,101 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
+import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
+import './LostAndFoundAdmin.css';
 
-function LostAndFound({ items, setItems }) {
-    const { user } = useAuth();
+function LostAndFound({ items, setItems, isAdminPage = false }) {
+    const { user, awardPoints } = useAuth();
     const { showNotification } = useNotification();
     const [formData, setFormData] = useState({ type: 'lost', item: '', route: '', description: '' });
     const [lostSearchTerm, setLostSearchTerm] = useState('');
     const [foundSearchTerm, setFoundSearchTerm] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const lostItems = useMemo(() =>
-        items
-            .filter(i => i.type === 'lost')
-            .filter(i =>
-                i.item.toLowerCase().includes(lostSearchTerm.toLowerCase()) ||
-                i.description.toLowerCase().includes(lostSearchTerm.toLowerCase())
-            )
-            .sort((a, b) => new Date(b.date) - new Date(a.date)),
-        [items, lostSearchTerm]
-    );
-    const foundItems = useMemo(() =>
-        items
-            .filter(i => i.type === 'found')
-            .filter(i =>
-                i.item.toLowerCase().includes(foundSearchTerm.toLowerCase()) ||
-                i.description.toLowerCase().includes(foundSearchTerm.toLowerCase())
-            )
-            .sort((a, b) => new Date(b.date) - new Date(a.date)),
-        [items, foundSearchTerm]
-    );
+    // --- Admin View State ---
+    const [adminSearchTerm, setAdminSearchTerm] = useState('');
+    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
+
+    // --- Data Filtering and Sorting ---
+    const filteredAndSortedItems = useMemo(() => {
+        let filtered = [...items];
+
+        if (isAdminPage && adminSearchTerm) {
+            const lowercasedTerm = adminSearchTerm.toLowerCase();
+            filtered = items.filter(item =>
+                Object.values(item).some(val =>
+                    String(val).toLowerCase().includes(lowercasedTerm)
+                )
+            );
+        }
+
+        return filtered.sort((a, b) => {
+            if (a[sortConfig.key] < b[sortConfig.key]) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (a[sortConfig.key] > b[sortConfig.key]) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [items, isAdminPage, adminSearchTerm, sortConfig]);
+
+    const lostItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'lost' && (i.item.toLowerCase().includes(lostSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(lostSearchTerm.toLowerCase()))), [filteredAndSortedItems, lostSearchTerm]);
+    const foundItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'found' && (i.item.toLowerCase().includes(foundSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(foundSearchTerm.toLowerCase()))), [filteredAndSortedItems, foundSearchTerm]);
+
+    // --- Pagination Logic ---
+    const itemsPerPage = 10;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredAndSortedItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage);
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+        setCurrentPage(1);
+    };
+
+    const getSortIndicator = (key) => {
+        if (sortConfig.key !== key) return '';
+        return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // --- Action Handlers ---
+    const handleMarkAsClaimed = (itemId) => {
+        setItems(prevItems =>
+            prevItems.map(item =>
+                item.id === itemId ? { ...item, status: 'claimed' } : item
+            )
+        );
+        showNotification("Item status updated to 'Claimed'.");
+    };
+
+    const openDeleteModal = (item) => {
+        setItemToDelete(item);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (!itemToDelete) return;
+        setItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+        showNotification(`Item "${itemToDelete.item}" has been deleted.`, "info");
+        setShowDeleteModal(false);
+        setItemToDelete(null);
     };
 
     const handleSubmit = (e) => {
@@ -42,7 +104,6 @@ function LostAndFound({ items, setItems }) {
             showNotification("Please fill out all fields.", "error");
             return;
         }
-
         const newItem = {
             ...formData,
             id: Date.now(),
@@ -50,12 +111,104 @@ function LostAndFound({ items, setItems }) {
             date: new Date().toISOString(),
             status: formData.type === 'found' ? 'unclaimed' : undefined,
         };
-
         setItems(prev => [newItem, ...prev]);
+        if (newItem.type === 'found') {
+            awardPoints(20);
+        }
         showNotification(`Your ${formData.type} item report has been posted!`);
         setFormData({ type: 'lost', item: '', route: '', description: '' }); // Reset form
     };
 
+    // --- RENDER LOGIC ---
+
+    if (isAdminPage) {
+        return (
+            <div className="admin-page-container">
+                <div className="dashboard-header">
+                    <h2>Manage Lost & Found</h2>
+                    <p>Review, update, and manage all reported items.</p>
+                </div>
+                <div className="dashboard-card full-width-card">
+                    <div className="table-controls">
+                        <input
+                            type="text"
+                            placeholder="Search all items..."
+                            value={adminSearchTerm}
+                            onChange={(e) => setAdminSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th onClick={() => requestSort('item')} className="sortable-header">
+                                    Item {getSortIndicator('item')}
+                                </th>
+                                <th onClick={() => requestSort('type')} className="sortable-header">
+                                    Type {getSortIndicator('type')}
+                                </th>
+                                <th onClick={() => requestSort('route')} className="sortable-header">
+                                    Route {getSortIndicator('route')}
+                                </th>
+                                <th onClick={() => requestSort('user')} className="sortable-header">
+                                    Reported By {getSortIndicator('user')}
+                                </th>
+                                <th onClick={() => requestSort('date')} className="sortable-header">
+                                    Date {getSortIndicator('date')}
+                                </th>
+                                <th onClick={() => requestSort('status')} className="sortable-header">
+                                    Status {getSortIndicator('status')}
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentItems.map(item => (
+                                <tr key={item.id}>
+                                    <td data-label="Item">{item.item}</td>
+                                    <td data-label="Type"><span className={`item-type-badge ${item.type}`}>{item.type}</span></td>
+                                    <td data-label="Route">{item.route}</td>
+                                    <td data-label="Reported By">{item.user}</td>
+                                    <td data-label="Date">{new Date(item.date).toLocaleDateString()}</td>
+                                    <td data-label="Status">
+                                        {item.status ? <span className={`status ${item.status}`}>{item.status}</span> : 'N/A'}
+                                    </td>
+                                    <td data-label="Actions" className="action-cell">
+                                        {item.type === 'found' && item.status === 'unclaimed' && (
+                                            <button onClick={() => handleMarkAsClaimed(item.id)} className="claim-btn">Mark Claimed</button>
+                                        )}
+                                        <button onClick={() => openDeleteModal(item)} className="delete-btn">Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {totalPages > 1 && (
+                        <div className="pagination-container">
+                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                &laquo; Previous
+                            </button>
+                            <span>
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                                Next &raquo;
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <ConfirmationModal
+                    show={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={confirmDelete}
+                    title="Confirm Deletion"
+                    message={`Are you sure you want to delete the report for "${itemToDelete?.item}"? This action cannot be undone.`}
+                />
+            </div>
+        );
+    }
+
+    // Default Student View
     const ItemCard = ({ item }) => (
         <div className={`item-card ${item.type === 'found' ? 'found-item' : 'lost-item'}`}>
             <h4>{item.item}</h4>
@@ -68,7 +221,6 @@ function LostAndFound({ items, setItems }) {
             </div>
         </div>
     );
-
     return (
         <div className="lost-found-container">
             <div className="dashboard-header">
