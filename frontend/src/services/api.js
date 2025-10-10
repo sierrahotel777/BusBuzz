@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live.azurewebsites.net/api';
 
 /**
  * Registers a new user.
@@ -39,7 +39,7 @@ export const loginUser = async (email, password) => {
  */
 export const getAllUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/auth/users`);
+    const response = await fetch(`${API_URL}/users`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -58,7 +58,7 @@ export const getAllUsers = async () => {
  */
 export const exportUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/auth/users/export`);
+    const response = await fetch(`${API_URL}/users/export`);
 
     if (!response.ok) {
       const data = await response.json();
@@ -88,7 +88,7 @@ export const exportUsers = async () => {
  * @returns {Promise<Object>} The result of the import operation.
  */
 export const importUsers = async (users) => {
-  const response = await fetch(`${API_URL}/auth/users/import`, {
+  const response = await fetch(`${API_URL}/users/import`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ users }),
@@ -96,67 +96,6 @@ export const importUsers = async (users) => {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Import failed.');
   return data;
-};
-
-/**
- * Creates a new user via the admin panel.
- * @param {Object} userData - The new user's data.
- * @param {string} token - The admin's JWT for authorization.
- * @returns {Promise<Object>} The newly created user object.
- */
-export const createUser = async (userData, token) => {
-  const response = await fetch(`${API_URL}/auth/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(userData),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Failed to create user.');
-  return data;
-};
-
-/**
- * Updates an existing user's data.
- * @param {string} userId - The ID of the user to update.
- * @param {Object} userData - The updated user data.
- * @param {string} token - The admin's JWT for authorization.
- * @returns {Promise<Object>} The updated user object.
- */
-export const updateUser = async (userId, userData, token) => {
-  const response = await fetch(`${API_URL}/auth/users/${userId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(userData),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Failed to update user.');
-  return data;
-};
-
-/**
- * Deletes a user.
- * @param {string} userId - The ID of the user to delete.
- * @param {string} token - The admin's JWT for authorization.
- */
-export const deleteUser = async (userId, token) => {
-  const response = await fetch(`${API_URL}/auth/users/${userId}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.message || 'Failed to delete user.');
-  }
-  // DELETE requests might not return a body, so we check for status 204 or 200
-  if (response.status !== 204 && response.status !== 200) {
-    throw new Error('Failed to delete user.');
-  }
 };
 
 /**

@@ -57,11 +57,12 @@ const UserManagement = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const confirmDeleteUser = async () => {
+    const confirmDeleteUser = () => {
         if (!userToDelete) return;
         setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
         showNotification(`User "${userToDelete.name}" has been deleted.`, 'info');
         setIsDeleteModalOpen(false);
+        setUserToDelete(null);
     };
 
     const handleImportClick = () => {
@@ -78,7 +79,8 @@ const UserManagement = () => {
                     try {
                         const response = await importUsers(results.data);
                         showNotification(response.message, 'success');
-                        refetchUsers(); // Refresh the user list after import
+                        // Here you might want to refresh the user list from the backend
+                        // For now, we'll just optimistically update if possible or just show the message.
                     } catch (error) {
                         showNotification(error.message, 'error');
                     }
