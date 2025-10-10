@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, getAllUsers } from '../services/api'; // Removed loginUser
+import { registerUser, getAllUsers, loginUser } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -60,32 +60,18 @@ export const AuthProvider = ({ children }) => {
         }
     }, [user]); // Re-run when user object changes
 
-    const login = (email, password) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => { // Simulate network delay
-                if (email === 'admin@test.com' && password === 'password') {
-                    const user = {
-                        id: 'dummy-admin-01',
-                        name: 'Admin User',
-                        email: 'admin@test.com',
-                        role: 'admin',
-                    };
-                    setUser({ ...user, lastActive: new Date().toISOString() });
-                    resolve(user);
-                } else if (email === 'student@test.com' && password === 'password') {
-                    const user = {
-                        id: 'dummy-student-01',
-                        name: 'Student User',
-                        email: 'student@test.com',
-                        role: 'student',
-                    };
-                    setUser({ ...user, lastActive: new Date().toISOString() });
-                    resolve(user);
-                } else {
-                    reject(new Error('Invalid credentials. Please use dummy accounts.'));
-                }
-            }, 500);
-        });
+    const login = async (email, password) => {
+        try {
+            const data = await loginUser(email, password);
+            // Assuming the API returns a user object and a token
+            // The user object from the backend should have id, name, email, role
+            const loggedInUser = { ...data.user, token: data.token };
+            setUser(loggedInUser);
+            return loggedInUser;
+        } catch (error) {
+            // The error from the API service will be thrown here
+            throw error;
+        }
     };
 
     const logout = () => {

@@ -5,11 +5,11 @@ import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import './UserManagement.css';
 import Papa from 'papaparse';
-import { exportUsers, importUsers } from '../services/api';
+import { exportUsers, importUsers, createUser, updateUser, deleteUser } from '../services/api';
 
 
 const UserManagement = () => {
-    const { users, setUsers } = useAuth();
+    const { user, users, refetchUsers } = useAuth();
     const { showNotification } = useNotification();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,21 +35,21 @@ const UserManagement = () => {
         setCurrentUser(null);
     };
 
-    const handleSaveUser = (formData, isEditing) => {
-        if (isEditing) {
-            setUsers(prevUsers => prevUsers.map(u => u.id === formData.id ? { ...u, ...formData } : u));
-            showNotification(`User "${formData.name}" updated successfully.`);
-        } else {
-            const userExists = users.some(u => u.collegeId === formData.collegeId);
-            if (userExists) {
-                showNotification(`User with College ID ${formData.collegeId} already exists.`, 'error');
-                return;
+    const handleSaveUser = async (formData, isEditing) => {
+        try {
+            if (isEditing) {
+                await updateUser(formData.id, formData, user.token);
+                showNotification(`User "${formData.name}" updated successfully.`);
+            } else {
+                await createUser(formData, user.token);
+                showNotification(`User "${formData.name}" created successfully.`, 'success');
             }
-            const newUser = { ...formData, id: `USR${Date.now()}` };
-            setUsers(prevUsers => [newUser, ...prevUsers]);
-            showNotification(`User "${formData.name}" created successfully.`, 'success');
+            refetchUsers(); // Refresh the user list from the backend
+        } catch (error) {
+            showNotification(error.message, 'error');
+        } finally {
+            handleCloseModal();
         }
-        handleCloseModal();
     };
 
     const openDeleteModal = (user) => {
@@ -57,12 +57,16 @@ const UserManagement = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const confirmDeleteUser = () => {
+    const confirmDeleteUser = async () => {
         if (!userToDelete) return;
-        setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
-        showNotification(`User "${userToDelete.name}" has been deleted.`, 'info');
+        try {
+            await deleteUser(userToDelete.id, user.token);
+            showNotification(`User "${userToDelete.name}" has been deleted.`, 'info');
+            refetchUsers(); // Refresh the user list
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
         setIsDeleteModalOpen(false);
-        setUserToDelete(null);
     };
 
     const handleImportClick = () => {
@@ -79,8 +83,7 @@ const UserManagement = () => {
                     try {
                         const response = await importUsers(results.data);
                         showNotification(response.message, 'success');
-                        // Here you might want to refresh the user list from the backend
-                        // For now, we'll just optimistically update if possible or just show the message.
+                        refetchUsers(); // Refresh the user list after import
                     } catch (error) {
                         showNotification(error.message, 'error');
                     }

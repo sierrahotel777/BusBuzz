@@ -25,38 +25,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import FeedbackManagement from "./components/FeedbackManagement";
 import BusManagement from "./components/BusManagement";
-
+require('dotenv').config();
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 import "./App.css";
 
-
-const initialAnnouncements = [
-    { id: 1, text: "Bus routes will be revised from next Monday. Please check the portal." },
-    { id: 2, text: "Transport services will be unavailable on the 25th due to a public holiday." }
-];
-
-// Add mock commendation data
-const initialCommendations = [
-    { id: 1, route: 'S1: VALASARAVAKKAM', praise: 'Safe Driving', message: 'Driver was very careful.', date: '2023-11-10' },
-    { id: 2, route: 'S5: TIRUVOTRIYUR', praise: 'Helpful & Courteous', message: '', date: '2023-11-09' },
-    { id: 3, route: 'S1: VALASARAVAKKAM', praise: 'On-Time Champion', message: 'Always on time!', date: '2023-11-08' },
-];
-
-const initialBusData = [
-    { busNo: 'TN01A1234', route: 'S1: VALASARAVAKKAM', capacity: 50, driver: 'Ramesh Kumar', status: 'On Route' },
-    { busNo: 'TN02B5678', route: 'S5: TIRUVOTRIYUR', capacity: 55, driver: 'Suresh Singh', status: 'Idle' },
-    { busNo: 'TN03C9012', route: 'S2: Porur', capacity: 45, driver: 'Anitha Devi', status: 'Maintenance' },
-];
-
-//
-const initialLostAndFound = [
-    { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
-    { id: 2, type: 'lost', item: 'Black Notebook', route: 'S2', date: '2023-11-09T18:00:00Z', description: 'Has a university logo on the cover.', user: 'Priya S.' }
-];
-
-// Mock crowd-sourced data
-const initialCrowdednessData = [
-    { route: 'S1: VALASARAVAKKAM', level: 'empty', timestamp: new Date().toISOString() }
-];
 
 // This component handles the logic for the root path.
 // If the user is logged in, it redirects them to their dashboard.
@@ -75,11 +47,11 @@ const RootRedirect = () => {
 const AppContent = () => {
   const location = useLocation();
   const [feedbackData, setFeedbackData] = useState([]);
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
-  const [commendations, setCommendations] = useState(initialCommendations);
-  const [lostAndFoundItems, setLostAndFoundItems] = useState(initialLostAndFound);
-  const [busData, setBusData] = useState(initialBusData);
-  const [crowdednessData, setCrowdednessData] = useState(initialCrowdednessData);
+  const [announcements, setAnnouncements] = useState([]);
+  const [commendations, setCommendations] = useState([]);
+  const [lostAndFoundItems, setLostAndFoundItems] = useState([]);
+  const [busData, setBusData] = useState([]);
+  const [crowdednessData, setCrowdednessData] = useState([]);
   const { user, users, isLoading, isExiting } = useAuth();
   
   useEffect(() => {
