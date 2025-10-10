@@ -39,7 +39,7 @@ export const loginUser = async (email, password) => {
  */
 export const getAllUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/users`);
+    const response = await fetch(`${API_URL}/auth/users`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -59,19 +59,10 @@ export const getAllUsers = async () => {
  * @returns {Promise<Array>} An array of the user's feedback objects.
  */
 export const getMyFeedback = async (userId) => {
-  try {
-    // The user ID is passed in the URL to fetch specific feedback.
-    const response = await fetch(`${API_URL}/feedback/my-feedback/${userId}`);
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch your feedback.');
-    }
-    return data;
-  } catch (error) {
-    console.error('API Error (getMyFeedback):', error);
-    throw error;
-  }
+  const response = await fetch(`${API_URL}/feedback/user/${userId}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to fetch your feedback.');
+  return data;
 };
 
 /**
@@ -80,7 +71,7 @@ export const getMyFeedback = async (userId) => {
  */
 export const getFeedback = async () => {
   try {
-    const response = await fetch(`${API_URL}/feedback`);
+    const response = await fetch(`${API_URL}/auth/feedback`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -99,7 +90,7 @@ export const getFeedback = async () => {
  */
 export const exportUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/users/export`);
+    const response = await fetch(`${API_URL}/auth/users/export`);
 
     if (!response.ok) {
       const data = await response.json();
@@ -129,7 +120,7 @@ export const exportUsers = async () => {
  * @returns {Promise<Object>} The result of the import operation.
  */
 export const importUsers = async (users) => {
-  const response = await fetch(`${API_URL}/users/import`, {
+  const response = await fetch(`${API_URL}/auth/users/import`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ users }),
@@ -149,7 +140,7 @@ export const importUsers = async (users) => {
  */
 export const updateFeedbackStatus = async (feedbackId, newStatus, notes, token) => {
   try {
-    const response = await fetch(`${API_URL}/feedback/${feedbackId}`, {
+    const response = await fetch(`${API_URL}/auth/feedback/${feedbackId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -182,12 +173,10 @@ export const submitFeedback = async (feedbackData, token) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // If you implement JWT, the token will be passed here
       // 'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(feedbackData),
   });
-
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to submit feedback.');
   return data;

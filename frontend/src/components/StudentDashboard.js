@@ -10,7 +10,8 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const { user } = useAuth();
   const { showNotification } = useNotification();
   // Filter to get only this student's feedback
-  const myFeedback = (feedbackData || []).filter(fb => fb.user === user.name);
+  const myFeedback = (feedbackData || []).filter(fb => fb.user === user.name)
+    .sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn));
 
   // State for the interactive bus details card
   const initialRoute = user.busRoute && routeData[user.busRoute] 

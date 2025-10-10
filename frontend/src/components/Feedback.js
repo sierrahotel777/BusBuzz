@@ -57,25 +57,27 @@ function Feedback({ setFeedbackData }) {
         driverBehavior,
         cleanliness,
       },
-      attachmentName: attachmentName, // In a real app, this would be a URL after upload
-      userId: user.id, // Pass user ID for association
+      attachmentName: attachmentName,
+      userId: user.id,
       userName: user.name,
     };
     try {
-      // Use the centralized API service instead of a hardcoded fetch
       const data = await submitFeedback(newFeedback);
 
       // Update the global state with the new feedback from the server response
       if (setFeedbackData) {
         setFeedbackData(prevData => [data.feedback, ...prevData]);
       }
-      setMyFeedback(prev => [data.feedback, ...prev]); // Update local history
+      // Re-fetch feedback history to ensure it's up-to-date
+      const updatedHistory = await getMyFeedback(user.id);
+      setMyFeedback(updatedHistory);
+
       showNotification("Feedback submitted successfully!", "success");
       navigate('/student');
-      } catch (error) {
+    } catch (error) {
       console.error("Error submitting feedback:", error);
       showNotification(error.message || "An error occurred while submitting feedback.", "error");
-      setIsSubmitting(false); // Allow user to try again
+      setIsSubmitting(false);
     }
   };
 
