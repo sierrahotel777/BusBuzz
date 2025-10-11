@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
+import './Form.css';
 import './LostAndFoundAdmin.css';
 
 function LostAndFound({ items, setItems, isAdminPage = false }) {
@@ -221,8 +222,8 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                 <p>Report or find lost items on the bus.</p>
             </div>
 
-            <div className="report-form-card">
-                <h3>Report an Item</h3>
+            <div className="form-container report-form-card">
+                <h2>Report an Item</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <div className="report-type-selector">

@@ -84,3 +84,8 @@ a:hover {
 .app-wrapper.exiting {
   animation: fadeOut 0.5s ease-out forwards;
 }
+
+/* General utility for report forms to span the full width in the dashboard grid */
+.report-form-card {
+    grid-column: 1 / -1;
+}
