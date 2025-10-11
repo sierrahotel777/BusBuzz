@@ -23,15 +23,13 @@ app.use(cors({
 }));
 
 app.use(express.json());
-//app.options('*', cors()); 
-app.use(express.json()); 
 
 // --- Routes ---
 app.get('/', (req, res) => {
   res.send('BusBuzz Backend API is running!');
 });
 
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/auth')); // All routes are in auth.js for now
 app.use('/api/feedback', require('./routes/feedback'));
 // --- Server Startup ---
 async function startServer() {

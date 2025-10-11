@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Feedback = require('../db/feedback');
 const { ObjectId } = require('mongodb');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Parser } = require('json2csv');
 const { getDb } = require('../db/mongo');
@@ -82,10 +83,20 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Passwords match. Return a success message and user data.
-    // In a real application, you would generate a JWT here.
+    // Passwords match. Generate a JWT.
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
     res.status(200).json({ 
       message: 'Login successful!',
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -227,18 +238,6 @@ router.get('/feedback/:id', async (req, res) => {
     res.json(feedback);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching feedback.' });
-  }
-});
-
-
-router.get('/feedback/my-feedback/:userId', auth(), async (req, res) => {
-  const { userId } = req.params;
-  try {
-    // Replace with your actual feedback model/query
-    const feedbacks = await Feedback.find({ userId });
-    res.json(feedbacks);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch feedback.' });
   }
 });
 
