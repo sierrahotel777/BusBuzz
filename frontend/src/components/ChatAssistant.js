@@ -27,7 +27,6 @@ const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
-  const [selectedRoute, setSelectedRoute] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -82,7 +81,6 @@ const ChatAssistant = () => {
 
     let aiMessage;
     if (type === 'select_route') {
-      setSelectedRoute(routeId);
       const stops = routeData[routeId]?.stops || {};
       const stopOptions = Object.keys(stops).map(stop => ({
         label: stop,
@@ -113,7 +111,6 @@ const ChatAssistant = () => {
     setMessages(prev => [...prev, userMessage]);
     if (aiMessage) {
       setTimeout(() => setMessages(prev => [...prev, aiMessage]), 500);
-      setSelectedRoute(null);
     }
   };
 
