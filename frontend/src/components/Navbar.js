@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTheme } from './ThemeContext';
+import logo from '../assets/logo.svg';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,7 +13,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         await logout();
-        navigate('/'); // Redirect to login after logout
+        navigate('/'); 
     };
 
     const toggleNav = () => {
@@ -26,7 +27,8 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                <NavLink to={user.role === 'admin' ? '/admin' : '/student'} className="navbar-brand">
+                <NavLink to={user.role === 'admin' ? '/admin' : '/student'} className="navbar-brand" onClick={closeNav}>
+                    <img src={logo} alt="BusBuzz Logo" className="navbar-logo" />
                     BusBuzz
                 </NavLink>
                 <button className="navbar-toggler" onClick={toggleNav} aria-label="Toggle navigation">
