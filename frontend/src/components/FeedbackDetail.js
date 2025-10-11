@@ -1,13 +1,10 @@
-// frontend/src/components/FeedbackDetail.js
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; // useParams is CRITICAL
-import { useNotification } from './NotificationContext'; // Assuming this hook exists
+import { useParams, Link } from 'react-router-dom'; 
+import { useNotification } from './NotificationContext'; 
 import { getFeedbackById, updateFeedbackStatus } from '../services/api'; 
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
-    // 1. Get the ID from the URL path, as defined in App.js route
     const { feedbackId } = useParams();
     const { showNotification } = useNotification();
     
@@ -17,14 +14,14 @@ function FeedbackDetail() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (!feedbackId) { // No user token check needed if middleware is removed
+        if (!feedbackId) { 
             setIsLoading(false);
             return;
         }
         const fetchDetails = async () => {
             try {
                 setIsLoading(true);
-                const data = await getFeedbackById(feedbackId); // No token needed
+                const data = await getFeedbackById(feedbackId); 
                 setFeedback({ ...data, id: data._id });
             } catch (error) {
                 showNotification(error.message || "Could not load feedback details.", 'error');
@@ -34,17 +31,15 @@ function FeedbackDetail() {
             }
         };
         fetchDetails();
-    }, [feedbackId, showNotification]); // No user dependency
+    }, [feedbackId, showNotification]); 
 
     const handleStatusChange = async (newStatus) => {
         setIsSubmitting(true);
         try {
-            // Placeholder: Call the API service to update the status (similar to getFeedbackDetail)
-            await updateFeedbackStatus(feedbackId, newStatus, internalNote); // No token needed
+            await updateFeedbackStatus(feedbackId, newStatus, internalNote); 
             
             showNotification(`Status updated to ${newStatus}. (Simulation)`, 'success');
             
-            // Optimistically update the local state 
             setFeedback(prev => ({
                 ...prev, 
                 status: newStatus,
@@ -77,7 +72,6 @@ function FeedbackDetail() {
         );
     }
     
-    // 🛑 Ensure you use the backend data structure for display:
     const userName = feedback.userName || "N/A"; 
     const submittedOn = new Date(feedback.submittedOn).toLocaleString(); 
 
@@ -89,7 +83,6 @@ function FeedbackDetail() {
             </div>
 
             <div className="feedback-grid">
-                {/* USER INFO CARD */}
                 <div className="detail-card user-info">
                     <h3>Submitted By</h3>
                     <p><strong>Name:</strong> {userName}</p>
@@ -97,7 +90,6 @@ function FeedbackDetail() {
                     <p><strong>Submitted:</strong> {submittedOn}</p>
                 </div>
                 
-                {/* BUS INFO CARD */}
                 <div className="detail-card bus-info">
                     <h3>Bus Details</h3>
                     <p><strong>Bus No:</strong> {feedback.busNo}</p>
@@ -109,23 +101,18 @@ function FeedbackDetail() {
                     )}
                 </div>
 
-                {/* RATINGS CARD */}
                 <div className="detail-card ratings-info">
                     <h3>Ratings</h3>
-                    {/* Assuming details field exists, adjust access based on your specific MongoDB structure */}
                     <p><strong>Punctuality:</strong> {feedback.details?.punctuality || 'N/A'}</p>
                     <p><strong>Driver Behavior:</strong> {feedback.details?.driverBehavior || 'N/A'}</p>
                     <p><strong>Cleanliness:</strong> {feedback.details?.cleanliness || 'N/A'}</p>
                 </div>
 
-                {/* COMMENTS CARD */}
                 <div className="detail-card comments-info full-width-card">
                     <h3>Student's Comments</h3>
                     <p>{feedback.comments}</p>
                 </div>
 
-                {/* RESOLUTION/ACTIONS CARD */}
-                {/* (The existing logic for resolution and actions remains valid here) */}
                 
                 {feedback.status === 'Resolved' && feedback.resolution && (
                     <div className="detail-card resolution-info full-width-card">

@@ -26,7 +26,6 @@ function ResetPassword() {
         
         setIsSubmitting(true);
 
-        // Simulate API call
         setTimeout(() => {
             showNotification('Password has been reset successfully! Please log in.');
             navigate('/');

@@ -33,7 +33,7 @@ function CrowdednessByRouteChart({ crowdednessData }) {
     }, [crowdednessData, theme]);
 
     const options = {
-        indexAxis: 'y', // Horizontal bar chart
+        indexAxis: 'y', 
         responsive: true,
         maintainAspectRatio: false,
         scales: {

@@ -293,5 +293,5 @@
     align-items: center;
     justify-content: center;
     color: #6c757d;
-    width: auto; /* Override the default button width */
+    width: auto; 
 }

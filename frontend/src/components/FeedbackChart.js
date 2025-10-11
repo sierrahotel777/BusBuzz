@@ -10,7 +10,6 @@ function FeedbackChart({ feedbackData, onSegmentClick }) {
     const chartRef = useRef();
 
     const onHover = (event, chartElement) => {
-        // The 'native' event is essential for getting the canvas element
         const canvas = event.native?.target;
         if (canvas) canvas.style.cursor = chartElement[0] ? 'pointer' : 'default';
     };

@@ -25,12 +25,11 @@ function UserFormModal({ isOpen, onClose, user }) {
                     name: user.name || '',
                     email: user.email || '',
                     role: user.role || 'student',
-                    password: '', // Don't pre-fill password for security
+                    password: '', 
                     collegeId: user.collegeId || '',
                     busRoute: user.busRoute || ''
                 });
             } else {
-                // Reset for new user
                 setFormData({ name: '', email: '', role: 'student', password: '', collegeId: '', busRoute: '' });
             }
         }
@@ -45,7 +44,6 @@ function UserFormModal({ isOpen, onClose, user }) {
         e.preventDefault();
         if (isEditing) {
             const dataToUpdate = { ...formData };
-            // If password field is empty, don't update the password
             if (!dataToUpdate.password) {
                 delete dataToUpdate.password;
             }

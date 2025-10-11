@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
+import './Form.css';
 import './LostAndFoundAdmin.css';
 
 function LostAndFound({ items, setItems, isAdminPage = false }) {
@@ -15,11 +16,9 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
     const [itemToDelete, setItemToDelete] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // --- Admin View State ---
     const [adminSearchTerm, setAdminSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
 
-    // --- Data Filtering and Sorting ---
     const filteredAndSortedItems = useMemo(() => {
         let filtered = [...items];
 
@@ -46,7 +45,6 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
     const lostItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'lost' && (i.item.toLowerCase().includes(lostSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(lostSearchTerm.toLowerCase()))), [filteredAndSortedItems, lostSearchTerm]);
     const foundItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'found' && (i.item.toLowerCase().includes(foundSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(foundSearchTerm.toLowerCase()))), [filteredAndSortedItems, foundSearchTerm]);
 
-    // --- Pagination Logic ---
     const itemsPerPage = 10;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -75,7 +73,6 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // --- Action Handlers ---
     const handleMarkAsClaimed = (itemId) => {
         setItems(prevItems =>
             prevItems.map(item =>
@@ -116,10 +113,8 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
             awardPoints(20);
         }
         showNotification(`Your ${formData.type} item report has been posted!`);
-        setFormData({ type: 'lost', item: '', route: '', description: '' }); // Reset form
+        setFormData({ type: 'lost', item: '', route: '', description: '' }); 
     };
-
-    // --- RENDER LOGIC ---
 
     if (isAdminPage) {
         return (
@@ -208,7 +203,6 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         );
     }
 
-    // Default Student View
     const ItemCard = ({ item }) => (
         <div className={`item-card ${item.type === 'found' ? 'found-item' : 'lost-item'}`}>
             <h4>{item.item}</h4>
@@ -228,8 +222,8 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                 <p>Report or find lost items on the bus.</p>
             </div>
 
-            <div className="report-form-card">
-                <h3>Report an Item</h3>
+            <div className="form-container report-form-card">
+                <h2>Report an Item</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <div className="report-type-selector">
@@ -263,7 +257,7 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                 </form>
             </div>
 
-            <div className="items-grid">
+            <div className="dashboard-card full-width-card">
                 <div className="items-column">
                     <h3><span className="column-icon">🔍</span>Recently Lost</h3>
                     <div className="search-bar-container">
@@ -279,6 +273,8 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                         {lostItems.length > 0 ? lostItems.map(item => <ItemCard key={item.id} item={item} />) : <p>No lost items reported.</p>}
                     </div>
                 </div>
+            </div>
+            <div className="dashboard-card full-width-card">
                 <div className="items-column">
                     <h3><span className="column-icon">🎁</span>Recently Found</h3>
                     <div className="search-bar-container">

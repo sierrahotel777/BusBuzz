@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Dashboard.css'; // Re-using the dashboard styles
+import './Dashboard.css'; 
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import CommendationModal from './CommendationModal';
@@ -14,7 +14,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const [myFeedback, setMyFeedback] = useState([]);
   const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
 
-  // State for the interactive bus details card
   const initialRoute = user.busRoute && routeData[user.busRoute] 
     ? user.busRoute 
     : routeNames[0];
@@ -36,15 +35,15 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     async function fetchFeedback() {
       setIsLoadingFeedback(true);
       try {
-        const feedbacks = await getMyFeedback(user.id); // Pass user.id for query param
+        const feedbacks = await getMyFeedback(user.id); 
         setMyFeedback(feedbacks);
       } catch (error) {
         showNotification(error.message || "Failed to load feedback.", "error");
       }
       setIsLoadingFeedback(false);
     }
-    if (user?.id) fetchFeedback(); // Only fetch if user.id is available
-  }, [user?.id, showNotification]); // Depend on user.id
+    if (user?.id) fetchFeedback(); 
+  }, [user?.id, showNotification]); 
   const [selectedStop, setSelectedStop] = useState(initialStop);
   const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
   const [notificationSent, setNotificationSent] = useState(false);
@@ -62,9 +61,9 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     if (recentReports.length > 0) {
-      return recentReports[0].level; // Return the most recent report's level
+      return recentReports[0].level; 
     }
-    return 'unknown'; // Default if no recent data
+    return 'unknown'; 
   }, [crowdednessData, selectedRoute]);
 
   const handleCrowdednessReport = (level) => {
@@ -73,9 +72,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       level,
       timestamp: new Date().toISOString(),
     };
-    // In a real app, you'd send this to a backend. Here, we update the shared state.
-    // To keep the demo simple, we'll just add the new report.
-    // A real implementation would likely replace old reports from the same user.
     setCrowdednessData(prev => [newReport, ...prev]);
     showNotification(`Thank you for reporting the bus status as "${level}"!`, 'info');
   };
@@ -86,17 +82,13 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       level: 'crowded',
       timestamp: new Date().toISOString(),
     };
-    // In a real app, this would be sent to a backend.
     setCrowdednessData(prev => [newReport, ...prev]);
     showNotification(`Overcrowding reported for route ${selectedRoute}. Thank you for helping!`, 'info');
   };
-
-  // Reset notification status when route or stop changes
   useEffect(() => {
     setNotificationSent(false);
   }, [selectedRoute, selectedStop]);
 
-  // Effect for checking ETA and sending notification
   useEffect(() => {
     if (!eta || notificationSent) return;
 
@@ -113,11 +105,10 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     const interval = setInterval(() => {
       const now = new Date();
       const minutesUntilEta = (etaDate - now) / 1000 / 60;
-      // Notify if bus is arriving in 10 minutes or less, but not if it has already passed
       if (minutesUntilEta <= 10 && minutesUntilEta > 0) {
         showNotification(`Your bus for route ${selectedRoute} is expected in about ${Math.ceil(minutesUntilEta)} minutes.`, 'info');
-        setNotificationSent(true); // Mark as sent to prevent re-notifying
-        clearInterval(interval); // Stop checking once notification is sent
+        setNotificationSent(true); 
+        clearInterval(interval); 
       }
     }, 30000); // Check every 30 seconds
 
@@ -153,7 +144,6 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
         <p>Here's your transport summary for today.</p>
       </div>
 
-      {/* Live display of the student's raised tickets */}
       <div className="dashboard-card full-width-card my-feedback-card">
         <h3>My Submitted Feedback</h3>
         {isLoadingFeedback ? <p>Loading feedback...</p> : myFeedback.length > 0 ? (
@@ -254,7 +244,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
           <ul className="found-items-list">
             {unclaimedFoundItems.map(item => (
               <li key={item.id}>
-                <strong>{item.item}</strong> on Route {item.route}
+                <strong>{item.item}</strong> <span className="text-light">on Route {item.route}</span>
                 <p>{item.description}</p>
               </li>
             ))}

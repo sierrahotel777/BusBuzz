@@ -1,29 +1,6 @@
+/* Override the max-width from form-container to allow full-width expansion */
 .report-form-card {
-    background: var(--surface-color);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 30px;
-    overflow: hidden;
-}
-
-.report-form-card h3 {
-    margin-top: 0;
-    color: var(--primary-color);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group-inline {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.form-group-inline > .form-group {
-    flex: 1;
+    max-width: 100%;
 }
 
 .report-type-selector {
@@ -31,58 +8,46 @@
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--border-color);
+    margin-bottom: 20px;
 }
 
 .report-type-selector label {
     flex: 1;
-    padding: 12px 15px;
+    padding: 12px;
     text-align: center;
     cursor: pointer;
     background-color: var(--subtle-bg);
     color: var(--text-color-light);
+    transition: background-color 0.2s, color 0.2s;
     font-weight: bold;
-    transition: all 0.2s ease-in-out;
-}
-
-.report-type-selector label:hover {
-    background-color: var(--hover-bg);
 }
 
 .report-type-selector label.active {
     background-color: var(--primary-color);
     color: white;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .report-type-selector input[type="radio"] {
     display: none;
 }
 
-.form-group label {
-    display: block;
-    font-weight: bold;
-    color: var(--text-color-light);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+.form-group-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 5px;
-    border: 1px solid var(--border-color);
-    background-color: var(--subtle-bg);
-    color: var(--text-color);
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .btn-submit-report {
-    background-color: var(--primary-color);
+    padding: 12px 25px;
+    background: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
@@ -90,27 +55,34 @@
 }
 
 .btn-submit-report:hover {
-    background-color: var(--primary-color-dark);
+    background: var(--primary-color-dark);
 }
 
-.form-actions {
-    margin-top: 25px;
-    text-align: right;
-}
-
-.items-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+.items-column {
+    width: 100%;
 }
 
 .items-column h3 {
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar-container {
+    margin-bottom: 20px;
+}
+
+.item-search {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
 }
 
 .items-list {
@@ -120,83 +92,49 @@
 }
 
 .item-card {
-    background: var(--surface-color);
-    padding: 15px;
+    background-color: var(--subtle-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    border-left: 5px solid;
+    padding: 15px;
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 
-.lost-item { border-color: var(--error-border); }
-.found-item { border-color: var(--success-border); }
+.item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
 
-.item-card h4 { margin: 0 0 10px 0; }
-.item-card p { margin: 5px 0; }
+.item-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.item-card p {
+    margin: 5px 0;
+    color: var(--text-color-light);
+    font-size: 0.9rem;
+}
 
 .item-footer {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--text-color-light);
+    align-items: center;
     margin-top: 15px;
     padding-top: 10px;
     border-top: 1px solid var(--border-color);
+    font-size: 0.8rem;
+    color: var(--text-color-light);
 }
 
 .item-status {
+    padding: 4px 8px;
+    border-radius: 12px;
     font-weight: bold;
     text-transform: capitalize;
 }
-.item-status.unclaimed { color: var(--warning-text); }
-.item-status.claimed { color: var(--success-text); }
 
-.search-bar-container {
-    margin-bottom: 20px;
-}
+.item-status.unclaimed { background-color: rgba(254, 193, 15, 0.2); color: #b4880b; }
+.item-status.claimed { background-color: var(--success-bg); color: var(--success-text); }
 
-.item-search {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid var(--border-color) !important;
-    background-color: var(--surface-color);
-    color: var(--text-color);
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.item-search:focus {
-    outline: none;
-    border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-}
-
-/* Status Badges for Admin Table */
-.status-badge {
-    padding: 0.25rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    white-space: nowrap;
-}
-
-.status-lost, .status-reported {
-    background-color: var(--error-bg);
-    color: var(--error-text);
-}
-
-.status-found, .status-unclaimed {
-    background-color: rgba(254, 193, 15, 0.2);
-    color: #b4880b;
-}
-
-.status-claimed {
-    background-color: var(--success-bg);
-    color: var(--success-text);
-}
-
-
-@media (max-width: 600px) {
-    .form-group-inline {
-        flex-direction: column;
-    }
-}
+[data-theme='dark'] .item-status.unclaimed { background-color: rgba(214, 158, 46, 0.2); color: #d69e2e; }
+[data-theme='dark'] .item-status.claimed { background-color: rgba(72, 187, 120, 0.2); color: #48bb78; }

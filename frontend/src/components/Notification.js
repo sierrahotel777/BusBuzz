@@ -7,9 +7,9 @@ const Notification = () => {
 
     useEffect(() => {
         if (notification) {
-            const timer = setTimeout(() => {
+            const timer = setTimeout(() => { 
                 hideNotification();
-            }, 3000); // Auto-hide after 3 seconds
+            }, 3000); 
 
             return () => clearTimeout(timer);
         }

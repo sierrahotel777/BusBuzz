@@ -27,7 +27,7 @@ function BusManagement({ busData, setBusData, users }) {
                         capacity: parseInt(row.capacity, 10) || 0,
                     }));
 
-                    // Merge new data with existing data, updating by busNo
+
                     setBusData(prevData => {
                         const busMap = new Map(prevData.map(bus => [bus.busNo, bus]));
                         newBuses.forEach(bus => busMap.set(bus.busNo, { ...busMap.get(bus.busNo), ...bus }));
@@ -41,7 +41,6 @@ function BusManagement({ busData, setBusData, users }) {
                 }
             });
         }
-        // Reset file input so the same file can be uploaded again
         event.target.value = null;
     };
 
@@ -57,7 +56,6 @@ function BusManagement({ busData, setBusData, users }) {
 
     const handleSaveBus = (formData, isEditing) => {
         if (isEditing) {
-            // Update existing bus
             setBusData(prevData =>
                 prevData.map(bus =>
                     bus.busNo === formData.busNo ? { ...bus, ...formData } : bus
@@ -65,7 +63,6 @@ function BusManagement({ busData, setBusData, users }) {
             );
             showNotification(`Bus ${formData.busNo} updated successfully!`);
         } else {
-            // Add new bus
             const busExists = busData.some(bus => bus.busNo === formData.busNo);
             if (busExists) {
                 showNotification(`Bus with number ${formData.busNo} already exists.`, 'error');
@@ -78,7 +75,6 @@ function BusManagement({ busData, setBusData, users }) {
         handleCloseModal();
     };
 
-    // --- Pagination Logic ---
     const itemsPerPage = 10;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -92,7 +88,7 @@ function BusManagement({ busData, setBusData, users }) {
     const drivers = users.filter(u => u.role === 'driver').map(d => d.name);
 
     return (
-        <div className="dashboard-grid"> {/* Use dashboard-grid for consistent padding and layout */}
+        <div className="dashboard-grid"> 
             <div className="dashboard-header">
                 <h2>Bus Management</h2>
                 <p>View, edit, and import bus details for the entire fleet.</p>

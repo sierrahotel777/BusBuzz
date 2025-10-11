@@ -4,7 +4,7 @@
   align-items: flex-start;
   padding: 50px 20px;
   background-color: var(--background-color);
-  min-height: calc(100vh - 150px); /* Adjust based on navbar height */
+  min-height: calc(100vh - 150px); 
 }
 
 .profile-card {

@@ -1,4 +1,4 @@
-/* Override global glass effect for a solid modal background */
+
 .commendation-modal {
     background: rgba(255, 255, 255, 0.4);
     border-radius: 16px;
@@ -90,7 +90,7 @@ body[data-theme='dark'] .commendation-modal .form-actions {
     border-top-color: var(--dark-border-color);
 }
 
-/* Set opacity for form elements inside the modal */
+
 .commendation-modal select,
 .commendation-modal textarea {
     background-color: rgba(255, 255, 255, 0.4) !important;

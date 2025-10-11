@@ -26,8 +26,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import FeedbackManagement from "./components/FeedbackManagement";
 import BusManagement from "./components/BusManagement";
+import ChatAssistant from "./components/ChatAssistant";
 
 import "./App.css";
+import "./components/ChatAssistant.css";
 
 
 const initialAnnouncements = [
@@ -35,7 +37,6 @@ const initialAnnouncements = [
     { id: 2, text: "Transport services will be unavailable on the 25th due to a public holiday." }
 ];
 
-// Add mock commendation data
 const initialCommendations = [
     { id: 1, route: 'S1: VALASARAVAKKAM', praise: 'Safe Driving', message: 'Driver was very careful.', date: '2023-11-10' },
     { id: 2, route: 'S5: TIRUVOTRIYUR', praise: 'Helpful & Courteous', message: '', date: '2023-11-09' },
@@ -48,20 +49,14 @@ const initialBusData = [
     { busNo: 'TN03C9012', route: 'S2: Porur', capacity: 45, driver: 'Anitha Devi', status: 'Maintenance' },
 ];
 
-//
 const initialLostAndFound = [
     { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
     { id: 2, type: 'lost', item: 'Black Notebook', route: 'S2', date: '2023-11-09T18:00:00Z', description: 'Has a university logo on the cover.', user: 'Priya S.' }
 ];
 
-// Mock crowd-sourced data
 const initialCrowdednessData = [
     { route: 'S1: VALASARAVAKKAM', level: 'empty', timestamp: new Date().toISOString() }
 ];
-
-// This component handles the logic for the root path.
-// If the user is logged in, it redirects them to their dashboard.
-// Otherwise, it shows the Login page.
 const RootRedirect = () => {
   const { user, isLoading } = useAuth();
 
@@ -72,36 +67,31 @@ const RootRedirect = () => {
   return user ? <Navigate to={user.role === 'admin' ? '/admin' : '/student'} replace /> : <Login />;
 };
 
-// A helper component to conditionally render the Navbar
-const AppContent = () => {
+function App() {
   const location = useLocation();
+  const { user, users, isLoading, isExiting } = useAuth();
   const [feedbackData, setFeedbackData] = useState([]);
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [commendations, setCommendations] = useState(initialCommendations);
   const [lostAndFoundItems, setLostAndFoundItems] = useState(initialLostAndFound);
   const [busData, setBusData] = useState(initialBusData);
   const [crowdednessData, setCrowdednessData] = useState(initialCrowdednessData);
-  const { user, users, isLoading, isExiting } = useAuth();
-  
+
   useEffect(() => {
     const fetchAllFeedback = async () => {
-      console.log("App.js: Attempting to fetch all feedback for admin panel...");
       try {
-        // Fetch all feedback, as there's no role-based filtering on the frontend anymore
         const data = await getFeedback();
-        console.log("App.js: Fetched feedback data:", data);
         setFeedbackData(data);
-        } catch (error) {
-          console.error("Failed to fetch feedback:", error);
-        }
+      } catch (error) {
+        console.error("Failed to fetch feedback:", error);
+      }
     };
     fetchAllFeedback();
-  }, []); // Fetch once on component mount, no user dependency needed for fetching all
-  
-  // We don't want to show the Navbar on the Login or Signup pages
+  }, []);
+
   const noNavbarRoutes = ['/', '/forgot-password', '/reset-password'];
   const showNavbar = !noNavbarRoutes.includes(location.pathname);
-  const showFooter = showNavbar; // Show footer on the same pages as navbar
+  const showFooter = showNavbar;
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -125,7 +115,10 @@ const AppContent = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route 
             path="/student" 
-            element={<ProtectedRoute role="student"><StudentDashboard feedbackData={feedbackData} announcements={announcements} setCommendations={setCommendations} lostAndFoundItems={lostAndFoundItems} crowdednessData={crowdednessData} setCrowdednessData={setCrowdednessData} users={users} /></ProtectedRoute>} 
+            element={
+              <ProtectedRoute role="student">
+                <StudentDashboard feedbackData={feedbackData} announcements={announcements} setCommendations={setCommendations} lostAndFoundItems={lostAndFoundItems} crowdednessData={crowdednessData} setCrowdednessData={setCrowdednessData} users={users} />
+              </ProtectedRoute>} 
           />
           <Route 
             path="/admin" 
@@ -161,18 +154,21 @@ const AppContent = () => {
           />
         </Routes>
       </div>
+      {user && user.role === 'student' && (
+        <ChatAssistant />
+      )}
       {showFooter && <Footer />}
     </div>
   );
 };
 
-function App() {
+function AppWrapper() {
   return (
     <Router>
       <AuthProvider>
         <ThemeProvider>
           <NotificationProvider>
-            <AppContent />
+            <App />
           </NotificationProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -180,4 +176,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppWrapper;
