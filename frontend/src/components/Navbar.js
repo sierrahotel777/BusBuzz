@@ -12,7 +12,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         await logout();
-        navigate('/'); // Redirect to login after logout
+        navigate('/'); 
     };
 
     const toggleNav = () => {

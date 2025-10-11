@@ -9,7 +9,6 @@ export const useNotification = () => {
 export const NotificationProvider = ({ children }) => {
     const [notification, setNotification] = useState(null);
 
-    // useCallback ensures the function reference doesn't change on every render
     const showNotification = useCallback((message, type = 'success') => {
         setNotification({ message, type, id: Date.now() });
     }, []);

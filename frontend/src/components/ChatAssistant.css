@@ -18,7 +18,7 @@
 }
 
 .chat-window {
-  position: fixed; /* Position above the toggle button */
+  position: fixed; 
   bottom: 100px;
   right: 20px;
   width: 350px;

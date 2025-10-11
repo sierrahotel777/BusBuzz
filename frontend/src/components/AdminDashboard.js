@@ -15,14 +15,12 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   const [chartRouteFilter, setChartRouteFilter] = useState('All');
   const { showNotification } = useNotification();
 
-  // Calculate stats from live data
   const stats = {
     totalFeedback: feedbackData.length,
     pendingIssues: feedbackData.filter(fb => fb.status === 'Pending').length,
     busesOnRoute: 32,
   };
 
-  // --- Data for Chart (filtered by route) ---
   const chartFilteredData = useMemo(() => {
     if (chartRouteFilter === 'All') {
       return feedbackData;
@@ -30,7 +28,6 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
     return feedbackData.filter(fb => fb.route === chartRouteFilter);
   }, [feedbackData, chartRouteFilter]);
 
-  // --- Leaderboard Logic ---
   const commendationCounts = useMemo(() => {
     return (commendations || []).reduce((acc, comm) => {
         acc[comm.route] = (acc[comm.route] || 0) + 1;
@@ -44,7 +41,6 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
           .slice(0, 5); // Top 5
   }, [commendationCounts]);
 
-  // Get unique routes for the filter dropdown
   const uniqueRoutes = useMemo(() => ['All', ...new Set(feedbackData.map(fb => fb.route))], [feedbackData]);
 
   const handleMarkAsClaimed = (itemId) => {
@@ -57,7 +53,7 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   };
 
   const handlePostAnnouncement = () => {
-    if (newAnnouncement.trim() === "") return; // Prevent empty posts
+    if (newAnnouncement.trim() === "") return; 
 
     const announcement = {
       id: Date.now(),
@@ -65,7 +61,7 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
     };
 
     setAnnouncements(prev => [announcement, ...prev]);
-    setNewAnnouncement(""); // Clear the input
+    setNewAnnouncement(""); 
     showNotification("Announcement posted successfully!");
   };
 

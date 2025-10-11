@@ -98,7 +98,6 @@ body[data-theme='dark'] .route-table th {
     box-sizing: border-box;
 }
 
-/* Bus Assignment Dropdown */
 .bus-assignment-dropdown {
     position: relative;
 }

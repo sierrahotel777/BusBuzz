@@ -1,7 +1,6 @@
 import React from 'react';
 import './SystemStatus.css';
 
-// In a real application, this data would come from a monitoring service API.
 const services = [
     { name: 'User Authentication', status: 'Operational', icon: '👤' },
     { name: 'Feedback Submissions', status: 'Operational', icon: '📝' },

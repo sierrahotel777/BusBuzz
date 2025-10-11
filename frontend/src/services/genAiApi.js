@@ -1,9 +1,4 @@
 import { routeData } from '../components/routeData';
-/**
- * Gets a response from the Gemini AI based on a user query and provided data.
- * @param {string} query The user's question.
- * @returns {string|object} The AI's response text or a structured object for options.
- */
 export const getAiResponse = (query) => {
   const lowerCaseQuery = query.toLowerCase().trim();
 
@@ -22,7 +17,6 @@ export const getAiResponse = (query) => {
   }
 
   if (lowerCaseQuery.includes("bus") || lowerCaseQuery.includes("route") || lowerCaseQuery.includes("timing") || lowerCaseQuery.includes("detail")) {
-    // Return a structured object to trigger the interactive flow
     return {
       text: 'Of course! Please select a bus route to see its stops and timings.',
       options: Object.keys(routeData).map(routeId => ({

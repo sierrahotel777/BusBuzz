@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { routeData } from './routeData'; // We need the detailed route data
+import { routeData } from './routeData'; 
 import './ChatAssistant.css';
 import { getAiResponse } from '../services/genAiApi';
 
@@ -39,7 +39,7 @@ const ChatAssistant = () => {
 
   const getInitialMessage = () => ({
     sender: 'ai',
-    ...getAiResponse('hello') // Use the AI service for the initial message
+    ...getAiResponse('hello') 
   });
 
   const toggleChat = () => {
@@ -65,7 +65,6 @@ const ChatAssistant = () => {
       options: typeof aiResponse === 'object' ? aiResponse.options : []
     };
 
-    // Simulate AI "thinking" time
     setTimeout(() => {
       setMessages(prev => [...prev, aiMessage]);
     }, 500);
@@ -76,7 +75,6 @@ const ChatAssistant = () => {
   const handleOptionClick = (option) => {
     const { type, routeId, stopName } = option.value;
 
-    // Add user's choice to messages
     const userMessage = { sender: 'user', text: option.label };
 
     let aiMessage;
@@ -107,14 +105,12 @@ const ChatAssistant = () => {
       aiMessage = getInitialMessage();
     }
 
-    // Simulate AI "thinking" time
     setMessages(prev => [...prev, userMessage]);
     if (aiMessage) {
       setTimeout(() => setMessages(prev => [...prev, aiMessage]), 500);
     }
   };
 
-  // This function renders the options as buttons
   const renderOptions = (options) => {
     if (!options || options.length === 0) return null;
     return (

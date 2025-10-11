@@ -1,11 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './FeedbackManagement.css'; // We'll create this file for styling
+import './FeedbackManagement.css'; 
 
 function FeedbackManagement({ feedbackData }) {
   const navigate = useNavigate();
 
-  // Sort feedback by most recent first
   const sortedFeedback = feedbackData ? [...feedbackData].sort((a, b) => new Date(b.submittedOn) - new Date(a.submittedOn)) : [];
 
   const handleRowClick = (id) => {

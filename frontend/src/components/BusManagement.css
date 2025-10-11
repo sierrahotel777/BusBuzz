@@ -84,14 +84,13 @@
 .save-btn:hover { background-color: #1e7e34; }
 .cancel-btn:hover { background-color: #5a6268; }
 
-/* Responsive table adjustments */
 @media (max-width: 768px) {
     .action-cell {
         flex-direction: column;
     }
 }
 
-/* Status Badge Styles */
+
 .status-badge {
     padding: 0.25rem 0.6rem;
     border-radius: 12px;

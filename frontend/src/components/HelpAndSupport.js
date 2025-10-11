@@ -46,11 +46,9 @@ function HelpAndSupport() {
     const handleContactSubmit = (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate an API call to a support desk or email service
         setTimeout(() => {
             setIsSubmitting(false);
             showNotification("Your message has been sent! We'll get back to you shortly.", 'info');
-            // Only clear the message field, keep user details
             setContactForm(prev => ({ ...prev, message: '' }));
         }, 1500);
     };

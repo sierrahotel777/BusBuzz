@@ -37,7 +37,6 @@ const initialAnnouncements = [
     { id: 2, text: "Transport services will be unavailable on the 25th due to a public holiday." }
 ];
 
-// Add mock commendation data
 const initialCommendations = [
     { id: 1, route: 'S1: VALASARAVAKKAM', praise: 'Safe Driving', message: 'Driver was very careful.', date: '2023-11-10' },
     { id: 2, route: 'S5: TIRUVOTRIYUR', praise: 'Helpful & Courteous', message: '', date: '2023-11-09' },
@@ -50,20 +49,14 @@ const initialBusData = [
     { busNo: 'TN03C9012', route: 'S2: Porur', capacity: 45, driver: 'Anitha Devi', status: 'Maintenance' },
 ];
 
-//
 const initialLostAndFound = [
     { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
     { id: 2, type: 'lost', item: 'Black Notebook', route: 'S2', date: '2023-11-09T18:00:00Z', description: 'Has a university logo on the cover.', user: 'Priya S.' }
 ];
 
-// Mock crowd-sourced data
 const initialCrowdednessData = [
     { route: 'S1: VALASARAVAKKAM', level: 'empty', timestamp: new Date().toISOString() }
 ];
-
-// This component handles the logic for the root path.
-// If the user is logged in, it redirects them to their dashboard.
-// Otherwise, it shows the Login page.
 const RootRedirect = () => {
   const { user, isLoading } = useAuth();
 

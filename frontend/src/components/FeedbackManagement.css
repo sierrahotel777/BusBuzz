@@ -1,5 +1,4 @@
-/* Re-use existing table styles from Dashboard.css or Feedback.css if available */
-/* This is a simplified version */
+
 .feedback-table {
     width: 100%;
     border-collapse: collapse;

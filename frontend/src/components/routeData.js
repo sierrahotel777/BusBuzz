@@ -1,7 +1,3 @@
-/**
- * Mock data for bus routes, stops, and timings.
- * In a real application, this would come from a backend API.
- */
 export const routeData = {
   'S1: VALASARAVAKKAM': {
     stops: {

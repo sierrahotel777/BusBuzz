@@ -13,7 +13,6 @@ function ForgotPassword() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call
         setTimeout(() => {
             showNotification('If an account with that email exists, a password reset link has been sent.', 'info');
             navigate('/');

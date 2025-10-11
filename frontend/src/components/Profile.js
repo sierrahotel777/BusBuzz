@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useNotification } from "./NotificationContext";
-import "./Profile.css"; // Using dedicated styles for the profile page
+import "./Profile.css"; 
 import { routeData, routeNames } from './routeData';
 
-// Helper function to format the 'last active' time
 function formatTimeAgo(isoString) {
     if (!isoString) return 'never';
     
@@ -31,7 +30,6 @@ function formatTimeAgo(isoString) {
 function Profile() {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  // Initial profile data now comes from the authenticated user
   const [profileData, setProfileData] = useState({
     name: user.name,
     email: user.email,
@@ -40,23 +38,22 @@ function Profile() {
     busRoute: user.busRoute || "",
     favoriteStop: user.favoriteStop || "",
   });
-  // Store original data to handle cancellation of edits
   const [originalProfileData, setOriginalProfileData] = useState(profileData);
   const { showNotification } = useNotification();
 
   const handleEditClick = () => {
-    setOriginalProfileData(profileData); // Save current state before editing
+    setOriginalProfileData(profileData); 
     setIsEditing(true);
   };
 
   const handleCancelClick = () => {
-    setProfileData(originalProfileData); // Revert to original data
+    setProfileData(originalProfileData); 
     setIsEditing(false);
   };
 
   const handleSaveClick = () => {
     updateUser(profileData);
-    setOriginalProfileData(profileData); // Update the 'original' data to the new saved state
+    setOriginalProfileData(profileData); 
     setIsEditing(false);
     showNotification("Profile updated successfully!");
   };
@@ -64,7 +61,6 @@ function Profile() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'busRoute') {
-        // When route changes, reset the favorite stop to the first one in the new route
         const newStops = routeData[value]?.stops || {};
         const firstStop = Object.keys(newStops)[0] || '';
         setProfileData(prev => ({
@@ -85,7 +81,7 @@ function Profile() {
             <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=007bff,1abc9c,3498db,9b59b6,e74c3c&backgroundType=gradientLinear`} alt="User Avatar" />
             {isEditing && (
               <div className="avatar-upload">
-                <label htmlFor="avatar-input">Change</label> {/* Avatar upload is a mock-up */}
+                <label htmlFor="avatar-input">Change</label> 
                 <input id="avatar-input" type="file" accept="image/*" disabled />
               </div>
             )}
@@ -111,17 +107,14 @@ function Profile() {
           </div>
           <div className="profile-field half-width">
             <label>College Email</label>
-            {/* Email is often a unique ID and not editable */}
             <p>{profileData.email}</p>
           </div>
           <div className="profile-field half-width">
             <label>College ID</label>
-            {/* College ID should not be editable */}
             <p>{profileData.collegeId || user.collegeId}</p>
           </div>
           <div className="profile-field half-width">
             <label>Role</label>
-            {/* Role is typically not user-editable */}
             <p>{profileData.role}</p>
           </div>
           <div className="profile-field">

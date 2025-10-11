@@ -31,28 +31,20 @@ export const AuthProvider = ({ children }) => {
             setUsers(allUsers);
         } catch (error) {
             console.error("Failed to fetch users on load", error);
-            // Handle this error, maybe show a notification
         } finally {
-            // The user state is initialized synchronously from localStorage,
-            // so we can set loading to false after fetching all users.
             setIsLoading(false);
         }
     };
 
-    // This effect runs once on app load to signal that the initial user check is complete.
     useEffect(() => {
         fetchUsers();
     }, []);
 
-    // Effect to update localStorage whenever the user object changes
     useEffect(() => {
-        // This effect runs when the component mounts and whenever the `user` state changes.
         try {
             if (user) {
-                // If user is logged in, save their data to localStorage.
                 localStorage.setItem('busbuzz-user', JSON.stringify(user));
             } else {
-                // If user is logged out, remove their data from localStorage.
                 localStorage.removeItem('busbuzz-user');
             }
         } catch (error) {
@@ -65,21 +57,19 @@ export const AuthProvider = ({ children }) => {
             const data = await loginUser(email, password);
             const loggedInUser = data.user;
             setUser({ ...loggedInUser, lastActive: new Date().toISOString() });
-            // The navigate logic is handled by the RootRedirect component upon state change.
             return loggedInUser;
         } catch (error) {
             console.error("Login failed:", error);
-            // Re-throw the error to be caught by the calling component (e.g., Login.js)
             throw error;
         }
     };
 
     const logout = () => {
-        setIsExiting(true); // Start the exit animation
+        setIsExiting(true); 
         setTimeout(() => {
-            setUser(null); // Clear the user state
-            navigate('/login'); // Redirect to login page
-            setIsExiting(false); // Reset animation state
+            setUser(null); 
+            navigate('/login'); 
+            setIsExiting(false); 
         }, 500); // Match animation duration
     };
 
@@ -93,11 +83,9 @@ export const AuthProvider = ({ children }) => {
 
     const updateUser = (updatedUserData) => {
         setUsers(currentUsers => currentUsers.map(u => u.id === updatedUserData.id ? { ...u, ...updatedUserData } : u));
-        // also update the currently logged in user if they are the one being edited
         if (user && user.id === updatedUserData.id) {
             setUser(currentUser => ({ ...currentUser, ...updatedUserData }));
         }
-        // In a real app, you'd also have an API call here to update the user in the DB
     };
 
     const deleteUser = (userId) => {
@@ -108,7 +96,6 @@ export const AuthProvider = ({ children }) => {
         if (user) {
             const updatedUser = { ...user, points: (user.points || 0) + pointsToAward };
             setUser(updatedUser);
-            // In a real app, you'd also have an API call here to update the user's points in the DB
         }
     };
 

@@ -47,9 +47,7 @@ function Feedback({ setFeedbackData }) {
     try {
       const data = await submitFeedback(newFeedback); // No token needed
 
-      // Update the global state with the new feedback from the server response
       if (setFeedbackData) {
-        // Ensure the new feedback object includes the _id from the server response
         setFeedbackData(prevData => [{ ...data.feedback, _id: data.feedback._id }, ...prevData]);
       }
 
@@ -64,8 +62,6 @@ function Feedback({ setFeedbackData }) {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      // In a real app, you'd handle the file object here for upload.
-      // For now, we'll just store the name.
       setAttachmentName(e.target.files[0].name);
     }
   };
