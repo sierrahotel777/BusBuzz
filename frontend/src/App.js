@@ -26,8 +26,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import FeedbackManagement from "./components/FeedbackManagement";
 import BusManagement from "./components/BusManagement";
+import ChatAssistant from "./components/ChatAssistant";
 
 import "./App.css";
+import "./components/ChatAssistant.css";
 
 
 const initialAnnouncements = [
@@ -72,36 +74,31 @@ const RootRedirect = () => {
   return user ? <Navigate to={user.role === 'admin' ? '/admin' : '/student'} replace /> : <Login />;
 };
 
-// A helper component to conditionally render the Navbar
-const AppContent = () => {
+function App() {
   const location = useLocation();
+  const { user, users, isLoading, isExiting } = useAuth();
   const [feedbackData, setFeedbackData] = useState([]);
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [commendations, setCommendations] = useState(initialCommendations);
   const [lostAndFoundItems, setLostAndFoundItems] = useState(initialLostAndFound);
   const [busData, setBusData] = useState(initialBusData);
   const [crowdednessData, setCrowdednessData] = useState(initialCrowdednessData);
-  const { user, users, isLoading, isExiting } = useAuth();
-  
+
   useEffect(() => {
     const fetchAllFeedback = async () => {
-      console.log("App.js: Attempting to fetch all feedback for admin panel...");
       try {
-        // Fetch all feedback, as there's no role-based filtering on the frontend anymore
         const data = await getFeedback();
-        console.log("App.js: Fetched feedback data:", data);
         setFeedbackData(data);
-        } catch (error) {
-          console.error("Failed to fetch feedback:", error);
-        }
+      } catch (error) {
+        console.error("Failed to fetch feedback:", error);
+      }
     };
     fetchAllFeedback();
-  }, []); // Fetch once on component mount, no user dependency needed for fetching all
-  
-  // We don't want to show the Navbar on the Login or Signup pages
+  }, []);
+
   const noNavbarRoutes = ['/', '/forgot-password', '/reset-password'];
   const showNavbar = !noNavbarRoutes.includes(location.pathname);
-  const showFooter = showNavbar; // Show footer on the same pages as navbar
+  const showFooter = showNavbar;
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -125,7 +122,10 @@ const AppContent = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route 
             path="/student" 
-            element={<ProtectedRoute role="student"><StudentDashboard feedbackData={feedbackData} announcements={announcements} setCommendations={setCommendations} lostAndFoundItems={lostAndFoundItems} crowdednessData={crowdednessData} setCrowdednessData={setCrowdednessData} users={users} /></ProtectedRoute>} 
+            element={
+              <ProtectedRoute role="student">
+                <StudentDashboard feedbackData={feedbackData} announcements={announcements} setCommendations={setCommendations} lostAndFoundItems={lostAndFoundItems} crowdednessData={crowdednessData} setCrowdednessData={setCrowdednessData} users={users} />
+              </ProtectedRoute>} 
           />
           <Route 
             path="/admin" 
@@ -161,18 +161,21 @@ const AppContent = () => {
           />
         </Routes>
       </div>
+      {user && user.role === 'student' && (
+        <ChatAssistant />
+      )}
       {showFooter && <Footer />}
     </div>
   );
 };
 
-function App() {
+function AppWrapper() {
   return (
     <Router>
       <AuthProvider>
         <ThemeProvider>
           <NotificationProvider>
-            <AppContent />
+            <App />
           </NotificationProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -180,4 +183,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppWrapper;
