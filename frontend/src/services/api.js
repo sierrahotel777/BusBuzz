@@ -1,4 +1,5 @@
-const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
+//const API_URL = process.env.REACT_APP_API_URL || 'https://busbuzz-api-live-eus.azurewebsites.net/api';
+const API_URL = 'https://busbuzz-api-live-eus.azurewebsites.net/api';
 
 /**
  * Registers a new user.
