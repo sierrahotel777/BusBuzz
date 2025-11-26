@@ -28,9 +28,16 @@ const createSchema = Joi.object({
 router.get('/', readLimiter, async (req, res) => {
   try {
     const q = {};
-    if (req.query.userId) q.userId = req.query.userId;
-    if (req.query.type) q.type = req.query.type;
-    if (req.query.status) q.status = req.query.status;
+    // Sanitize and whitelist query parameters
+    if (req.query.userId) q.userId = String(req.query.userId).replace(/[^a-zA-Z0-9_@.\-]/g, '');
+    if (req.query.type) {
+      const t = String(req.query.type).toLowerCase();
+      if (t === 'lost' || t === 'found') q.type = t;
+    }
+    if (req.query.status) {
+      const s = String(req.query.status).toLowerCase();
+      if (['unclaimed','claimed','pending','resolved'].includes(s)) q.status = s;
+    }
     const docs = await col().find(q).sort({ date: -1 }).toArray();
     res.status(200).json(docs.map(d => ({ ...d, id: d._id })));
   } catch (err) {
@@ -59,7 +66,13 @@ router.put('/:id', writeLimiter, async (req, res) => {
   const { id } = req.params;
   if (!ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid ID.' });
   try {
-    const update = { $set: req.body };
+    // Whitelist updatable fields to avoid operator injection
+    const allowed = ['status','description','route','item'];
+    const safeBody = {};
+    for (const k of allowed) {
+      if (k in req.body) safeBody[k] = req.body[k];
+    }
+    const update = { $set: safeBody };
     const result = await col().updateOne({ _id: new ObjectId(id) }, update);
     if (result.matchedCount === 0) return res.status(404).json({ message: 'Item not found.' });
     res.status(200).json({ message: 'Updated.' });

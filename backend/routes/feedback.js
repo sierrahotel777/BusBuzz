@@ -66,7 +66,12 @@ const updateSchema = Joi.object({
 router.get('/', readLimiter, async (req, res) => {
   try {
     const { userId } = req.query;
-    const query = userId ? { userId } : {};
+    let query = {};
+    if (userId) {
+      // Sanitize userId: allow safe alphanum and basic symbols
+      const safeUserId = String(userId).replace(/[^a-zA-Z0-9_@.\-]/g, '');
+      query = { userId: safeUserId };
+    }
     const docs = await col().find(query).sort({ submittedOn: -1 }).toArray();
     const formatted = docs.map(d => ({ ...d, id: d._id }));
     res.status(200).json(formatted);

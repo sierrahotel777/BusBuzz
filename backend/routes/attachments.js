@@ -66,7 +66,9 @@ router.get('/:filename', (req, res) => {
   const { filename } = req.params;
   const buffer = attachmentStore.get(filename);
   if (!buffer) return res.status(404).json({ message: 'File not found.' });
-  res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+  // Sanitize filename and quote to avoid header injection / reflected XSS
+  const safeFilename = String(filename).replace(/[^a-zA-Z0-9_.\-]/g, '_');
+  res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
   res.status(200).send(buffer);
 });
 
