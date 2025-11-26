@@ -159,7 +159,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
               {myFeedback.map(fb => (
                 <tr key={fb.id} onClick={() => navigate(`/feedback/${fb.id}`)} className="clickable-row">
                   <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
-                  <td data-label="Route">{fb.route}</td>
+                  <td data-label="Route">{fb.route || 'N/A'}</td>
                   <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
                 </tr>
               ))}

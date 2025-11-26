@@ -53,6 +53,13 @@ function Feedback({ setFeedbackData }) {
       userName: user.name,
     };
     try {
+      console.log('=== FEEDBACK SUBMISSION DEBUG ===');
+      console.log('Route:', route);
+      console.log('BusNo:', busNo);
+      console.log('Comments:', comments);
+      console.log('Issue:', issueCategory);
+      console.log('Details:', { punctuality, driverBehavior, cleanliness });
+      console.log('Full payload:', JSON.stringify(newFeedback, null, 2));
       console.log('Submitting feedback payload:', newFeedback);
       const data = await submitFeedback(newFeedback); // No token needed
       console.log('Backend response for feedback submit:', data);

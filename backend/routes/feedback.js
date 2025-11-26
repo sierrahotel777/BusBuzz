@@ -63,9 +63,11 @@ const updateSchema = Joi.object({
 });
 
 // ---------- Routes ----------
-router.get('/', readLimiter, async (_req, res) => {
+router.get('/', readLimiter, async (req, res) => {
   try {
-    const docs = await col().find({}).sort({ submittedOn: -1 }).toArray();
+    const { userId } = req.query;
+    const query = userId ? { userId } : {};
+    const docs = await col().find(query).sort({ submittedOn: -1 }).toArray();
     const formatted = docs.map(d => ({ ...d, id: d._id }));
     res.status(200).json(formatted);
   } catch (error) {
@@ -76,11 +78,19 @@ router.get('/', readLimiter, async (_req, res) => {
 
 router.post('/', writeLimiter, async (req, res) => {
   try {
+    console.log('DEBUG: Raw request body received:', JSON.stringify(req.body, null, 2));
+    
     assertNoMongoOperators(req.body);
     const { value, error } = createSchema.validate(req.body, { stripUnknown: true });
+    
+    console.log('DEBUG: Joi validation error:', error);
+    console.log('DEBUG: Joi validated value:', JSON.stringify(value, null, 2));
+    
     if (error) return res.status(400).json({ message: error.message });
 
     const doc = { ...value, submittedOn: new Date(), status: 'Pending' };
+    console.log('DEBUG: Document to be inserted:', JSON.stringify(doc, null, 2));
+    
     const result = await col().insertOne(doc);
     res.status(201).json({ message: 'Feedback submitted successfully!', feedback: { ...doc, id: result.insertedId } });
   } catch (error) {

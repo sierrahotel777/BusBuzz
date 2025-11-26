@@ -132,14 +132,14 @@ function FeedbackDetail() {
                 <div className="detail-card user-info">
                     <h3>Submitted By</h3>
                     <p><strong>Name:</strong> {userName}</p>
-                    <p><strong>Route:</strong> {feedback.route}</p>
+                    <p><strong>Route:</strong> {feedback.route || 'N/A'}</p>
                     <p><strong>Submitted:</strong> {submittedOn}</p>
                 </div>
 
                 <div className="detail-card bus-info">
                     <h3>Bus Details</h3>
-                    <p><strong>Bus No:</strong> {feedback.busNo}</p>
-                    <p><strong>Issue:</strong> {feedback.issue}</p>
+                    <p><strong>Bus No:</strong> {feedback.busNo || 'N/A'}</p>
+                    <p><strong>Issue:</strong> {feedback.issue || 'N/A'}</p>
                     {(feedback.attachments && feedback.attachments.length > 0) ? (
                         <p><strong>Attachment:</strong>
                             <a href={feedback.attachments[0].url} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>

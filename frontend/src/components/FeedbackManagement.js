@@ -37,8 +37,8 @@ function FeedbackManagement({ feedbackData }) {
                 <tr key={fb._id} onClick={() => handleRowClick(fb._id)} className="clickable-row">
                   <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
                   <td data-label="User">{fb.userName || 'N/A'}</td>
-                  <td data-label="Route">{fb.route}</td>
-                  <td data-label="Issue">{fb.issue}</td>
+                  <td data-label="Route">{fb.route || 'N/A'}</td>
+                  <td data-label="Issue">{fb.issue || 'N/A'}</td>
                   <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
                   <td data-label="Action" className="action-link" onClick={(e) => { e.stopPropagation(); handleRowClick(fb._id); }}>View Detail</td>
                 </tr>

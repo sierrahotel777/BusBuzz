@@ -69,10 +69,29 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
     };
 
+    // Fetch items when the component mounts if items are empty (so data syncs with backend)
+    useEffect(() => {
+        let mounted = true;
+        if (!items || items.length === 0) {
+            getLostAndFound().then(data => {
+                if (!mounted) return;
+                // normalize id field
+                const mapped = data.map(d => ({ ...d, id: d.id || d._id }));
+                setItems(mapped);
+            }).catch(err => {
+                // keep using local data if backend is unreachable
+                console.warn('Failed to load lost & found from backend:', err.message);
+            });
+        }
+        return () => { mounted = false; };
+    }, [items, setItems]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+
 
     const handleMarkAsClaimed = async (itemId) => {
         try {
@@ -226,22 +245,7 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
             </div>
         </div>
     );
-    // Fetch items when the component mounts if items are empty (so data syncs with backend)
-    useEffect(() => {
-        let mounted = true;
-        if (!items || items.length === 0) {
-            getLostAndFound().then(data => {
-                if (!mounted) return;
-                // normalize id field
-                const mapped = data.map(d => ({ ...d, id: d.id || d._id }));
-                setItems(mapped);
-            }).catch(err => {
-                // keep using local data if backend is unreachable
-                console.warn('Failed to load lost & found from backend:', err.message);
-            });
-        }
-        return () => { mounted = false; };
-    }, []);
+    
 
     return (
         <div className="dashboard-grid">
