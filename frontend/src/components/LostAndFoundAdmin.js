@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNotification } from './NotificationContext';
+import { updateLostAndFound, deleteLostAndFound, getLostAndFound } from '../services/api';
 import './Dashboard.css';
 import './LostAndFound.css';
 
@@ -37,13 +38,18 @@ function LostAndFoundAdmin({ lostAndFoundItems, setLostAndFoundItems }) {
         return sortableItems;
     }, [filteredItems, sortConfig]);
 
-    const handleMarkAsClaimed = (itemId) => {
-        setLostAndFoundItems(prevItems =>
-            prevItems.map(item =>
-                item.id === itemId ? { ...item, status: 'claimed' } : item
-            )
-        );
-        showNotification("Item status updated to 'Claimed'.");
+    const handleMarkAsClaimed = async (itemId) => {
+        try {
+            await updateLostAndFound(itemId, { status: 'claimed' });
+            setLostAndFoundItems(prevItems =>
+                prevItems.map(item =>
+                    item.id === itemId ? { ...item, status: 'claimed' } : item
+                )
+            );
+            showNotification("Item status updated to 'Claimed'.");
+        } catch (err) {
+            showNotification(err.message || 'Failed to mark claimed', 'error');
+        }
     };
 
     const requestSort = (key) => {

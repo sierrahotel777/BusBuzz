@@ -193,3 +193,53 @@ export const deleteFeedback = async (feedbackId) => {
   const data = await response.json();
   throw new Error(data.message || 'Failed to delete feedback.');
 };
+
+// Lost & Found API
+export const getLostAndFound = async (query = {}) => {
+  const params = new URLSearchParams(query).toString();
+  const url = params ? `${API_URL}/lostfound?${params}` : `${API_URL}/lostfound`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch lost & found items.');
+  return data;
+};
+
+export const postLostAndFound = async (item) => {
+  try {
+    const res = await fetch(`${API_URL}/lostfound`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { text }; }
+    if (!res.ok) {
+      const msg = data && (data.message || data.error) ? `${res.status} ${res.statusText}: ${data.message || data.error}` : `${res.status} ${res.statusText}`;
+      throw new Error(msg);
+    }
+    return data;
+  } catch (err) {
+    // Surface network errors or HTTP errors with clearer messages
+    if (err && err.message) throw err;
+    throw new Error('Network error posting lost & found item.');
+  }
+};
+
+export const updateLostAndFound = async (id, update) => {
+  const res = await fetch(`${API_URL}/lostfound/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(update),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to update item.');
+  return data;
+};
+
+export const deleteLostAndFound = async (id) => {
+  const res = await fetch(`${API_URL}/lostfound/${id}`, { method: 'DELETE' });
+  if (res.status === 204) return true;
+  const data = await res.json();
+  throw new Error(data.message || 'Failed to delete item.');
+};

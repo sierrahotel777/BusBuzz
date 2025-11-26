@@ -36,6 +36,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/auth')); // All routes are in auth.js for now
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/attachments', require('./routes/attachments'));
+app.use('/api/lostfound', require('./routes/lostfound'));
 // --- Server Startup ---
 async function startServer() {
   try {

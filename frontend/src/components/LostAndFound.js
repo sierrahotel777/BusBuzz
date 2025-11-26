@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
+import { getLostAndFound, postLostAndFound, updateLostAndFound, deleteLostAndFound } from '../services/api';
 import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
 import './Form.css';
@@ -73,13 +74,18 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleMarkAsClaimed = (itemId) => {
-        setItems(prevItems =>
-            prevItems.map(item =>
-                item.id === itemId ? { ...item, status: 'claimed' } : item
-            )
-        );
-        showNotification("Item status updated to 'Claimed'.");
+    const handleMarkAsClaimed = async (itemId) => {
+        try {
+            await updateLostAndFound(itemId, { status: 'claimed' });
+            setItems(prevItems =>
+                prevItems.map(item =>
+                    item.id === itemId ? { ...item, status: 'claimed' } : item
+                )
+            );
+            showNotification("Item status updated to 'Claimed'.");
+        } catch (err) {
+            showNotification(err.message || 'Failed to mark claimed', 'error');
+        }
     };
 
     const openDeleteModal = (item) => {
@@ -87,33 +93,38 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
         setShowDeleteModal(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!itemToDelete) return;
-        setItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
-        showNotification(`Item "${itemToDelete.item}" has been deleted.`, "info");
+        try {
+            await deleteLostAndFound(itemToDelete.id);
+            setItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+            showNotification(`Item "${itemToDelete.item}" has been deleted.`, "info");
+        } catch (err) {
+            showNotification(err.message || 'Failed to delete item.', 'error');
+        }
         setShowDeleteModal(false);
         setItemToDelete(null);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.item || !formData.route || !formData.description) {
             showNotification("Please fill out all fields.", "error");
             return;
         }
-        const newItem = {
-            ...formData,
-            id: Date.now(),
-            user: user.name,
-            date: new Date().toISOString(),
-            status: formData.type === 'found' ? 'unclaimed' : undefined,
-        };
-        setItems(prev => [newItem, ...prev]);
-        if (newItem.type === 'found') {
-            awardPoints(20);
+        try {
+            const payload = { ...formData, user: user.name };
+            const created = await postLostAndFound(payload);
+            // backend returns { ...doc, id }
+            setItems(prev => [{ ...created, id: created.id }, ...prev]);
+            if (created.type === 'found') {
+                awardPoints(20);
+            }
+            showNotification(`Your ${formData.type} item report has been posted!`);
+            setFormData({ type: 'lost', item: '', route: '', description: '' });
+        } catch (err) {
+            showNotification(err.message || 'Failed to post report.', 'error');
         }
-        showNotification(`Your ${formData.type} item report has been posted!`);
-        setFormData({ type: 'lost', item: '', route: '', description: '' }); 
     };
 
     if (isAdminPage) {
@@ -215,6 +226,23 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
             </div>
         </div>
     );
+    // Fetch items when the component mounts if items are empty (so data syncs with backend)
+    useEffect(() => {
+        let mounted = true;
+        if (!items || items.length === 0) {
+            getLostAndFound().then(data => {
+                if (!mounted) return;
+                // normalize id field
+                const mapped = data.map(d => ({ ...d, id: d.id || d._id }));
+                setItems(mapped);
+            }).catch(err => {
+                // keep using local data if backend is unreachable
+                console.warn('Failed to load lost & found from backend:', err.message);
+            });
+        }
+        return () => { mounted = false; };
+    }, []);
+
     return (
         <div className="dashboard-grid">
             <div className="dashboard-header">
