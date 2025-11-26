@@ -9,6 +9,7 @@ const TermsOfService = () => {
                 <p>Last updated: {new Date().toLocaleDateString()}</p>
             </div>
             <div className="legal-content">
+                <p className="text-light">These terms govern the use of BusBuzz. By using the app, you agree to fair use and respectful conduct.</p>
                 <h3>1. Introduction</h3>
                 <p>Welcome to BusBuzz! These terms and conditions outline the rules and regulations for the use of BusBuzz's services.</p>
 
@@ -33,6 +34,7 @@ const TermsOfService = () => {
 
                 <h3>6. Limitation of liability</h3>
                 <p>In no event shall BusBuzz, nor any of its officers, directors and employees, shall be held liable for anything arising out of or in any way connected with your use of this Application whether such liability is under contract.</p>
+                <p className="text-light">For questions about these terms, please reach out via the Help & Support page.</p>
             </div>
         </div>
     );

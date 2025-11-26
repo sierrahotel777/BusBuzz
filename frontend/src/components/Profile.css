@@ -72,14 +72,20 @@
   right: 0;
   background: var(--primary-color);
   color: white;
-  padding: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .avatar-upload:hover {
   background: var(--primary-color-dark);
+  transform: scale(1.05);
 }
 
 .avatar-upload input[type="file"] {
@@ -148,13 +154,21 @@
     background-color: var(--secondary-color);
 }
 
-.profile-field input {
+.profile-field input, .profile-field select {
   width: 100%;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border-color);
   font-size: 1rem;
   box-sizing: border-box; /* Ensures padding doesn't affect width */
+  background: var(--surface-color);
+  color: var(--text-color);
+}
+
+.profile-field input:focus, .profile-field select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
 .profile-actions {

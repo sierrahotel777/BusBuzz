@@ -99,14 +99,38 @@ function LostAndFoundAdmin({ lostAndFoundItems, setLostAndFoundItems }) {
                                     <td data-label="Route">{item.route}</td>
                                     <td data-label="Date">{new Date(item.date).toLocaleDateString()}</td>
                                     <td data-label="Type"><span className={`status-badge status-${item.type}`}>{item.type}</span></td>
-                                    <td data-label="Status">
+                                                                        <td data-label="Status">
                                         <span className={`status-badge status-${item.status || 'reported'}`}>
                                             {item.status || 'Reported'}
                                         </span>
                                     </td>
+                                                                        {item.attachments && item.attachments.length > 0 && (
+                                                                            <td data-label="Attachments">
+                                                                                <ul className="attachments-list">
+                                                                                    {item.attachments.map((att, idx) => (
+                                                                                        <li key={idx}>
+                                                                                            <a href={att.url} target="_blank" rel="noreferrer">
+                                                                                                {att.name || 'Attachment'}
+                                                                                            </a>
+                                                                                        </li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </td>
+                                                                        )}
                                     <td data-label="Action">
                                         {item.type === 'found' && item.status === 'unclaimed' && (
                                             <button onClick={() => handleMarkAsClaimed(item.id)} className="claim-btn">Mark as Claimed</button>
+                                        )}
+                                        {item.type === 'lost' && (
+                                            <button onClick={async () => {
+                                                try {
+                                                    await updateLostAndFound(item.id, { type: 'found', status: 'unclaimed' });
+                                                    setLostAndFoundItems(prev => prev.map(i => i.id === item.id ? { ...i, type: 'found', status: 'unclaimed' } : i));
+                                                    showNotification("Item marked as found.");
+                                                } catch (err) {
+                                                    showNotification(err.message || 'Failed to mark as found', 'error');
+                                                }
+                                            }} className="claim-btn">Mark Found</button>
                                         )}
                                     </td>
                                 </tr>

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './SystemStatus.css';
+import { checkAIHealth } from '../services/api';
 
 const services = [
     { name: 'User Authentication', status: 'Operational', icon: '👤' },
@@ -16,6 +17,18 @@ const statusInfo = {
 };
 
 function SystemStatus() {
+    const [aiConfigured, setAiConfigured] = useState(null);
+    useEffect(() => {
+        async function run() {
+            try {
+                const res = await checkAIHealth();
+                setAiConfigured(res.configured === true);
+            } catch {
+                setAiConfigured(false);
+            }
+        }
+        run();
+    }, []);
     const overallStatus = services.some(s => s.status === 'Outage') 
         ? 'Major Outage' 
         : services.some(s => s.status === 'Degraded Performance') 
@@ -47,6 +60,17 @@ function SystemStatus() {
                         </div>
                     </div>
                 ))}
+                {aiConfigured !== null && (
+                    <div className="status-item">
+                        <div className="status-name">
+                            <span className="status-icon">🤖</span>
+                            <span>AI Assistant</span>
+                        </div>
+                        <div className={`status-badge ${aiConfigured ? 'operational' : 'outage'}`}>
+                            {aiConfigured ? 'Operational' : 'Unavailable'}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

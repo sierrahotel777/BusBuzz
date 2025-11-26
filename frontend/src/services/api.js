@@ -39,6 +39,18 @@ export const getAllUsers = async () => {
     throw error;
   }
 };
+// Routes API
+export const getRoutes = async () => {
+  try {
+    const res = await fetch(`${API_URL}/routes`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch routes.');
+    return data; // [{ name, capacity, buses: [...], stops: {...}, id }]
+  } catch (err) {
+    console.error('API Error (getRoutes):', err);
+    throw err;
+  }
+};
 
 export const updateUserProfile = async (userId, profileData) => {
   try {
@@ -261,4 +273,15 @@ export const deleteLostAndFound = async (id) => {
   if (res.status === 204) return true;
   const data = await res.json();
   throw new Error(data.message || 'Failed to delete item.');
+};
+
+// System health (AI service)
+export const checkAIHealth = async () => {
+  try {
+    const res = await fetch(`${API_URL}/ai/health`);
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data };
+  } catch (err) {
+    return { ok: false, status: 0, data: null };
+  }
 };

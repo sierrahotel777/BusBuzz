@@ -1,10 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./Form.css";
 import "./Feedback.css";
 import { useNotification } from "./NotificationContext";
-import { submitFeedback, uploadAttachment } from "../services/api";
+import { submitFeedback, uploadAttachment, getRoutes } from "../services/api";
+
+// Helper to fetch buses; falls back to direct fetch if no API helper exists
+async function fetchBuses() {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/buses`);
+    if (!res.ok) throw new Error('Failed to load buses');
+    return await res.json();
+  } catch (e) {
+    // Fallback to relative path (dev proxy)
+    const res = await fetch(`/api/buses`);
+    if (!res.ok) throw new Error('Failed to load buses');
+    return await res.json();
+  }
+}
 
 function Feedback({ setFeedbackData }) {
   const [route, setRoute] = useState("");
@@ -17,9 +31,40 @@ function Feedback({ setFeedbackData }) {
   const [attachmentFile, setAttachmentFile] = useState(null);
   const [comments, setComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [routes, setRoutes] = useState([]);
+  const [buses, setBuses] = useState([]);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadData() {
+      try {
+        const [routesData, busesData] = await Promise.all([
+          getRoutes().catch(() => []),
+          fetchBuses().catch(() => []),
+        ]);
+        if (!mounted) return;
+        setRoutes(Array.isArray(routesData) ? routesData : []);
+        setBuses(Array.isArray(busesData) ? busesData : []);
+      } catch (err) {
+        // Non-blocking: allow manual entry if backend is down
+        console.warn('Failed loading routes/buses:', err);
+      }
+    }
+    loadData();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!route) return;
+    // Auto-derive bus number by matching selected route name
+    const match = buses.find(b => (b.routeName || b.route || b.name) === route);
+    if (match && (match.busNumber || match.number)) {
+      setBusNo(match.busNumber || match.number);
+    }
+  }, [route, buses]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,11 +89,12 @@ function Feedback({ setFeedbackData }) {
       }
     }
 
+    const commentWithEmail = user?.email ? `${comments}\n\nContact: ${user.email}` : comments;
     const newFeedback = {
       route,
       busNo,
-      comments,
-      message: comments, // some backends expect `message` — include for compatibility
+      comments: commentWithEmail,
+      message: commentWithEmail, // some backends expect `message` — include for compatibility
       issue: issueCategory,
       details: {
         punctuality,
@@ -64,7 +110,7 @@ function Feedback({ setFeedbackData }) {
       console.log('=== FEEDBACK SUBMISSION DEBUG ===');
       console.log('Route:', route);
       console.log('BusNo:', busNo);
-      console.log('Comments:', comments);
+      console.log('Comments:', commentWithEmail);
       console.log('Issue:', issueCategory);
       console.log('Details:', { punctuality, driverBehavior, cleanliness });
       console.log('Full payload:', JSON.stringify(newFeedback, null, 2));
@@ -107,23 +153,27 @@ function Feedback({ setFeedbackData }) {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
           <label htmlFor="route">Route Number</label>
-          <input
+          <select
             id="route"
-            type="text"
-            placeholder="e.g., 5A"
             value={route}
             onChange={(e) => setRoute(e.target.value)}
             required
-          />
+          >
+            <option value="" disabled>Select a route</option>
+            {routes.map((r) => (
+              <option key={r._id || r.name} value={r.name}>{r.name}</option>
+            ))}
+          </select>
           </div>
           <div className="form-group">
           <label htmlFor="busNo">Bus Number</label>
           <input
             id="busNo"
             type="text"
-            placeholder="e.g., KA-01-F-1234"
+            placeholder=""
             value={busNo}
             onChange={(e) => setBusNo(e.target.value)}
+            disabled={true}
             required
           />
           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { getLostAndFound, postLostAndFound, updateLostAndFound, deleteLostAndFound, uploadAttachment } from '../services/api';
+import { getLostAndFound, postLostAndFound, updateLostAndFound, deleteLostAndFound, uploadAttachment, getRoutes } from '../services/api';
 import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
 import './Form.css';
@@ -20,6 +20,22 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [adminSearchTerm, setAdminSearchTerm] = useState('');
+    const [routes, setRoutes] = useState([]);
+
+    useEffect(() => {
+        let mounted = true;
+        async function loadRoutes() {
+            try {
+                const data = await getRoutes();
+                if (mounted) setRoutes(Array.isArray(data) ? data : []);
+            } catch (e) {
+                console.warn('Failed to load routes for Lost & Found:', e);
+                if (mounted) setRoutes([]);
+            }
+        }
+        loadRoutes();
+        return () => { mounted = false; };
+    }, []);
 
     // Compute filtered items for student view
     const lostItems = useMemo(() => 
@@ -120,7 +136,8 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
             return;
         }
         try {
-            const payload = { ...formData, user: user.name, userId: user.id };
+            const descWithEmail = user?.email ? `${formData.description}\n\nContact: ${user.email}` : formData.description;
+            const payload = { ...formData, description: descWithEmail, user: user.name, userId: user.id };
             // If attachment present, upload first
             if (attachmentFile) {
                 try {
@@ -230,6 +247,9 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                 <span>Posted by {item.user}</span>
                 {item.status && <span className={`item-status ${item.status}`}>{item.status}</span>}
                 <span>{new Date(item.date).toLocaleDateString()}</span>
+                {item.type === 'lost' && item.userId === user.id && (
+                    <button className="delete-btn" onClick={() => openDeleteModal(item)}>Remove from list</button>
+                )}
             </div>
         </div>
     );
@@ -267,7 +287,12 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                         </div>
                         <div className="form-group">
                             <label htmlFor="bus-route">Bus Route</label>
-                            <input type="text" name="route" placeholder="Which bus route? (e.g., S5)" value={formData.route} onChange={handleChange} required />
+                            <select name="route" value={formData.route} onChange={handleChange} required>
+                                <option value="" disabled>Select a route</option>
+                                {routes.map(r => (
+                                    <option key={r._id || r.name} value={r.name}>{r.name}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="form-group">

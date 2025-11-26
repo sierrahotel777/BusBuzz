@@ -67,7 +67,7 @@ router.put('/:id', writeLimiter, async (req, res) => {
   if (!ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid ID.' });
   try {
     // Whitelist updatable fields to avoid operator injection
-    const allowed = ['status','description','route','item'];
+    const allowed = ['status','description','route','item','type'];
     const safeBody = {};
     for (const k of allowed) {
       if (k in req.body) safeBody[k] = req.body[k];

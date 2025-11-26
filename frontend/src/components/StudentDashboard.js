@@ -4,8 +4,9 @@ import './Dashboard.css';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import CommendationModal from './CommendationModal';
-import { getMyFeedback } from '../services/api';
+import { getMyFeedback, getLostAndFound } from '../services/api';
 import { routeData, routeNames } from './routeData';
+import { getRoutes } from '../services/api';
 
 function StudentDashboard({ feedbackData, announcements, setCommendations, lostAndFoundItems, crowdednessData, setCrowdednessData, users }) {
   const { user } = useAuth();
@@ -14,24 +15,59 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const [myFeedback, setMyFeedback] = useState([]);
   const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
 
-  const initialRoute = user.busRoute && routeData[user.busRoute] 
+  const [routesFromBackend, setRoutesFromBackend] = useState(null);
+  useEffect(() => {
+    async function loadRoutes() {
+      try {
+        const data = await getRoutes();
+        const map = {};
+        const names = [];
+        for (const r of data) {
+          map[r.name] = { stops: r.stops || {}, capacity: r.capacity };
+          names.push(r.name);
+        }
+        setRoutesFromBackend({ map, names });
+      } catch (e) {
+        setRoutesFromBackend(null);
+      }
+    }
+    loadRoutes();
+  }, []);
+
+  const effectiveRouteData = routesFromBackend?.map || routeData;
+  const effectiveRouteNames = routesFromBackend?.names || routeNames;
+
+  const initialRoute = user.busRoute && effectiveRouteData[user.busRoute] 
     ? user.busRoute 
-    : routeNames[0];
+    : effectiveRouteNames[0];
   
-  const stopsForInitialRoute = routeData[initialRoute]?.stops || {};
+  const stopsForInitialRoute = effectiveRouteData[initialRoute]?.stops || {};
   
   const initialStop = user.favoriteStop && stopsForInitialRoute[user.favoriteStop]
     ? user.favoriteStop
     : Object.keys(stopsForInitialRoute)[0];
 
-  const myLostAndFoundItems = useMemo(() => 
-    (lostAndFoundItems || []).filter(item => item.user === user.name)
-      .sort((a, b) => new Date(b.date) - new Date(a.date)),
-    [lostAndFoundItems, user.name]);
+  const [myLostAndFoundItems, setMyLostAndFoundItems] = useState([]);
+  useEffect(() => {
+    let timer;
+    async function refreshLF() {
+      try {
+        const items = await getLostAndFound({ userId: user.id });
+        const mine = (items || []).filter(item => item.user === user.name)
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        setMyLostAndFoundItems(mine);
+      } catch (_) {}
+    }
+    if (user?.id) {
+      refreshLF();
+      timer = setInterval(refreshLF, 30000);
+    }
+    return () => { if (timer) clearInterval(timer); };
+  }, [user?.id, user.name]);
 
   const [selectedRoute, setSelectedRoute] = useState(initialRoute);
   const [selectedStop, setSelectedStop] = useState(initialStop);
-  const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
+  const [eta, setEta] = useState(effectiveRouteData[initialRoute].stops[initialStop]);
   const [notificationSent, setNotificationSent] = useState(false);
   const [isCommendationModalOpen, setIsCommendationModalOpen] = useState(false);
 
@@ -41,15 +77,15 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   useEffect(() => {
     if (user.busRoute && user.busRoute !== selectedRoute) {
       setSelectedRoute(user.busRoute);
-      const stopsForRoute = routeData[user.busRoute]?.stops || {};
+      const stopsForRoute = effectiveRouteData[user.busRoute]?.stops || {};
       const stopToSet = user.favoriteStop && stopsForRoute[user.favoriteStop]
         ? user.favoriteStop
         : Object.keys(stopsForRoute)[0];
       setSelectedStop(stopToSet);
-      const newEta = routeData[user.busRoute].stops[stopToSet];
+      const newEta = effectiveRouteData[user.busRoute].stops[stopToSet];
       setEta(newEta);
     }
-  }, [user.busRoute, user.favoriteStop, selectedRoute]);
+  }, [user.busRoute, user.favoriteStop, selectedRoute, effectiveRouteData]);
 
   // Fetch user's feedback
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,7 +172,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
 
   const handleRouteChange = (e) => {
     const newRoute = e.target.value;
-    const newStops = routeData[newRoute].stops;
+    const newStops = effectiveRouteData[newRoute].stops;
     const firstStop = Object.keys(newStops)[0];
     setSelectedRoute(newRoute);
     setSelectedStop(firstStop);
@@ -146,7 +182,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
   const handleStopChange = (e) => {
     const newStop = e.target.value;
     setSelectedStop(newStop);
-    setEta(routeData[selectedRoute].stops[newStop]);
+    setEta(effectiveRouteData[selectedRoute].stops[newStop]);
   };
 
   const whatsNewItems = [
@@ -231,14 +267,14 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
 
           <label htmlFor="stop-select">Your Stop:</label>
           <select id="stop-select" value={selectedStop} onChange={handleStopChange}>
-            {Object.keys(routeData[selectedRoute].stops).map(stop => (
+            {Object.keys(effectiveRouteData[selectedRoute].stops).map(stop => (
               <option key={stop} value={stop}>{stop}</option>
             ))}
           </select>
 
           <div className="bus-capacity-display">
             <strong>Bus Capacity:</strong>
-            <span>{routeData[selectedRoute]?.capacity || 'N/A'} Seats</span>
+            <span>{effectiveRouteData[selectedRoute]?.capacity || 'N/A'} Seats</span>
           </div>
           <div className="eta-display">
             <p><strong>Estimated Arrival:</strong></p>

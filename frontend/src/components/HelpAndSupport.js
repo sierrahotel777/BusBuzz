@@ -57,7 +57,7 @@ function HelpAndSupport() {
         <div className="help-container">
             <div className="dashboard-header">
                 <h2>Help & Support</h2>
-                <p>Find answers to common questions about BusBuzz.</p>
+                <p>Find answers, get guidance, and contact support.</p>
             </div>
             <div className="faq-section">
                 {faqs.map((faq, index) => (
@@ -77,7 +77,7 @@ function HelpAndSupport() {
 
             <div className="contact-section">
                 <h3>Still Need Help?</h3>
-                <p>If you couldn't find an answer, feel free to send us a message directly.</p>
+                <p>If you couldn't find an answer, send us a message. We’ll respond to your college email.</p>
                 <form onSubmit={handleContactSubmit}>
                     <div className="form-row">
                         <div className="form-group">
@@ -93,7 +93,7 @@ function HelpAndSupport() {
                         <label htmlFor="message">Message</label>
                         <textarea id="message" name="message" rows="5" value={contactForm.message} onChange={handleContactChange} required placeholder="Please describe your issue or question..."></textarea>
                     </div>
-                    <button type="submit" disabled={isSubmitting}>
+                    <button type="submit" className="submit-btn" disabled={isSubmitting}>
                         {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                 </form>

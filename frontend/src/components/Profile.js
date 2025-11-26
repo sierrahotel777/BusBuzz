@@ -102,7 +102,7 @@ function Profile() {
             <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=007bff,1abc9c,3498db,9b59b6,e74c3c&backgroundType=gradientLinear`} alt="User Avatar" />
             {isEditing && (
               <div className="avatar-upload">
-                <label htmlFor="avatar-input">Change</label> 
+                <label htmlFor="avatar-input" aria-label="Change profile image">✏️</label>
                 <input id="avatar-input" type="file" accept="image/*" disabled />
               </div>
             )}

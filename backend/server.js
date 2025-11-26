@@ -37,6 +37,9 @@ app.use('/api/auth', require('./routes/auth')); // All routes are in auth.js for
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/attachments', require('./routes/attachments'));
 app.use('/api/lostfound', require('./routes/lostfound'));
+app.use('/api/buses', require('./routes/buses'));
+app.use('/api/routes', require('./routes/routes'));
+app.use('/api/buses', require('./routes/buses'));
 // --- Server Startup ---
 async function startServer() {
   try {

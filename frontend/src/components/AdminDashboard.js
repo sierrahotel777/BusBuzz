@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import "./Dashboard.css";
 import ConfirmationModal from "./ConfirmationModal";
@@ -15,10 +15,24 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   const [chartRouteFilter, setChartRouteFilter] = useState('All');
   const { showNotification } = useNotification();
 
+  const [busCount, setBusCount] = useState(0);
+  useEffect(() => {
+    async function fetchBusCount() {
+      try {
+        const res = await fetch('/api/buses');
+        const data = await res.json();
+        if (Array.isArray(data)) setBusCount(data.length);
+      } catch (e) {
+        setBusCount(0);
+      }
+    }
+    fetchBusCount();
+  }, []);
+
   const stats = {
     totalFeedback: feedbackData.length,
     pendingIssues: feedbackData.filter(fb => fb.status === 'Pending').length,
-    busesOnRoute: 32,
+    busesOnRoute: busCount,
   };
 
   const chartFilteredData = useMemo(() => {
