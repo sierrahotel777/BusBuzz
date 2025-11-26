@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { getLostAndFound } from '../services/api';
 import { Link } from 'react-router-dom';
 import "./Dashboard.css";
 import ConfirmationModal from "./ConfirmationModal";
@@ -19,7 +20,8 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
   useEffect(() => {
     async function fetchBusCount() {
       try {
-        const res = await fetch('/api/buses');
+        const base = process.env.REACT_APP_API_URL || '/api';
+        const res = await fetch(`${base.replace(/\/?$/, '')}/buses`);
         const data = await res.json();
         if (Array.isArray(data)) setBusCount(data.length);
       } catch (e) {
@@ -27,7 +29,23 @@ function AdminDashboard({ feedbackData, announcements, setAnnouncements, commend
       }
     }
     fetchBusCount();
+    const interval = setInterval(fetchBusCount, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  // Ensure found items populate even if parent did not provide yet
+  useEffect(() => {
+    async function ensureFoundItems() {
+      try {
+        if (!lostAndFoundItems || lostAndFoundItems.length === 0) {
+          const data = await getLostAndFound({});
+          const mapped = (data || []).map(d => ({ ...d, id: d.id || d._id }));
+          setLostAndFoundItems(mapped);
+        }
+      } catch (_) {}
+    }
+    ensureFoundItems();
+  }, [lostAndFoundItems, setLostAndFoundItems]);
 
   const stats = {
     totalFeedback: feedbackData.length,

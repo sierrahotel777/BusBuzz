@@ -1,78 +1,85 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { ObjectId } = require('mongodb');
+const { getDb } = require('../db/mongo');
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
-let useMemoryStorage = false;
+// Use memory storage for multer - files will be stored in MongoDB
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
-// Try to create uploads directory; if it fails (e.g., in container with read-only filesystem), use memory storage
-try {
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-} catch (err) {
-  console.warn('Cannot create uploads directory, using memory-based storage:', err.message);
-  useMemoryStorage = true;
-}
-
-const storage = useMemoryStorage
-  ? multer.memoryStorage()
-  : multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const safeName = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-      cb(null, `${unique}-${safeName}`);
-    }
-  });
-
-const upload = multer({ storage });
-
-// In-memory store for attachments (fallback when disk storage unavailable)
-const attachmentStore = new Map();
+// Collection for storing file metadata and binary data
+const attachmentsCol = () => getDb().collection('Attachments');
 
 // POST /api/attachments - upload single file under field 'file'
-router.post('/', upload.single('file'), (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
   console.log('DEBUG: File upload request received');
   console.log('DEBUG: File object:', req.file ? { name: req.file.originalname, size: req.file.size } : 'NO FILE');
   
   if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
-  let filename, urlPath;
-  if (useMemoryStorage) {
-    // Generate unique ID and store in memory
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    filename = unique + '-' + req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-    attachmentStore.set(filename, req.file.buffer);
-    urlPath = `/api/attachments/${filename}`;
-    console.log('DEBUG: Stored in memory - filename:', filename);
-  } else {
-    filename = req.file.filename;
-    urlPath = `/uploads/${filename}`;
-    console.log('DEBUG: Stored on disk - filename:', filename);
+  try {
+    const safeOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    
+    // Store file in MongoDB with metadata
+    const doc = {
+      filename: safeOriginalName,
+      originalName: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      data: req.file.buffer, // Store binary data directly
+      uploadedAt: new Date(),
+    };
+    
+    const result = await attachmentsCol().insertOne(doc);
+    const fileId = result.insertedId.toString();
+    const urlPath = `/api/attachments/${fileId}`;
+    
+    console.log('DEBUG: Stored in MongoDB - fileId:', fileId);
+    console.log('DEBUG: Returning response - url:', urlPath, 'filename:', safeOriginalName);
+    
+    res.status(201).json({ 
+      filename: safeOriginalName, 
+      url: urlPath, 
+      originalName: safeOriginalName,
+      fileId: fileId
+    });
+  } catch (err) {
+    console.error('Error storing attachment in MongoDB:', err);
+    res.status(500).json({ message: 'Failed to store attachment.' });
   }
-
-  console.log('DEBUG: Returning response - url:', urlPath, 'filename:', filename);
-  const safeOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  res.status(201).json({ filename, url: urlPath, originalName: safeOriginalName });
 });
 
-// GET /api/attachments/:filename - retrieve file (for memory storage)
-router.get('/:filename', (req, res) => {
-  const { filename } = req.params;
-  const buffer = attachmentStore.get(filename);
-  if (!buffer) return res.status(404).json({ message: 'File not found.' });
-  // Sanitize filename and quote to avoid header injection / reflected XSS
-  const safeFilename = String(filename).replace(/[^a-zA-Z0-9_.\-]/g, '_');
-  res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
-  res.setHeader('Content-Type', 'application/octet-stream');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.status(200).send(buffer);
+// GET /api/attachments/:fileId - retrieve file from MongoDB
+router.get('/:fileId', async (req, res) => {
+  const { fileId } = req.params;
+  
+  // Validate ObjectId
+  if (!ObjectId.isValid(fileId)) {
+    return res.status(400).json({ message: 'Invalid file ID.' });
+  }
+  
+  try {
+    const file = await attachmentsCol().findOne({ _id: new ObjectId(fileId) });
+    
+    if (!file || !file.data) {
+      return res.status(404).json({ message: 'File not found.' });
+    }
+    
+    // Sanitize filename and quote to avoid header injection / reflected XSS
+    const safeFilename = String(file.filename || 'attachment').replace(/[^a-zA-Z0-9_.\-]/g, '_');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+    res.setHeader('Content-Type', file.mimetype || 'application/octet-stream');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.status(200).send(file.data.buffer);
+  } catch (err) {
+    console.error('Error retrieving attachment from MongoDB:', err);
+    res.status(500).json({ message: 'Failed to retrieve attachment.' });
+  }
 });
 
 module.exports = router;

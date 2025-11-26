@@ -285,15 +285,20 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                             <label htmlFor="item-name">Item Name</label>
                             <input type="text" name="item" placeholder="What was the item? (e.g., Black Notebook)" value={formData.item} onChange={handleChange} required />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="bus-route">Bus Route</label>
-                            <select name="route" value={formData.route} onChange={handleChange} required>
-                                <option value="" disabled>Select a route</option>
-                                {routes.map(r => (
-                                    <option key={r._id || r.name} value={r.name}>{r.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                                                <div className="form-group">
+                                                        <label htmlFor="bus-route">Bus Route</label>
+                                                        <select
+                                                            name="route"
+                                                            value={formData.route}
+                                                            onChange={handleChange}
+                                                            required
+                                                        >
+                                                            <option value="" disabled>Select a route</option>
+                                                            {routes.map(r => (
+                                                                <option key={r._id || r.name} value={r.name}>{r.name}</option>
+                                                            ))}
+                                                        </select>
+                                                </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="description">Description</label>

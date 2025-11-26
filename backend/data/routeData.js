@@ -1,13 +1,1514 @@
-// Placeholder for full route data (boarding points + timings)
-// Structure:
-// {
-//   "1: Ennore": {
-//     stops: {
-//       "Stop Name": "HH:MM AM/PM",
-//       ...
-//     }
-//   },
-//   ...
-// }
+export const routeData = {
+  '1: Ennore': {
+    stops: {
+      'Ennore Bus Stand': '05:04 AM',
+      'Ernavur anna nagar': '05:42 AM',
+      'Lift Gate': '05:45 AM',
+      'ITC': '05:05 AM',
+      'Wimco nagar': '05:52 AM',
+      'Thiruvottiyur Market': '05:54 AM',
+      'Theradi': '05:56 AM',
+      'Kaladipet market': '05:57 AM',
+      'Raja Kadai': '05:58 AM',
+      'Thangal': '12:00 AM',
+      'Tollgate': '06:01 AM',
+    },
+  },
+  '10: Vyasarpadi (Erikarai)': {
+    stops: {
+      'Vyasarpadi (Erikarai)': '06:10 AM',
+      'Jeeva Station': '06:12 AM',
+      'Binny mill Corner': '06:22 AM',
+      'Otteri': '06:25 AM',
+      'Podikadai Bus Stop': '06:27 AM',
+      'TP Hospital': '06:29 AM',
+      'Ayanavaram - Indian Bank': '06:33 AM',
+      'Sayani Theatre': '06:35 AM',
+    },
+  },
+  '10A: ICF (New route)': {
+    stops: {
+      'ICF Signal': '06:30 AM',
+      'Kallu Kadai': '06:35 AM',
+      'Villivakkam Kalpana Hotel': '06:37 AM',
+      'Anna Nagar West Depot': '06:45 AM',
+    },
+  },
+  '10C: Binny Mill Church': {
+    stops: {
+      'Jamalia School': '06:15 AM',
+      'Binny Mill Church': '06:02 AM',
+      'Noor Hotel': '06:03 AM',
+      'Joint Office': '06:32 AM',
+      'Arisi mandi': '06:34 AM',
+      'Kambar Arangam': '06:36 AM',
+      'ICF Signal': '06:38 AM',
+      'Kallukadai Bus Stop': '06:04 AM',
+      'Villivakkam Kalpana Hotel': '06:42 AM',
+      'Nadhamuni Theatre': '06:44 AM',
+    },
+  },
+  '11: Moolakadai': {
+    stops: {
+      'Erukkancheri ABR kalyana Mandapam': '06:15 AM',
+      'Erukkancheri - Rajalakshmi Cars Showroom': '06:02 AM',
+      'Moolakadai': '06:25 AM',
+      'M1.Police Station': '06:27 AM',
+      'Kanakan chatram (Shell Petrol Bunk)': '06:29 AM',
+      'Kalpana Lamps': '06:31 AM',
+      'Madavaram Andhra Bus Stand': '06:33 AM',
+      'Retteri RTO Office': '06:35 AM',
+    },
+  },
+  '11A: Thathankuppam (DRJ)': {
+    stops: {
+      'Thathankuppam (DRJ)': '06:35 AM',
+      'Karukku Bridge': '06:45 AM',
+      'Pattaravakkam': '06:47 AM',
+      'Ambattur Telephone Exchange': '06:05 AM',
+    },
+  },
+  '11C: Korattur': {
+    stops: {
+      'Korattur Police Station': '06:30 AM',
+      'Bakthavatchlam School Signal': '06:35 AM',
+      'Church': '06:37 AM',
+    },
+  },
+  '12: MKB Nagar': {
+    stops: {
+      'MKB Nagar': '06:15 AM',
+      'KKD Nagar': '06:17 AM',
+      'MR Nagar': '06:02 AM',
+      'Pavithra Hospital': '06:22 AM',
+    },
+  },
+  '12A: Venus (New route)': {
+    stops: {
+      'Venus Bus Stop': '06:25 AM',
+      'Lakshmi amman Koil': '06:28 AM',
+      'BPCL Petrol Bunk': '06:03 AM',
+    },
+  },
+  '12B: Kolathur': {
+    stops: {
+      'Vyasarpadi Fire Service': '06:15 AM',
+      'BB Road Junction': '06:02 AM',
+      'Lakshmi amman Koil': '06:23 AM',
+      'Brindha Theatre': '06:25 AM',
+      'Welding Shop': '06:03 AM',
+    },
+  },
+  '12C: Perambur': {
+    stops: {
+      'BP Road': '06:10 AM',
+      'Perambur Bus Depot': '06:12 AM',
+      'Perambur Rly Station': '06:13 AM',
+      'Perumbur Church': '06:15 AM',
+      'Ajantha Bakers': '06:16 AM',
+      'Venus Bus Stop': '06:18 AM',
+      'Lakshmi Amman Koil (kolathur)': '06:25 AM',
+      'BPCL Petrol Bunk': '06:26 AM',
+    },
+  },
+  '13: Peravallur': {
+    stops: {
+      'Peravalur': '06:20 AM',
+      'Jawahar Nagar Bus Stop': '06:22 AM',
+      'Axis Bank': '06:23 AM',
+      'Agaram BPCL Bunk': '06:25 AM',
+      'Thiruvalluvar Kalyanamandabam': '06:26 AM',
+      'Periyar Nagar Vegetable market': '06:28 AM',
+    },
+  },
+  '13A: Kolathur (Don Bosco School)': {
+    stops: {
+      'Kolathur (Don Bosco School)': '06:30 AM',
+      'Retteri Junction': '06:35 AM',
+      'Saravana Store (Padi)': '06:42 AM',
+      'Korattur Signal': '06:43 AM',
+      'Britannia': '06:46 AM',
+    },
+  },
+  '13B: T.V.K Nagar': {
+    stops: {
+      'TVK Idugadu': '06:15 AM',
+      'TVK Bus stand': '06:02 AM',
+      'Senthil Nagar': '06:35 AM',
+    },
+  },
+  '13C: Poombukar Nagar': {
+    stops: {
+      'SBI-Bank': '06:20 AM',
+      'Poombukar Nagar Post Office': '06:23 AM',
+      'Grace Super Market': '06:25 AM',
+      'Temple School': '06:03 AM',
+    },
+  },
+  '14: Minjur': {
+    stops: {
+      'Rice Mill': '05:50 AM',
+      'Kattur Koot Road': '05:55 AM',
+      'Hemachandra Nagar': '05:51 AM',
+      'Pachaiyamman Koil Archi': '05:52 AM',
+      'Valluvar Nagar': '12:00 AM',
+      'Patamanthri': '06:05 AM',
+      'Manali New Town': '06:01 AM',
+      'Vichoor': '06:12 AM',
+      'Andarkuppam Check Post': '06:15 AM',
+      'Manjampakkam Ring Road': '06:03 AM',
+    },
+  },
+  '14C: Veterinary college (mathur)': {
+    stops: {
+      'Manali Market': '06:15 AM',
+      'Shastri nagar': '06:02 AM',
+      'Mathur 3rd Main Road': '06:22 AM',
+      'Mathur 1st Main Road': '06:24 AM',
+      'Veterinary college': '06:26 AM',
+      'Arul Nagar': '06:28 AM',
+      'Thapalpetti': '06:03 AM',
+      'Madhavaram Old Bus stand': '06:35 AM',
+      'Madhavaram New Bus stand': '06:38 AM',
+    },
+  },
+  '15: Ayappakkam': {
+    stops: {
+      'Dunlop': '06:03 AM',
+      'Canara Bank': '06:31 AM',
+      'Cake World - Ambattur': '06:35 AM',
+      'Murugappa Polytechnic': '06:43 AM',
+    },
+  },
+  '15A: Ayappakkam Water Tank': {
+    stops: {
+      'Ayappakkam Water Tank': '06:40 AM',
+      'VGN Platina': '06:43 AM',
+      'Aparna Nagar': '06:45 AM',
+      'Shivan Koil': '06:48 AM',
+      'Koladi HP Petrol Bunk': '06:05 AM',
+      'Thiruverkadu Bus Stand': '06:52 AM',
+      'Pallavan Nagar': '06:55 AM',
+      'VGN Mahalakshmi Appartments': '06:58 AM',
+      'Velapanchavadi Kendra Vihar Appartment': '12:00 AM',
+    },
+  },
+  '15B: Thirumullaivoyal': {
+    stops: {
+      'Thirumullaivoyal': '06:40 AM',
+      'Vaishnawi Nagar': '06:45 AM',
+      'Outer Ring Road bye Pass - Chokanallur': '12:00 AM',
+    },
+  },
+  '15C: Ambattur OT': {
+    stops: {
+      'Singapore shopping': '06:30 AM',
+      'Anaikattucherry': '07:05 AM',
+      'Sitharkadu': '07:01 AM',
+    },
+  },
+  '15D: Ayappakkam Church (water tank)': {
+    stops: {
+      'Ayappakkam church (water tank)': '06:30 AM',
+      'Pillaiyar kovil': '06:32 AM',
+      'ICMR': '06:34 AM',
+      'Selvi Mahal': '06:36 AM',
+      'Ration shop': '06:37 AM',
+      'EB': '06:04 AM',
+    },
+  },
+  '15E: Vinayagapuram': {
+    stops: {
+      'Vinayagapuram SS Mahal': '06:15 AM',
+      'Lakshmipuram': '06:16 AM',
+      'Vinayagapuram Koot Raod': '06:17 AM',
+      'Vinayagapuram Bazar': '06:18 AM',
+      'Vinayagapuram KVB ATM': '06:19 AM',
+      'Surapet Main Road': '06:23 AM',
+      'Manikandapuram HP Petrol Bunk': '06:33 AM',
+    },
+  },
+  '15F: Dunlop (New route)': {
+    stops: {
+      'Dunlop': '06:30 AM',
+      'Sri Ramasamy school Signal': '06:35 AM',
+      'Saraswathi Nagar': '06:45 AM',
+      'Vaishnavi Nagar': '06:05 AM',
+    },
+  },
+  '16: Ponneri': {
+    stops: {
+      'Krishnapuram (Ponneri)': '05:50 AM',
+      'Andarkuppam': '05:55 AM',
+      'Velammal School': '05:57 AM',
+      'Thachoor Koot Road': '12:00 AM',
+      'Panchati': '06:03 AM',
+      'Irulipattu': '06:06 AM',
+      'Janapachathiram Koot Road': '06:08 AM',
+      'Karanodai': '06:01 AM',
+      'Cholavaram': '06:12 AM',
+      'Padiyanallur': '06:15 AM',
+      'MA Nagar': '06:18 AM',
+    },
+  },
+  '16A: Kallikuppam': {
+    stops: {
+      'Surapet': '06:25 AM',
+      'Kallikuppam Arch': '06:03 AM',
+      'Wireless': '06:32 AM',
+      'Oragadam': '06:35 AM',
+      'P.T.R.Kalyanamanadapam': '06:36 AM',
+      'Ajay Stadiuem': '06:45 AM',
+    },
+  },
+  '16B: Redhills Bypass': {
+    stops: {
+      'Sothupakkam Signal': '06:25 AM',
+      'SSR Palace': '06:03 AM',
+      'Nel arisi kalyana mandapam (Signal)': '06:32 AM',
+      'Redhills Market': '06:35 AM',
+      'Redhills Bus Stand': '06:37 AM',
+      'Alamaram': '06:42 AM',
+      'Gandhi Nagar': '06:45 AM',
+      'Petrol Bunk (Pammathukulam)': '06:47 AM',
+      'Outer ring road Bridge': '06:05 AM',
+      'Perumal Adipatham': '06:52 AM',
+      'Saint Michaels Polytechnic': '06:55 AM',
+    },
+  },
+  '16C: Puzhal Bypass': {
+    stops: {
+      'Kavankarai': '06:20 AM',
+      'Puzhal Jail': '06:22 AM',
+      'Puzhual Camp': '06:23 AM',
+      'Shanmugapuram': '06:03 AM',
+      'Pudur': '06:35 AM',
+    },
+  },
+  '16D: Gandhinagar Police Booth (Redhills)': {
+    stops: {
+      'Gandhinagar Police Booth (Redhills)': '06:15 AM',
+      'Pammathu kulam Bus Stop': '06:17 AM',
+      'HP Petrol Bunk': '06:19 AM',
+      'Alamaram Bus Stop': '06:23 AM',
+      'GRT (Redhills)': '06:25 AM',
+      'Redhills Bus Stop': '06:27 AM',
+      'Redhills market': '06:03 AM',
+    },
+  },
+  '16E: Oragadam (Ambattur)': {
+    stops: {
+      'Oragadam - PTR Kalyana Mandapam': '06:30 AM',
+      'Stedford': '06:35 AM',
+      'Saraswathi Nagar': '06:04 AM',
+      'Avadi Check post': '06:05 AM',
+      'Paruthipattu': '12:00 AM',
+    },
+  },
+  '17: Uthukottai': {
+    stops: {
+      'Uthukottai Bus Stand': '05:45 AM',
+      'Peruncheri': '05:55 AM',
+      'Seethancheri': '06:02 AM',
+      'Poondi Koot Road': '06:15 AM',
+      'Thiruvallur - Meera Theatre': '06:03 AM',
+      'Thiruvallur GRT': '06:42 AM',
+    },
+  },
+  '17A: Kakkalur': {
+    stops: {
+      'Kakkalur Bus stop': '06:35 AM',
+      'Manavalanagar Railway Station': '06:05 AM',
+      'NDP Mahal': '06:52 AM',
+      'Ondikuppam (Sangeetha Hotel)': '06:54 AM',
+      'Putlur Bus Stop': '12:00 AM',
+      'Aranvoyal Bus Stop': '07:05 AM',
+      'Thirumazhisai bus stand': '07:02 AM',
+    },
+  },
+  '17B: Thiruvallur': {
+    stops: {
+      'Vasantha Bhavan Hotel': '06:50 AM',
+      'State Bank of India': '06:52 AM',
+      'Oil Mill': '06:55 AM',
+      'Caterpillar': '07:05 AM',
+      'Melnallathur': '07:08 AM',
+      'TCL': '07:01 AM',
+      'Athikulam': '07:12 AM',
+    },
+  },
+  '17C: Veppampattu': {
+    stops: {
+      'Veppampattu Tea Kadai': '06:25 AM',
+      'Kandankollai': '06:03 AM',
+      'Chevappettai': '06:35 AM',
+      'Tholuvur': '06:04 AM',
+      'Thaneerkulam': '06:45 AM',
+      'Thiruvalur GRT': '06:55 AM',
+    },
+  },
+  '17D: Thirunindravur': {
+    stops: {
+      'Veppampattu Rly Station': '06:35 AM',
+      'Veppampattu Rly 2nd Gate': '06:38 AM',
+      'Thirunindravur- Murugan Koil': '06:45 AM',
+      'Thirunindravur': '06:05 AM',
+      'Nadukuthagai': '06:53 AM',
+      'Jaya college': '06:55 AM',
+      'Nemelichery rountana': '12:00 AM',
+    },
+  },
+  '17E: Nemilichery Roundana': {
+    stops: {
+      'Nanban Snacks': '06:50 AM',
+      'Jaya School': '06:52 AM',
+      'Nadukuthagai': '06:55 AM',
+      'Gomathipuram': '12:00 AM',
+      'Kottapedu': '07:02 AM',
+      'Vellavedu': '07:15 AM',
+      'Thirumazhisai bus stand': '07:02 AM',
+      'Thirumazhisai sivan koil': '07:23 AM',
+    },
+  },
+  '17F: Thiruvallur (Municipality Office) (New route)': {
+    stops: {
+      'Thiruvallur (Municipality Office)': '06:45 AM',
+      'Post office': '06:47 AM',
+      'Pattarai': '06:57 AM',
+    },
+  },
+  '18: Avadi': {
+    stops: {
+      'Avadi Ramarathinam': '06:40 AM',
+      'Ponnu Supermarket': '06:42 AM',
+    },
+  },
+  '18A: Ambattur Stedford Hospital': {
+    stops: {
+      'JB Estate': '12:00 AM',
+      'Vasantham Nagar': '07:02 AM',
+      'Paruthipattu police Booth': '07:06 AM',
+      'Kaduvetti': '07:07 AM',
+      'Bharat bunk': '07:08 AM',
+    },
+  },
+  '18B: Avadi (GRT)': {
+    stops: {
+      'Avadi Pillyarkoil': '06:50 AM',
+      'Kavarapalayam': '06:51 AM',
+      'Sindhu Nagar': '06:52 AM',
+      'Sekkadu': '06:53 AM',
+      'Hindu College': '06:54 AM',
+      'Pattabiram Bridge': '06:56 AM',
+    },
+  },
+  '18C: Avadi Market': {
+    stops: {
+      'Govarthnagiri': '06:46 AM',
+      'Ayankulam': '06:47 AM',
+      'Paruthipatu': '06:49 AM',
+      'Kaduveti': '06:05 AM',
+      'Seneerkuppam': '06:51 AM',
+    },
+  },
+  '18D: Avadi (veerapuram)': {
+    stops: {
+      'Kollumedu GH': '06:05 AM',
+      'Kannadapalayam': '06:07 AM',
+      'Vel Tech junction': '06:15 AM',
+      'Kovilpathagai': '06:02 AM',
+      'Ajay stadium': '06:25 AM',
+      'Kalainar Nagar': '06:27 AM',
+      'Brinda nagar': '06:03 AM',
+      'CRPF junction': '06:45 AM',
+      'Mittanemili': '06:48 AM',
+    },
+  },
+  '18E: Muthapudupet': {
+    stops: {
+      'Muthapudupet Post office': '06:10 AM',
+      'Muthapudupet': '06:15 AM',
+      'Shastri nagar': '06:02 AM',
+      'Nemelichery tollgate': '06:25 AM',
+      'Gomathipuram': '06:45 AM',
+      'Kottabedu': '06:05 AM',
+      'Puduchatram': '07:05 AM',
+      'Nemam': '07:01 AM',
+      'Vellavedu': '07:15 AM',
+      'Thirumazhisai sivan kovil': '07:02 AM',
+      'Gundumedu': '07:23 AM',
+    },
+  },
+  '19: Chengalpattu': {
+    stops: {
+      'Chengalpet GH': '05:45 AM',
+      'Chengalpet Rotanakenar': '05:47 AM',
+      'Chengalpet New Bus Stop': '05:05 AM',
+      'Chengalpet Old Bus Stop': '05:52 AM',
+      'Mahindra city': '06:01 AM',
+      'S.P.Koil': '06:15 AM',
+    },
+  },
+  '19A: Perungalathur': {
+    stops: {
+      'Perungalathur Bus stop': '06:40 AM',
+      'Perungalathur Earikarai': '06:43 AM',
+      'Irumpuliyur': '06:46 AM',
+      'Old Tambaram Kulam': '06:48 AM',
+      'Lakshmipuram': '06:05 AM',
+      'Krishnanagar': '06:53 AM',
+    },
+  },
+  '19B: Varatharaja Theatre': {
+    stops: {
+      'Varatharaja Theatre': '06:35 AM',
+      'Santorium': '06:38 AM',
+      'Bharathamada Street': '06:42 AM',
+      'Bharathi Nagar': '06:48 AM',
+      'Gandhi Nagar': '06:49 AM',
+      'Padmavathy Kalyanamandapam': '06:05 AM',
+      'Parvathy Nagar': '06:52 AM',
+      'Outer Ring Road (Service Road)': '06:55 AM',
+    },
+  },
+  '19C: Hasthinapuram': {
+    stops: {
+      'Hasthinapuram Bus Stand': '06:30 AM',
+      'Amman Koil': '06:32 AM',
+      'Kumaran Kundram': '06:35 AM',
+      'Bharathi Nagar Auto Stand': '06:37 AM',
+      'Tambaram Gandhi Road': '06:05 AM',
+      'Madanapuram Bridge (outer ring Road)': '06:55 AM',
+    },
+  },
+  '19D: Guduvanchery': {
+    stops: {
+      'Guduvanchery Bus stand': '06:30 AM',
+      'Guduvanchery EB': '06:32 AM',
+      'Urapakkam Tea Kadai': '06:34 AM',
+      'Urapakkam School stop': '06:36 AM',
+      'Vandalur': '06:04 AM',
+    },
+  },
+  '19E: Tambaram (MCC)': {
+    stops: {
+      'Tambaram (MCC)': '06:45 AM',
+      'Bharathi Nagar': '06:05 AM',
+      'Padmavathi': '06:52 AM',
+    },
+  },
+  '19F: Maraimalai Nagar': {
+    stops: {
+      'Maraimalai Nagar Bus Stop': '06:20 AM',
+      'Kattankulathur Bus Stop': '06:22 AM',
+      'SRM (Potheri)': '06:24 AM',
+      'Thailavaram': '06:25 AM',
+      'Srinivasapuram': '06:27 AM',
+    },
+  },
+  '19G: Perungalathur (New route)': {
+    stops: {
+      'Old Tambaram Kulam': '06:03 AM',
+      'Lakshmipuram': '06:37 AM',
+      'Krishnanagar': '06:45 AM',
+    },
+  },
+  '1B: Periyamedu': {
+    stops: {
+      'Ennore Bus Stand': '05:04 AM',
+      'Ernavur': '05:43 AM',
+      'Murugan Koil': '05:45 AM',
+      'Mullai Nagar': '05:47 AM',
+    },
+  },
+  '1C: Tondiarpet (RTO Office)': {
+    stops: {
+      'Tondiarpet Depot': '06:05 AM',
+      'Kasimedu': '06:01 AM',
+      'Kasimedu Petrol Bunk': '06:11 AM',
+      'kalmandapam Police Station': '06:13 AM',
+      'ST Anne\'s School': '06:14 AM',
+      'Royapuram Bridge': '06:16 AM',
+      'Beach Station': '06:02 AM',
+      'Annamalai Mandram': '06:23 AM',
+      'GH (Rajiv Gandhi Hospital)': '06:25 AM',
+      'Everest Hotel': '06:27 AM',
+      'Neyveli House': '06:31 AM',
+      'KMC': '06:32 AM',
+    },
+  },
+  '2: Tondiarpet': {
+    stops: {
+      'Tondiarpet Mani Cycle Shop': '06:10 AM',
+      'Police Quarters': '06:11 AM',
+      'Post Office': '06:12 AM',
+      'Maharani (Singapore Shoppee)': '06:13 AM',
+    },
+  },
+  '20: Kamatchi Hospital (Pallikaranai)': {
+    stops: {
+      'Kamachi Hospital': '06:15 AM',
+      'Narayanapuram': '06:17 AM',
+      'Pallikaranai Oil Mill': '06:19 AM',
+      'Pallikaranai Govt School': '06:21 AM',
+      'Pallikaranai Jayachandran': '06:23 AM',
+      'Nilgiris Supermarket': '06:25 AM',
+    },
+  },
+  '20A: Medavakkam X Road': {
+    stops: {
+      'Medavakkam X Road': '06:30 AM',
+      'Puthukoil Bus Stop': '06:32 AM',
+      'Santhoshpuram Signal': '06:35 AM',
+      'Sembakkam Signal': '06:04 AM',
+      'Rajakilpakkam Signal': '06:42 AM',
+    },
+  },
+  '20B: Padur': {
+    stops: {
+      'Siruseri Roundtana': '05:50 AM',
+      'Padur Market': '05:53 AM',
+      'Hindustan College': '12:00 AM',
+      'Kelambakkam(Vandalur X Road)': '06:03 AM',
+      'Pudupakkam': '06:06 AM',
+      'Mambakkam': '06:01 AM',
+      'Mambakkam Sivan Koil': '06:15 AM',
+      'Thiruvanchery': '06:03 AM',
+      'Theeder Nagar': '06:33 AM',
+      'Lakshmi Ammal College': '06:37 AM',
+      'Bharath Engineering College': '06:04 AM',
+      'Indra Nagar': '06:42 AM',
+      'Malar Hospital': '06:45 AM',
+    },
+  },
+  '20C: Madipakkam': {
+    stops: {
+      'Ponniamman Koil': '06:15 AM',
+      'PNB Bank': '06:18 AM',
+      'Sathasiva Nagar': '06:02 AM',
+      'Ram Nagar': '06:22 AM',
+      'Kaiveli Signal': '06:28 AM',
+    },
+  },
+  '20D: Nanmangalam': {
+    stops: {
+      'Nanmangalam': '06:25 AM',
+      'Vadakupattu Road': '06:27 AM',
+      'Vellakal': '06:29 AM',
+      'Kamarajapuram': '06:35 AM',
+      'Mahalakshmi Nagar': '06:38 AM',
+      'Selaiyur': '06:42 AM',
+      'Sankara vidyalaya School': '06:43 AM',
+      'Poondi Bazaar': '06:44 AM',
+      'Tambaram Railway Station': '06:45 AM',
+    },
+  },
+  '20E: Chrompet': {
+    stops: {
+      'Chrompet Saravana Stores': '06:40 AM',
+      'Chrompet (Railway Station)': '06:42 AM',
+      'MIT Bridge': '06:45 AM',
+      'Sanatorium TB Hospital': '06:47 AM',
+      'Tambaram Mepz': '06:05 AM',
+    },
+  },
+  '20F: Bharath University': {
+    stops: {
+      'Bharath University': '06:35 AM',
+      'Indra Nagar': '06:37 AM',
+      'Malar Hospital': '06:04 AM',
+      'Camp Road': '06:42 AM',
+      'ICICI Bank': '06:45 AM',
+      'Old Tambaram Kulam': '06:55 AM',
+      'Krishna Nagar (Mudichur Road)': '06:58 AM',
+    },
+  },
+  '20G: Sembakkam (New route)': {
+    stops: {
+      'Sembakkam Signal': '06:35 AM',
+      'Rajakilpakkam Signal': '06:42 AM',
+    },
+  },
+  '21: NGO Colony': {
+    stops: {
+      'NGO Colony Dept': '06:20 AM',
+      'Kakkanpalam': '06:25 AM',
+      'Arun Ice Parler': '06:28 AM',
+      'Prem Care Hospital': '06:03 AM',
+      'Puzuthiwakkam Road': '06:32 AM',
+      'Sakthi Cars': '06:35 AM',
+    },
+  },
+  '21A: Velachery': {
+    stops: {
+      'Tansi Nagar': '06:15 AM',
+      'Murugan Kalyanamandapam': '06:02 AM',
+      'Velachery Chekpost': '06:25 AM',
+      'Shanthi Apartment': '06:03 AM',
+      'Sakthi Cars': '06:37 AM',
+      'Alandur Court': '06:42 AM',
+      'Jothi Theatre': '06:47 AM',
+    },
+  },
+  '21C: Adambakkam': {
+    stops: {
+      'Thandeeswarm Bus Stop': '06:15 AM',
+      'Gandhi Road': '06:17 AM',
+      'Race Course Road': '06:18 AM',
+      'NGO Colony': '06:25 AM',
+      'St.Thomas Mount Rly Station': '06:27 AM',
+      'Jayalakshmi Theatre': '06:03 AM',
+      'Thillaiganga nagar subway': '06:35 AM',
+    },
+  },
+  '22: Sholinganallur (OMR)': {
+    stops: {
+      'Sholinganallur': '05:50 AM',
+      'Saravana Stores': '05:55 AM',
+      'Karapakkam Bus Stop': '12:00 AM',
+      'RRE Bus Stop': '06:01 AM',
+      'Thorapakkam': '06:12 AM',
+      'Perunkudi': '06:13 AM',
+      'MGR Road': '06:15 AM',
+      'Thramani Rly Station': '06:17 AM',
+      'Baby Nagar': '06:24 AM',
+      'Vijaya Nagar Kajana Jewlers': '06:29 AM',
+    },
+  },
+  '23: Kovilampakkam': {
+    stops: {
+      'Kovilambakkam': '06:15 AM',
+      'Kaiveli Signal': '06:25 AM',
+      'Vanuvampet Perumal Kovil': '06:35 AM',
+      'Nayara Petrol Bunk': '06:05 AM',
+    },
+  },
+  '23C: Keelkatalai': {
+    stops: {
+      'Echangadu Singal': '06:15 AM',
+      'Kaiveli Singal': '06:25 AM',
+      'Vanuvampet Perumal Kovil': '06:35 AM',
+      'Nagalkeni': '06:05 AM',
+      'Thiruneermalai Erikarai': '06:55 AM',
+      'Thirumudivakkam': '12:00 AM',
+    },
+  },
+  '23b: Meenambakkam (New route)': {
+    stops: {
+      'Meenambakkam': '06:25 AM',
+      'Airport': '06:28 AM',
+      'Pallavaram': '06:03 AM',
+    },
+  },
+  '24: Nanganallur': {
+    stops: {
+      'Moovarasampettai kulam': '06:25 AM',
+      'JK Mahal': '06:28 AM',
+      'Nanganallur Bus Stand': '06:03 AM',
+      'Ranga theatre': '06:32 AM',
+      'Independence Park': '06:35 AM',
+    },
+  },
+  '24C: Pallavaram Bus stand': {
+    stops: {
+      'Pallavaram Bus Stand': '06:40 AM',
+      'Pallavaram Ponds Singal': '06:43 AM',
+      'nagalkeni (Nayara Petrol Bunk)': '06:48 AM',
+      'nagalkeni Erikarai': '06:05 AM',
+      'Thirumudivakkam': '06:55 AM',
+    },
+  },
+  '25: VGP (ECR)': {
+    stops: {
+      'VGP': '06:00 AM',
+      'Vettuvakani': '06:08 AM',
+      'Neelankarai Puhari': '06:11 AM',
+      'Neelankarai Police Station': '06:13 AM',
+      'Palavakkam Anoty Church': '06:15 AM',
+      'Palavakkam Periyar Street': '06:17 AM',
+      'Kotivakkam Bus Stop': '06:19 AM',
+      'Thiruvanmiur RTO Office': '06:21 AM',
+      'Murutheswarar Koil': '06:23 AM',
+      'Thiruvanmiur Depot': '06:25 AM',
+      'Thiruvanmiur Signal': '06:26 AM',
+      'Tidel Park': '06:28 AM',
+      'Butt Road': '06:04 AM',
+      'Sangeetha Hotel Signal': '06:42 AM',
+      'Kumanan Chavadi Petrol Bunk': '12:00 AM',
+    },
+  },
+  '25C: Adyar': {
+    stops: {
+      'Indra Nagar Water Tank': '06:15 AM',
+      'Besant Nagar': '06:18 AM',
+      'BSNL Office Adyar': '06:22 AM',
+      'Adyar Signal': '06:24 AM',
+      'Adyar Bus Stand (Ambica Appalam)': '06:26 AM',
+      'Madhya Kailash': '06:03 AM',
+      'Balaji hospital (Guindy)': '06:38 AM',
+      'Butt Road': '06:04 AM',
+    },
+  },
+  '26: Triplicane': {
+    stops: {
+      'D1 Police Station': '06:05 AM',
+      'Rathna Café': '06:08 AM',
+      'ICE House': '06:12 AM',
+      'Meesapet Market': '06:15 AM',
+      'New College': '06:02 AM',
+      'Fire Office': '06:23 AM',
+    },
+  },
+  '26C: Teynampet': {
+    stops: {
+      'Teynampet Signal': '06:15 AM',
+      'Teynampet Metro': '06:16 AM',
+      'Nandanam Signal': '06:02 AM',
+      'Nandanam Fire Office': '06:21 AM',
+      'Saidapet (Metro Station)': '06:26 AM',
+      'Kalaignar Arch': '06:28 AM',
+      'Chinnamalai Court': '06:03 AM',
+    },
+  },
+  '27: Pattinapakkam': {
+    stops: {
+      'Airtel Office': '06:00 AM',
+      'Mandaveli Bus Depot': '06:03 AM',
+      'Devanathan Street': '06:05 AM',
+      'Mandaveli Post office': '06:07 AM',
+      'Billrtoth Hospital': '06:01 AM',
+      'C.P.Ramasamy Road': '06:15 AM',
+      'TTK Road': '06:17 AM',
+      'Kaliappa Hospital': '06:13 AM',
+      'Adyar Gate Hotel': '06:16 AM',
+      'Kotturpuram': '06:02 AM',
+    },
+  },
+  '27C: Santhome (Light house)': {
+    stops: {
+      'Pattinapakkam Signal': '06:05 AM',
+      'Santhome Church': '06:07 AM',
+      'Light House': '06:01 AM',
+      'Jain Temple': '06:01 AM',
+      'Luz Corner': '06:12 AM',
+      'Vivekanada College': '06:13 AM',
+      'Ajantha Bridge': '06:15 AM',
+      'New Woodlands': '06:17 AM',
+      'Music Academy': '06:02 AM',
+      'Stella Marrys College': '06:22 AM',
+    },
+  },
+  '28: Nungambakkam (Shastri bhawan)': {
+    stops: {
+      'Shastri bhawan': '06:15 AM',
+      'Taj Coromandel hotel(sterling road)': '06:02 AM',
+      'Valluvarkottam': '06:24 AM',
+      'Periyar salai bus stop': '06:25 AM',
+      'Kodambakkam Bridge': '06:28 AM',
+      'Sekar Emporium': '06:03 AM',
+      'Five lights junction signal(kodambakkam)': '06:32 AM',
+      'Power House': '06:35 AM',
+      'Samiyar Madam': '06:36 AM',
+    },
+  },
+  '28B: Virugambakkam (New route)': {
+    stops: {
+      'Valasaravakkam': '06:35 AM',
+      'Porur': '06:05 AM',
+    },
+  },
+  '28C: Lakshman Sruthi': {
+    stops: {
+      'Vadapalani Bus Stand': '06:20 AM',
+      'Lakshman Sruthi': '06:03 AM',
+      'la martin school': '06:04 AM',
+      'Karapakkam': '06:05 AM',
+      'Porur Bus stand': '06:55 AM',
+      'Kattupakkam (Hyundai showroom)': '06:58 AM',
+    },
+  },
+  '29: Saligramam': {
+    stops: {
+      'Surya Hospital': '06:20 AM',
+      'Parvathi Bhavan': '06:21 AM',
+      'Dasarathapuram': '06:23 AM',
+      'Sudharma Mahal': '06:25 AM',
+      'Kamachi Store': '06:26 AM',
+      'Saligramam Bus Stand': '06:27 AM',
+      'AVM Colony': '06:29 AM',
+    },
+  },
+  '29C: Alwarthirunagar': {
+    stops: {
+      'Mega Mart': '06:40 AM',
+      'Valasaravakkam Signal': '06:43 AM',
+    },
+  },
+  '2C: Ajax-Thiruvottiyur': {
+    stops: {
+      'Ajax Bus Depot': '05:50 AM',
+      'Periyar nagar': '05:57 AM',
+      'Ellaiamman koil': '12:00 AM',
+      'Lakshmi koil': '06:05 AM',
+      'Cemetery road': '06:13 AM',
+      'Mint Old Bus stand': '06:15 AM',
+      'Mint New Bus stand': '06:16 AM',
+      'Padmanabha Theatre': '06:18 AM',
+    },
+  },
+  '3: Choolai': {
+    stops: {
+      'Choolai post office': '06:15 AM',
+      'Veperi Police Station': '06:02 AM',
+      'Muthumari amman Koil- Pursaiwakkam': '06:22 AM',
+      'Gangadeeswarar Koil': '06:23 AM',
+      'Alagappa Road': '06:25 AM',
+      'Pathala Ponniammam Koil': '06:27 AM',
+      'Motcham theatre': '06:03 AM',
+      'Mummy Daddy': '06:32 AM',
+    },
+  },
+  '30: Chinmaya Nagar': {
+    stops: {
+      'Natesan Nagar': '06:30 AM',
+      'Sai Nagar Bus Stop': '06:32 AM',
+      'Chinmaya Nagar Bus Stop': '06:35 AM',
+    },
+  },
+  '30C: Elango Nagar': {
+    stops: {
+      'Elango Nagar': '06:40 AM',
+      'Virugambakkam Market': '06:42 AM',
+      'Kesavarthini': '06:44 AM',
+      'Friends Park Hotel': '06:45 AM',
+      'Lakshmi Nagar': '06:47 AM',
+      'Saibaba Koil (Kumanan Chavadi)': '07:05 AM',
+    },
+  },
+  '31: Valluvarkottam': {
+    stops: {
+      'Valluvarkottam': '06:15 AM',
+      'Madras Coffee House': '06:17 AM',
+      'Kannadasan Silai': '06:19 AM',
+      'Panagal Park': '06:21 AM',
+      'Nalli Silks': '06:24 AM',
+      'SRM Hospitel': '06:25 AM',
+      'J.P.Road (West Mambalam)': '06:26 AM',
+      'Ayodhya Mandapam': '06:28 AM',
+      'Postal Colony': '06:29 AM',
+      'Sangamam Hotel': '06:03 AM',
+      'Ambica Empire Hotel': '06:35 AM',
+    },
+  },
+  '31C: Ashok Pillar (New route)': {
+    stops: {
+      'J P Road West Mambalam': '06:20 AM',
+      'Ayodhiya Mandabam': '06:25 AM',
+      'Postal Colony': '06:35 AM',
+    },
+  },
+  '32: CIT.Nagar': {
+    stops: {
+      'CIT Nagar Bus Stop': '06:15 AM',
+      'Vasanth & Co': '06:18 AM',
+      'Aranganathan Sub Way': '06:02 AM',
+      'Srinivasa Theatre': '06:25 AM',
+      'Metupalayam': '06:27 AM',
+      'Blue Tank': '06:03 AM',
+    },
+  },
+  '32C: Ashok Pillar': {
+    stops: {
+      'Kasi Theatre': '06:02 AM',
+      'Ekkatuthangal': '06:25 AM',
+      'Ramapuram': '06:35 AM',
+      'Porur Sivan kovil': '06:45 AM',
+    },
+  },
+  '33: K.K.Nagar (Sivan park)': {
+    stops: {
+      'Sivan Park': '06:20 AM',
+      'K.K.Nagar Pillaiyar koil': '06:21 AM',
+      'Hotel Saravana Bhavan': '06:25 AM',
+      'MGR Nagar Market': '06:27 AM',
+      'Ajantha': '06:29 AM',
+    },
+  },
+  '33C: Nesapakkam': {
+    stops: {
+      'Nesapakkam Bus Stand': '06:35 AM',
+      'Pondichery Guest House': '06:37 AM',
+    },
+  },
+  '34: Porur Ramachandra': {
+    stops: {
+      'Ramachandra': '06:45 AM',
+      'Ambedkar Statue': '06:48 AM',
+      'Kattupakkam Honda Show Room': '06:51 AM',
+      'Maran garden': '06:54 AM',
+      'Munisvaran Koil (Kattupakkam)': '06:56 AM',
+    },
+  },
+  '34B: Iyyappanthangal (New route)': {
+    stops: {
+      'Iyappanthangal Depot': '06:40 AM',
+      'Kattupakkam': '06:45 AM',
+      'Aravind Eye Hospital': '06:55 AM',
+    },
+  },
+  '34C: Iyyappanthangal': {
+    stops: {
+      'Iyyappanthangal': '06:40 AM',
+      'Nazharathpettai bunk': '07:05 AM',
+    },
+  },
+  '35: Pammal (Therasa School)': {
+    stops: {
+      'Therasa School': '06:35 AM',
+      'Puthur Koil': '06:37 AM',
+      'Krishna Nagar': '06:04 AM',
+      'Pozhichalur Church': '06:42 AM',
+    },
+  },
+  '35A: Mangadu': {
+    stops: {
+      'Mangadu Gangai Amman Koil': '06:50 AM',
+      'MGR Statue': '06:55 AM',
+      'Kumanachavdi': '06:58 AM',
+      'Sai Baba Koil': '12:00 AM',
+    },
+  },
+  '35B: Arunmathi Theatre(Pammal)': {
+    stops: {
+      'Arunmathi Theatre': '06:45 AM',
+      'Indian Bank': '06:46 AM',
+      'Anakaputhur Amman Kovil': '06:05 AM',
+      'Manikandan Nagar': '06:55 AM',
+      'Metha Nagar': '06:58 AM',
+      'Kundrathur Theradi': '12:00 AM',
+    },
+  },
+  '35C: Kundrathur': {
+    stops: {
+      'Mananchery': '06:38 AM',
+      'Andarkuppam': '06:39 AM',
+      'Sivanthangal': '06:42 AM',
+      'Muthukumaran Bus Stop': '06:45 AM',
+      'Pattu Koot Road': '06:47 AM',
+      'Mangadu': '06:51 AM',
+    },
+  },
+  '35D: Pammal': {
+    stops: {
+      'Pozhichalur Church': '06:40 AM',
+      'Anakaputhur Bridge': '06:43 AM',
+    },
+  },
+  '35E: Kundrathur (New route)': {
+    stops: {
+      'Kundrathur Theradi': '06:40 AM',
+      'Mangadu': '06:45 AM',
+      'Karayanchavadi EB': '12:00 AM',
+    },
+  },
+  '36: Kovur': {
+    stops: {
+      'Moondram Kattalai': '06:30 AM',
+      'Kovur RTO Office': '06:32 AM',
+      'Kovur High School': '06:34 AM',
+      'Panicherry': '06:36 AM',
+      'Girugampakkam Bus Stop': '06:39 AM',
+      'Girugampakkam Lakshmi Kalyanamandapam': '06:41 AM',
+      'Kolapakkam Bus Stop': '06:43 AM',
+      'Bai Kadai': '06:45 AM',
+    },
+  },
+  '36C: Madhanandapuram': {
+    stops: {
+      'Madhanandapuram Bus Stop': '06:35 AM',
+      'Madhanandapuram Petrol Bunk': '06:38 AM',
+      'Porur EB': '06:39 AM',
+      'Porur Bridge Down': '06:41 AM',
+      'Iyappanthangal': '06:45 AM',
+    },
+  },
+  '37: DLF': {
+    stops: {
+      'DLF': '06:45 AM',
+      'Mugaliwakkam': '06:47 AM',
+      'Mugaliwakkam Bus Stop': '06:49 AM',
+      'Saravana Stores': '06:51 AM',
+      'Police Station': '06:53 AM',
+    },
+  },
+  '37A: Iyyappanthangal (Reliance Mart)': {
+    stops: {
+      'Iyyappanthangal (Reliance Mart)': '06:50 AM',
+      'Kattupakkam Petrol Bunk': '06:55 AM',
+      'E.V.P. Mahal': '06:57 AM',
+    },
+  },
+  '37B: NIVH Poonamalle': {
+    stops: {
+      'National Institute for the Visually Handicapped': '07:00 AM',
+      'Govt.Higher Secoundary School': '07:02 AM',
+      'Karayanchavadi Bus Stop': '07:05 AM',
+      'Indian Bank': '07:08 AM',
+      'E.B.Office': '07:01 AM',
+      'Perumal Koil': '07:12 AM',
+      'Golden Apartment (Poonamallee Byepass)': '07:14 AM',
+      'Paraivakkam Signal': '07:15 AM',
+    },
+  },
+  '37C: Poonamallee Bus Stand': {
+    stops: {
+      'Poonamallee ambedkar statue': '07:05 AM',
+    },
+  },
+  '37D: Poonamallee Ambedkar statue': {
+    stops: {
+      'Poonamallee ambedkar statue': '07:00 AM',
+      'Nazarathpettai': '07:02 AM',
+      'Chembarambakkam': '07:01 AM',
+      'RIT Bus stop': '07:15 AM',
+      'Pappanchatram': '07:17 AM',
+    },
+  },
+  '37E: Poonamallee (New route)': {
+    stops: {
+      'Parivakkam Signal': '06:55 AM',
+      'Golden Opulence Apartment': '12:00 AM',
+    },
+  },
+  '38: Cheyyar': {
+    stops: {
+      'State Bank': '05:40 AM',
+      'Soundari Theatre': '05:42 AM',
+      'Pandiyampakkam': '05:55 AM',
+      'Mangal Koot Road': '12:00 AM',
+      'Mamandur': '06:03 AM',
+      'Dusi': '06:07 AM',
+      'Iyyangarkulam X road': '06:01 AM',
+      'Punchaiarasanthangal': '06:11 AM',
+    },
+  },
+  '38C: Vandavasi': {
+    stops: {
+      'Vandavasi New Bus stand': '05:25 AM',
+      'Vandavasi Old Bus stand': '05:03 AM',
+      'Thennangur Bus stand': '05:38 AM',
+      'Manamathi X Road': '05:05 AM',
+      'Peru Nagar': '05:52 AM',
+      'Mangal X Road': '12:00 AM',
+      'Sevelimedu': '06:15 AM',
+      'Housing Board': '06:02 AM',
+      'Kanchipuram collectorate': '06:23 AM',
+    },
+  },
+  '39: Uthiramerur': {
+    stops: {
+      'Uthirumerur': '05:35 AM',
+      'Karuvappampoondi': '05:45 AM',
+      'Manalmedu': '05:48 AM',
+      'Vengacherry': '05:05 AM',
+      'Magaral': '05:55 AM',
+      'Arpakkam': '05:58 AM',
+      'Kalakatur': '06:05 AM',
+      'Kuruvimalai': '06:08 AM',
+      'Orikkai': '06:12 AM',
+      'Miltary Road': '06:15 AM',
+      'KK Nagar': '06:17 AM',
+      'Keel Gate': '06:02 AM',
+      'Keeramandapam': '06:22 AM',
+    },
+  },
+  '39C: Kanchipuram': {
+    stops: {
+      'Kancheepuram Bus Stand': '06:30 AM',
+      'Ekambaranathar temple': '06:34 AM',
+      'Ponnerikarai': '06:04 AM',
+      'Kancheepuram RTO Office': '06:42 AM',
+      'Sunguvarchatram': '12:00 AM',
+    },
+  },
+  '3C: Doveton Bridge': {
+    stops: {
+      'Muthumariamman kovil (Dovton Bridge)': '06:15 AM',
+      'Kellys - Signal': '06:03 AM',
+      'Murugan Hospital': '06:35 AM',
+      'Kallarai- Road': '06:37 AM',
+      'Periyapalayathamman Temple': '06:38 AM',
+      'Shenoy nagar Bus Stop': '06:04 AM',
+    },
+  },
+  '4: Chintadripet': {
+    stops: {
+      'Chintadripet Fish Market': '06:15 AM',
+      'Chintadripet Market': '06:17 AM',
+      'Chintadripet Police Quarters': '06:18 AM',
+      'Pudupet': '06:02 AM',
+      'Egmore Court': '06:22 AM',
+      'Rajarthinam Stadium': '06:24 AM',
+      'Egmore (Co-Optex) Bridge': '06:26 AM',
+      'Halls Road Junction': '06:28 AM',
+      'Chepet Signal': '06:03 AM',
+      'Harington Road Junction': '06:35 AM',
+      'Pantaloon': '06:04 AM',
+      'Skywalk bridge': '06:42 AM',
+    },
+  },
+  '40: Walajabad': {
+    stops: {
+      'New Police Station': '06:15 AM',
+      'Chetty Street': '06:17 AM',
+      'Perumal Koil': '06:02 AM',
+      'Tollgate': '06:21 AM',
+      'Periyar Nagar': '06:22 AM',
+      'Pachaiyappa\'s College': '06:23 AM',
+    },
+  },
+  '40A: Ayyampettai': {
+    stops: {
+      'Ayyampettai Anjeneyar Koil': '06:03 AM',
+      'Ayyampettai Bus Stop': '06:32 AM',
+      'Ayyampettai Easwearan Koil': '06:33 AM',
+      'Ekanampet': '06:35 AM',
+      'Rajampet': '06:38 AM',
+      'Walajabad': '06:42 AM',
+      'Waranavasi': '06:47 AM',
+      'Oragadam': '06:55 AM',
+      'Casagrand': '12:00 AM',
+      'Vallakottai': '07:01 AM',
+      'Pondur': '07:04 AM',
+      'Sriperumbudur Bus Stop': '07:08 AM',
+      'Theradi Bus Stop': '07:01 AM',
+      'Sriperumbudur Arch': '07:16 AM',
+      'VGN Apartment(MRF)': '07:02 AM',
+    },
+  },
+  '40B: Rangasamy Kulam': {
+    stops: {
+      'Rengasamy Kulam': '06:20 AM',
+      'Mungelmandapam': '06:23 AM',
+      'Thaluk Office': '06:25 AM',
+      'Kachepeswarar Koil': '06:27 AM',
+      'Gujarathi Chithiram': '06:32 AM',
+      'Oli Mohamed Pettai (Kori)': '06:33 AM',
+      'Rajalakshmi Cars': '07:18 AM',
+    },
+  },
+  '40C: Kanchipuram Bus Stand': {
+    stops: {
+      'Ramas Cafe': '06:30 AM',
+    },
+  },
+  '40D: Kancheepuram (New route)': {
+    stops: {
+      'Housing Board': '06:20 AM',
+      'Kancheepuram Bus Stand': '06:03 AM',
+    },
+  },
+  '41: Ranipet': {
+    stops: {
+      'Ranipet Old Bus Stand': '05:45 AM',
+      'Muthukadai': '05:05 AM',
+      'VC Moottur': '05:54 AM',
+      'Walajapet GH': '05:56 AM',
+      'Walajapet Bus Stand': '05:58 AM',
+      'Housing Board': '12:00 AM',
+      'AAA College': '06:02 AM',
+    },
+  },
+  '41A: Arani (Irumbedu X Road)': {
+    stops: {
+      'Irumbedu Koot Road': '05:15 AM',
+      'Thamaraipakkam': '05:02 AM',
+      'Thimiri': '05:25 AM',
+      'Arcot': '05:04 AM',
+      'Ranipet Bypass': '05:43 AM',
+      'Walajapet Toll Gate': '05:05 AM',
+      'Bagaveli Koot Road': '05:52 AM',
+      'Kaveripakkam': '12:00 AM',
+      'Sirukarumbur': '06:05 AM',
+      'Ocheri': '06:01 AM',
+      'Avalur': '06:15 AM',
+      'Perumpuliyur': '06:17 AM',
+    },
+  },
+  '41C: Vellore': {
+    stops: {
+      'Vellore Rountana': '05:20 AM',
+      'Sathuvachari': '05:22 AM',
+      'Vallar': '05:23 AM',
+      'Puttuthakku': '05:03 AM',
+    },
+  },
+  '42: Arakkonam': {
+    stops: {
+      'Vimal School': '06:08 AM',
+      'Indira Gandhi Statue': '06:01 AM',
+      'Suvalapet': '06:12 AM',
+      'Old Bus Stand': '06:13 AM',
+      'New Bus Stand': '06:14 AM',
+      'Thakkolam Koot Road': '06:03 AM',
+      'Kadambanallur': '06:32 AM',
+      'Naidu Mess': '06:33 AM',
+      'Thakkolam E.B': '06:34 AM',
+      'Thakkolam Bazzer(Meal)': '06:35 AM',
+      'Thakkolam Bazzer(Keel)': '06:36 AM',
+      'Thakkolam Petrol Bunk': '06:37 AM',
+      'Perampakkam': '06:05 AM',
+      'Kattu koot Road': '07:01 AM',
+    },
+  },
+  '42A: Senthamangalam': {
+    stops: {
+      'Senthamangalam': '06:15 AM',
+      'Attupakkam Koot Road': '06:22 AM',
+      'Illuppaithandalam': '06:25 AM',
+      'Parameswaramangalam': '06:28 AM',
+      'Thakkolam koot Road': '06:03 AM',
+      'Kadambanallur': '06:32 AM',
+      'Naidu Mess': '06:35 AM',
+      'Thakkolam E.B': '06:36 AM',
+      'Thakkolam Bazzar(Up)': '06:38 AM',
+      'Thakkolam Bazzar(Down)': '06:04 AM',
+      'Thakkolam Petrol Bunk': '06:47 AM',
+      'Perampakkam': '06:05 AM',
+      'Kattu koot Road': '07:01 AM',
+    },
+  },
+  '42B: S R Gate (New route)': {
+    stops: {
+      'Takkolam X Road': '06:40 AM',
+      'Perambakkm': '06:55 AM',
+    },
+  },
+  '42C: Sholingur': {
+    stops: {
+      'Sholingur Bus Stand': '05:35 AM',
+      'Karumaiamman Koil': '05:36 AM',
+      'Anjaneyar Kovil': '05:38 AM',
+      'Sholigur Textile Mill': '05:04 AM',
+      'Paranchi': '05:05 AM',
+      'Salai': '05:57 AM',
+      'Chitteri': '06:02 AM',
+      'Kummunipet': '06:05 AM',
+      'Kainoor': '06:07 AM',
+      'Nethaji Nagar': '06:08 AM',
+      'Windru pet': '06:01 AM',
+      'S R Gate': '06:13 AM',
+      'Venkatespuram': '06:15 AM',
+      'Perumuchi': '06:17 AM',
+      'Pudhukesavaram': '06:35 AM',
+      'Mettukuppam': '06:37 AM',
+      'Marimangalam': '06:38 AM',
+      'Narasingapuram': '06:39 AM',
+      'Koovam': '06:42 AM',
+      'Mappedu': '06:05 AM',
+      'Vooluthai': '06:55 AM',
+    },
+  },
+  '43: Thiruthani': {
+    stops: {
+      'Thirupathi Bypass': '05:45 AM',
+      'Arcot Kuppam': '06:01 AM',
+      'Kanakammachathram': '06:15 AM',
+      'Ramanjeri': '06:25 AM',
+      'Narayanapuram Koot Road': '06:35 AM',
+      'Pandur': '06:45 AM',
+      'Thirupachur Bypass': '06:05 AM',
+      'Manavala Nagar Bus Stop': '12:00 AM',
+      'Pattarai (Indian Oil Petrol Bunk)': '07:05 AM',
+      'Chatram': '07:15 AM',
+      'Mevalurkuppam': '07:03 AM',
+    },
+  },
+  '44: Nemili-Panappakkam': {
+    stops: {
+      'Nemili Bus Stand': '05:45 AM',
+      'Vetangulam': '05:05 AM',
+      'Reddyvalam': '05:55 AM',
+      'Panapakkam': '06:05 AM',
+      'Damal': '06:01 AM',
+      'Baluchetti': '06:15 AM',
+      'Ambi Bypass': '06:02 AM',
+      'Ariyaperumbakkam': '06:22 AM',
+      'Vellagate (Sakthiganapthy Hotel)': '06:25 AM',
+      'Meenachi College (KPM)': '06:03 AM',
+      'Enathur Petrol Bunk': '06:33 AM',
+      'Rajakulam': '06:35 AM',
+      'Sathankulam': '06:38 AM',
+      'Chinnachatram': '06:41 AM',
+      'Pillaichatram': '06:45 AM',
+      'Senthamangalam': '06:48 AM',
+      'Santhavellore': '06:05 AM',
+      'Thirumangalam': '06:55 AM',
+      'Mambakkam': '12:00 AM',
+      'Vadamangalam': '07:05 AM',
+      'Nokia Gate': '07:08 AM',
+      'Sriperumbudur Police Station': '07:12 AM',
+      'Sriperumbudur Toll gate': '07:15 AM',
+    },
+  },
+  '45: Padappai': {
+    stops: {
+      'Padappai': '06:25 AM',
+      'Keel Padappai (High School)': '06:28 AM',
+      'Karasangal': '06:04 AM',
+      'Manimangalam': '06:43 AM',
+      'Naduverpattu': '06:05 AM',
+      'Melnallathur High School': '06:55 AM',
+      'Pudupet Koot Road': '12:00 AM',
+      'nallur Check post': '07:02 AM',
+      'Sriperumbudur RTO Office': '07:01 AM',
+      'Sriperumbudur High School Stoping': '07:11 AM',
+    },
+  },
+  '4C: Loyola College': {
+    stops: {
+      'Loyola College': '06:35 AM',
+      'Nungambakkam Railway Station': '06:38 AM',
+      'Mehta Nagar': '06:04 AM',
+      'Anna Arch': '06:45 AM',
+      'Arumpakkam- Indian Hospital': '06:05 AM',
+    },
+  },
+  '5: Chintamani': {
+    stops: {
+      'Chintamani': '06:30 AM',
+      'K3 Police station': '06:33 AM',
+      'Razack Garden': '06:35 AM',
+      'MMDA': '06:38 AM',
+      'MMDA Bus Depot': '06:04 AM',
+    },
+  },
+  '5A: Arumbakkam': {
+    stops: {
+      'Paanchali Amman Koil (Arumbakkam)': '06:35 AM',
+      'Maduravoyal Ration shop': '06:05 AM',
+      'Maduravoyal Murugan Koil arch': '06:52 AM',
+      'Maduravoyal Market': '06:53 AM',
+      'ACS Medical College': '07:05 AM',
+    },
+  },
+  '5B: Maduravoyal Erikarai': {
+    stops: {
+      'Maduravoyal Erikarai': '06:05 AM',
+      'Vanagaram bus stop': '06:55 AM',
+      'Shrivari Signal': '06:57 AM',
+      'Velappanchavadi (Harsha Toyota)': '12:00 AM',
+    },
+  },
+  '5C: Thirunagar (Ambica Empire Hotel)': {
+    stops: {
+      'Thirunagar (Ambica Empire Hotel)': '06:40 AM',
+      'Vallavan Hotel': '06:42 AM',
+      'SAF Games Village': '06:44 AM',
+      'Vijayakanth kalayana Mandapam': '06:45 AM',
+      'Toyota Show Room': '06:47 AM',
+      'Radiance flats': '06:05 AM',
+      'Nerkundram': '06:52 AM',
+      'Vengaya Mandi': '06:54 AM',
+    },
+  },
+  '5D: MMDA (New route)': {
+    stops: {
+      'M.M.D.A Bus Depot': '06:35 AM',
+      'Toyata Showroom': '06:05 AM',
+      'Nerkundram': '12:00 AM',
+      'Vanagaram Fish Market': '07:01 AM',
+    },
+  },
+  '6: New Avadi Road Water Tank': {
+    stops: {
+      'New Avadi Road Water Tank': '06:25 AM',
+      'Gangaiamman koil': '06:27 AM',
+      'Lotus Colony': '06:29 AM',
+      '14- Shop': '06:34 AM',
+      'Kandasamy College': '06:36 AM',
+      'Nalli Silks': '06:38 AM',
+      'Ayyappan Temple': '06:04 AM',
+      'Blue star': '06:42 AM',
+      'Tower Park Metro Station': '06:44 AM',
+      'Santhosh Super Market': '06:46 AM',
+      'Hot chips': '06:48 AM',
+      'Senthil Nursing Home': '06:05 AM',
+      'CPWD Quarters': '06:52 AM',
+    },
+  },
+  '7: Anna Nagar East': {
+    stops: {
+      'Anna Nagar RTO Office': '06:35 AM',
+      'Anna Nagar East 1st Avenue': '06:37 AM',
+      'Anna Nagar East 6th Avenue': '06:39 AM',
+      'Chennai Mobiles': '06:41 AM',
+      'Kovai Palamuthircholai': '06:42 AM',
+      'Akshyam Hotel': '06:45 AM',
+      'Nuts Piczs': '06:47 AM',
+      'SBI Bank - 6th Avenue': '06:49 AM',
+      'Bata Show Room': '06:51 AM',
+      'Vijaya Maruthi': '06:52 AM',
+      'Reliance Fresh': '06:54 AM',
+    },
+  },
+  '7A: Krishna Nagar (Vellammal School)': {
+    stops: {
+      'Vellammal School': '06:45 AM',
+      'Golden flats': '06:48 AM',
+    },
+  },
+  '7C: Thriumangalam': {
+    stops: {
+      'Thriumangalam EB Bus Stop': '06:40 AM',
+      'Collector nagar': '06:43 AM',
+      'TSK Nagar': '06:47 AM',
+    },
+  },
+  '8: SIDCO Villivakkam': {
+    stops: {
+      'SIDCO Villivakkam': '06:35 AM',
+      'Singarampillai School': '06:37 AM',
+      'Anbu Colony': '06:39 AM',
+      'Anna Nagar West Depot': '06:04 AM',
+    },
+  },
+  '8C: Waves': {
+    stops: {
+      'Waves': '06:40 AM',
+      'V3 JJ Nagar Police Booth': '06:45 AM',
+      'Water Tank': '06:47 AM',
+      'IOB Mogappair East': '06:55 AM',
+    },
+  },
+  '9: Mogappair East': {
+    stops: {
+      'Spartan school': '06:40 AM',
+      'Mogappair East Bus Stop (7H)': '06:43 AM',
+    },
+  },
+  '9A: Mogappair (Golden Flat)': {
+    stops: {
+      'SBI': '06:55 AM',
+      'Greater Chennai corporation park': '06:59 AM',
+      'VGN Service Road': '07:01 AM',
+      'MGR University': '07:05 AM',
+    },
+  },
+  '9B: Mogappair': {
+    stops: {
+      'Grace Super Market': '06:45 AM',
+      'Ambedkar Ground': '06:46 AM',
+      'Velammal School (Mogappair West)': '06:47 AM',
+      'Mogappair Water Tank Road': '06:49 AM',
+      '(7M) Amutha Matri. School': '06:51 AM',
+    },
+  },
+  '9C: Mogappair west': {
+    stops: {
+      'DRJ Super Market': '06:50 AM',
+    },
+  },
+};
 
-module.exports.routeData = {};
+export const routeNames = Object.keys(routeData);

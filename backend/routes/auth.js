@@ -258,7 +258,7 @@ router.get('/feedback/:id', readLimiter, async (req, res) => {
   }
 });
 
-// PUT /api/auth/profile/:userId - update user profile (busRoute, favoriteStop, etc.)
+// PUT /api/auth/profile/:userId - update user profile (assignedBusRouteNo, boardingPoint, etc.)
 router.put('/profile/:userId', writeLimiter, async (req, res) => {
   const { userId } = req.params;
   if (!ObjectId.isValid(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
@@ -266,8 +266,15 @@ router.put('/profile/:userId', writeLimiter, async (req, res) => {
   try {
     assertNoMongoOperators(req.body);
     // Only allow specific fields to be updated
-    const allowed = ['busRoute', 'favoriteStop', 'name', 'favoriteStopName'];
-    const updates = pick(req.body, allowed);
+    const allowed = ['assignedBusRouteNo', 'boardingPoint', 'name'];
+    let updates = pick(req.body, allowed);
+    // Backward compatibility: map legacy fields to new schema
+    if (req.body.busRoute && !updates.assignedBusRouteNo) {
+      updates.assignedBusRouteNo = req.body.busRoute;
+    }
+    if (req.body.favoriteStop && !updates.boardingPoint) {
+      updates.boardingPoint = req.body.favoriteStop;
+    }
     
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ message: 'No valid fields to update.' });

@@ -111,6 +111,7 @@
 
 .lost-and-found-container input[type="text"],
 .lost-and-found-container input[type="file"],
+.lost-and-found-container input[list],
 .lost-and-found-container select,
 .lost-and-found-container textarea {
     width: 100%;
@@ -149,6 +150,7 @@
 
 .lost-and-found-container input[type="text"]:focus,
 .lost-and-found-container input[type="file"]:focus,
+.lost-and-found-container input[list]:focus,
 .lost-and-found-container select:focus,
 .lost-and-found-container textarea:focus {
     outline: none;

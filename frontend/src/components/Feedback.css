@@ -59,6 +59,7 @@
 .feedback-page-container input[type="text"],
 .feedback-page-container input[type="email"],
 .feedback-page-container input[type="file"],
+.feedback-page-container input[list],
 .feedback-page-container select,
 .feedback-page-container textarea {
     width: 100%;
@@ -98,6 +99,7 @@
 .feedback-page-container input[type="text"]:focus,
 .feedback-page-container input[type="email"]:focus,
 .feedback-page-container input[type="file"]:focus,
+.feedback-page-container input[list]:focus,
 .feedback-page-container select:focus,
 .feedback-page-container textarea:focus {
     outline: none;

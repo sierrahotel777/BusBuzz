@@ -61,7 +61,7 @@ function Profile() {
         favoriteStop: profileData.favoriteStop,
       };
       
-      await updateUserProfile(user.id, updates);
+      await updateUserProfile(user._id || user.id, updates);
       
       // Update local auth context
       updateUser(profileData);

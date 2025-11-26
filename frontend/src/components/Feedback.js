@@ -58,11 +58,22 @@ function Feedback({ setFeedbackData }) {
   }, []);
 
   useEffect(() => {
-    if (!route) return;
+    if (!route || !buses.length) {
+      setBusNo('');
+      return;
+    }
     // Auto-derive bus number by matching selected route name
-    const match = buses.find(b => (b.routeName || b.route || b.name) === route);
-    if (match && (match.busNumber || match.number)) {
-      setBusNo(match.busNumber || match.number);
+    // Backend buses have 'route' field with full name (e.g., "5A: Arumbakkam")
+    // and 'busNo' field with the bus number
+    const match = buses.find(b => {
+      const busRoute = b.route || b.routeName || b.name || '';
+      // Match exact route or if route is prefix (e.g., "5A" matches "5A: Arumbakkam")
+      return busRoute === route || busRoute.startsWith(route + ':');
+    });
+    if (match) {
+      setBusNo(match.busNo || match.busNumber || match.number || '');
+    } else {
+      setBusNo('');
     }
   }, [route, buses]);
 
