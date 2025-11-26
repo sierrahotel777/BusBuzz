@@ -72,8 +72,28 @@ router.post('/', writeLimiter, async (req, res) => {
   }
 });
 
+// Get feedback by ID
+router.get('/:id', readLimiter, async (req, res) => {
+  const { id } = req.params;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid feedback ID.' });
+  }
+
+  try {
+    const doc = await col().findOne({ _id: new ObjectId(id) });
+    if (!doc) {
+      return res.status(404).json({ message: 'Feedback not found.' });
+    }
+    res.status(200).json({ ...doc, id: doc._id });
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    res.status(500).json({ message: 'An error occurred while fetching feedback.' });
+  }
+});
+
 // Update feedback (for admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', writeLimiter, async (req, res) => {
   const { id } = req.params;
   const { status, resolution } = req.body;
 
@@ -82,20 +102,19 @@ router.put('/:id', async (req, res) => {
   }
 
   try {
-    const feedbackCollection = getFeedbackCollection();
-    const result = await feedbackCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status, resolution } });
+    const result = await col().updateOne({ _id: new ObjectId(id) }, { $set: { status, resolution } });
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Feedback not found.' });
     }
     res.status(200).json({ message: 'Feedback updated successfully.' });
   } catch (error) {
-    console.error('Error adding conversation entry:', error);
-    res.status(500).json({ message: 'An error occurred while adding the conversation entry.' });
+    console.error('Error updating feedback:', error);
+    res.status(500).json({ message: 'An error occurred while updating feedback.' });
   }
 });
 
 // Add conversation entry to a feedback (students or admin can post comments/attachments)
-router.post('/:id/conversation', async (req, res) => {
+router.post('/:id/conversation', writeLimiter, async (req, res) => {
   const { id } = req.params;
   const entry = req.body.entry;
 
@@ -108,8 +127,7 @@ router.post('/:id/conversation', async (req, res) => {
   }
 
   try {
-    const feedbackCollection = getFeedbackCollection();
-    const result = await feedbackCollection.updateOne(
+    const result = await col().updateOne(
       { _id: new ObjectId(id) },
       { $push: { conversation: entry } }
     );
