@@ -61,4 +61,33 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Add conversation entry to a feedback (students or admin can post comments/attachments)
+router.post('/:id/conversation', async (req, res) => {
+  const { id } = req.params;
+  const entry = req.body.entry;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid feedback ID.' });
+  }
+
+  if (!entry || !entry.user || !entry.timestamp) {
+    return res.status(400).json({ message: 'Invalid conversation entry.' });
+  }
+
+  try {
+    const feedbackCollection = getFeedbackCollection();
+    const result = await feedbackCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $push: { conversation: entry } }
+    );
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'Feedback not found.' });
+    }
+    res.status(201).json({ message: 'Conversation entry added.', entry });
+  } catch (error) {
+    console.error('Error adding conversation entry:', error);
+    res.status(500).json({ message: 'An error occurred while adding the conversation entry.' });
+  }
+});
+
 module.exports = router;

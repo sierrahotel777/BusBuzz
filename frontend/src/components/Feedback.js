@@ -22,18 +22,15 @@ function Feedback({ setFeedbackData }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!attachmentName) {
-      showNotification("A photo or video attachment is required to submit feedback.", "error");
-      return;
-    }
+    // Attachment and rating fields are optional now — do not block submission
 
     setIsSubmitting(true);
 
     const newFeedback = {
       route,
       busNo,
-      comments,      
+      comments,
+      message: comments, // some backends expect `message` — include for compatibility
       issue: issueCategory,
       details: {
         punctuality,
@@ -45,10 +42,15 @@ function Feedback({ setFeedbackData }) {
       userName: user.name,
     };
     try {
+      console.log('Submitting feedback payload:', newFeedback);
       const data = await submitFeedback(newFeedback); // No token needed
+      console.log('Backend response for feedback submit:', data);
 
       if (setFeedbackData) {
-        setFeedbackData(prevData => [{ ...data.feedback, _id: data.feedback._id }, ...prevData]);
+        // Backend may return `feedback.id` or `feedback._id`. Normalize it for the frontend list.
+        const fb = data.feedback || data;
+        const normalized = { ...fb, _id: fb._id || fb.id };
+        setFeedbackData(prevData => [normalized, ...prevData]);
       }
 
       showNotification("Feedback submitted successfully!", "success");
@@ -116,7 +118,7 @@ function Feedback({ setFeedbackData }) {
             <legend>Rate Your Experience</legend>
           <div className="form-group">
             <label>Driver Behavior</label>
-            <select value={driverBehavior} onChange={(e) => setDriverBehavior(e.target.value)} required>
+            <select value={driverBehavior} onChange={(e) => setDriverBehavior(e.target.value)}>
               <option value="" disabled>Select rating</option>
               <option value="Excellent">Excellent</option>
               <option value="Good">Good</option>
@@ -126,7 +128,7 @@ function Feedback({ setFeedbackData }) {
           </div>
           <div className="form-group">
             <label>Punctuality</label>
-            <select value={punctuality} onChange={(e) => setPunctuality(e.target.value)} required>
+            <select value={punctuality} onChange={(e) => setPunctuality(e.target.value)}>
               <option value="" disabled>Select rating</option>
               <option value="On Time">On Time</option>
               <option value="Slightly Late">Slightly Late</option>
@@ -135,7 +137,7 @@ function Feedback({ setFeedbackData }) {
           </div>
           <div className="form-group">
             <label>Cleanliness</label>
-            <select value={cleanliness} onChange={(e) => setCleanliness(e.target.value)} required>
+            <select value={cleanliness} onChange={(e) => setCleanliness(e.target.value)}>
               <option value="" disabled>Select rating</option>
               <option value="Very Clean">Very Clean</option>
               <option value="Clean">Clean</option>
@@ -159,7 +161,7 @@ function Feedback({ setFeedbackData }) {
           <div className="form-group">
             <label htmlFor="attachment">Attach Photo/Video</label>
           <div className="file-input-wrapper">
-            <input type="file" id="attachment" name="attachment" onChange={handleFileChange} accept="image/*,video/*" required />
+            <input type="file" id="attachment" name="attachment" onChange={handleFileChange} accept="image/*,video/*" />
             <span className="file-input-label">
               {attachmentName || 'Choose a file...'}
             </span>

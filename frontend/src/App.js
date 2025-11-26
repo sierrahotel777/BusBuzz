@@ -27,6 +27,8 @@ import Footer from "./components/Footer";
 import FeedbackManagement from "./components/FeedbackManagement";
 import BusManagement from "./components/BusManagement";
 import ChatAssistant from "./components/ChatAssistant";
+import { initialBusData } from "./assets/initialBusData";
+
 
 import "./App.css";
 import "./components/ChatAssistant.css";
@@ -43,11 +45,6 @@ const initialCommendations = [
     { id: 3, route: 'S1: VALASARAVAKKAM', praise: 'On-Time Champion', message: 'Always on time!', date: '2023-11-08' },
 ];
 
-const initialBusData = [
-    { busNo: 'TN01A1234', route: 'S1: VALASARAVAKKAM', capacity: 50, driver: 'Ramesh Kumar', status: 'On Route' },
-    { busNo: 'TN02B5678', route: 'S5: TIRUVOTRIYUR', capacity: 55, driver: 'Suresh Singh', status: 'Idle' },
-    { busNo: 'TN03C9012', route: 'S2: Porur', capacity: 45, driver: 'Anitha Devi', status: 'Maintenance' },
-];
 
 const initialLostAndFound = [
     { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
@@ -147,6 +144,10 @@ function App() {
           <Route 
             path="/feedback" 
             element={<ProtectedRoute role="student"><Feedback setFeedbackData={setFeedbackData} /></ProtectedRoute>}
+          />
+          <Route 
+            path="/feedback/:feedbackId"
+            element={<ProtectedRoute role="student"><FeedbackDetail feedbackData={feedbackData} setFeedbackData={setFeedbackData} /></ProtectedRoute>} 
           />
           <Route 
             path="/admin/feedback/:feedbackId"

@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; 
-import { useNotification } from './NotificationContext'; 
-import { getFeedbackById, updateFeedbackStatus } from '../services/api'; 
+import { useParams, Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import { useNotification } from './NotificationContext';
+import { getFeedbackById, uploadAttachment, addConversationEntry } from '../services/api';
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
     const { feedbackId } = useParams();
+    const { user } = useAuth();
     const { showNotification } = useNotification();
-    
+
     const [feedback, setFeedback] = useState(null);
-    const [internalNote, setInternalNote] = useState('');
+    const [comment, setComment] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (!feedbackId) { 
+        if (!feedbackId) {
             setIsLoading(false);
             return;
         }
         const fetchDetails = async () => {
             try {
                 setIsLoading(true);
-                const data = await getFeedbackById(feedbackId); 
-                setFeedback({ ...data, id: data._id });
+                const data = await getFeedbackById(feedbackId);
+                setFeedback({ ...data, id: data._id || data.id });
             } catch (error) {
                 showNotification(error.message || "Could not load feedback details.", 'error');
                 setFeedback(null);
@@ -31,28 +34,52 @@ function FeedbackDetail() {
             }
         };
         fetchDetails();
-    }, [feedbackId, showNotification]); 
+    }, [feedbackId, showNotification]);
 
-    const handleStatusChange = async (newStatus) => {
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!comment.trim() && !selectedFile) {
+            showNotification('Please add a comment or attachment.', 'error');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
-            await updateFeedbackStatus(feedbackId, newStatus, internalNote); 
-            
-            showNotification(`Status updated to ${newStatus}. (Simulation)`, 'success');
-            
+            let attachmentUrl = null;
+            let attachmentName = null;
+
+            if (selectedFile) {
+                const uploadResult = await uploadAttachment(selectedFile);
+                attachmentUrl = uploadResult.url;
+                attachmentName = uploadResult.originalName;
+            }
+
+            const entry = {
+                user: user.name,
+                message: comment || '',
+                timestamp: new Date().toISOString(),
+                attachment: attachmentUrl ? { url: attachmentUrl, name: attachmentName } : null,
+            };
+
+            await addConversationEntry(feedbackId, entry);
+
+            // Update local state
             setFeedback(prev => ({
-                ...prev, 
-                status: newStatus,
-                resolution: newStatus === 'Resolved' ? {
-                    resolvedBy: "Admin", // Hardcode or get from local storage if no auth
-                    resolvedOn: new Date().toISOString(),
-                    notes: internalNote || 'Issue marked as resolved.'
-                } : prev.resolution
+                ...prev,
+                conversation: [...(prev.conversation || []), entry]
             }));
-            
-            setInternalNote('');
+
+            setComment('');
+            setSelectedFile(null);
+            showNotification('Comment posted successfully!', 'success');
         } catch (error) {
-            showNotification(error.message, 'error');
+            showNotification(error.message || 'Failed to post comment.', 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -67,19 +94,19 @@ function FeedbackDetail() {
             <div className="feedback-detail-container">
                 <h2>Feedback Not Found</h2>
                 <p>The requested feedback item could not be found or you lack permission.</p>
-                <Link to="/admin/feedback-management" className="back-link">← Back to Management</Link>
+                <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
             </div>
         );
     }
-    
-    const userName = feedback.userName || "N/A"; 
-    const submittedOn = new Date(feedback.submittedOn).toLocaleString(); 
+
+    const userName = feedback.userName || 'N/A';
+    const submittedOn = new Date(feedback.submittedOn).toLocaleString();
 
     return (
         <div className="feedback-detail-container">
             <div className="feedback-detail-header">
                 <h2>Feedback Details (ID: {feedbackId})</h2>
-                <Link to="/admin/feedback-management" className="back-link">← Back to Management</Link>
+                <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
             </div>
 
             <div className="feedback-grid">
@@ -89,14 +116,14 @@ function FeedbackDetail() {
                     <p><strong>Route:</strong> {feedback.route}</p>
                     <p><strong>Submitted:</strong> {submittedOn}</p>
                 </div>
-                
+
                 <div className="detail-card bus-info">
                     <h3>Bus Details</h3>
                     <p><strong>Bus No:</strong> {feedback.busNo}</p>
                     <p><strong>Issue:</strong> {feedback.issue}</p>
                     {feedback.attachmentName && (
-                        <p><strong>Attachment:</strong> 
-                            <button onClick={() => alert('Attachment download/view logic goes here.')} className="attachment-link">{feedback.attachmentName}</button>
+                        <p><strong>Attachment:</strong>
+                            <a href={`http://localhost:5000/uploads/${feedback.attachmentName}`} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
                         </p>
                     )}
                 </div>
@@ -110,44 +137,55 @@ function FeedbackDetail() {
 
                 <div className="detail-card comments-info full-width-card">
                     <h3>Student's Comments</h3>
-                    <p>{feedback.comments}</p>
+                    <p>{feedback.comments || feedback.message || 'No additional comments.'}</p>
                 </div>
 
-                
-                {feedback.status === 'Resolved' && feedback.resolution && (
-                    <div className="detail-card resolution-info full-width-card">
-                        <h3>Resolution Details</h3>
-                        <p><strong>Resolved By:</strong> {feedback.resolution.resolvedBy}</p>
-                        <p><strong>Resolved On:</strong> {new Date(feedback.resolution.resolvedOn).toLocaleString()}</p>
-                        <p><strong>Notes:</strong> {feedback.resolution.notes}</p>
-                    </div>
-                )}
-
-                {feedback.status !== 'Resolved' && (
-                    <div className="detail-card admin-actions full-width-card">
-                        <h3>Admin Actions</h3>
-                        <div className="action-form">
-                            <textarea
-                                value={internalNote}
-                                onChange={(e) => setInternalNote(e.target.value)}
-                                placeholder="Add internal notes before changing status..."
-                                rows="3"
-                            />
-                            <div className="action-buttons">
-                                {feedback.status === 'Pending' && (
-                                    <button onClick={() => handleStatusChange('In Progress')} disabled={isSubmitting} className="btn-progress">
-                                        {isSubmitting ? 'Updating...' : 'Mark as In Progress'}
-                                    </button>
-                                )}
-                                {feedback.status !== 'Resolved' && (
-                                    <button onClick={() => handleStatusChange('Resolved')} disabled={isSubmitting} className="btn-resolve">
-                                        {isSubmitting ? 'Updating...' : 'Mark as Resolved'}
-                                    </button>
+                <div className="detail-card conversation-section full-width-card">
+                    <h3>Conversation</h3>
+                    <div className="conversation-thread">
+                        {(feedback.conversation || []).map((entry, idx) => (
+                            <div key={idx} className={`message-bubble ${entry.user === user?.name ? 'own-message' : 'other-message'}`}>
+                                <div className="message-header">
+                                    <strong>{entry.user}</strong>
+                                    <span className="message-timestamp">{new Date(entry.timestamp).toLocaleString()}</span>
+                                </div>
+                                {entry.message && <p>{entry.message}</p>}
+                                {entry.attachment && (
+                                    <div className="message-attachment">
+                                        <a href={entry.attachment.url} target="_blank" rel="noopener noreferrer">📎 {entry.attachment.name}</a>
+                                    </div>
                                 )}
                             </div>
-                        </div>
+                        ))}
                     </div>
-                )}
+                </div>
+
+                <div className="detail-card comment-form full-width-card">
+                    <h3>Add Comment</h3>
+                    <form onSubmit={handleCommentSubmit}>
+                        <div className="form-group">
+                            <textarea
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                placeholder="Add your comment here..."
+                                rows="4"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="comment-attachment">Attach a file (optional):</label>
+                            <input
+                                id="comment-attachment"
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="image/*,video/*,.pdf,.doc,.docx"
+                            />
+                            {selectedFile && <p className="selected-file">Selected: {selectedFile.name}</p>}
+                        </div>
+                        <button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Posting...' : 'Post Comment'}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

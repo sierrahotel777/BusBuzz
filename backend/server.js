@@ -7,6 +7,7 @@ const { connectToDatabase } = require('./db/mongo');
 const app = express();
 // Use port 5000 inside the container, as configured in Azure App Settings (WEBSITES_PORT=5000)
 const port = process.env.PORT || 5000; 
+const path = require('path');
 
 // --- Configuration ---
 // Configure CORS to allow access from local host and deployed frontend
@@ -24,6 +25,9 @@ app.use(cors({
 
 app.use(express.json());
 
+// Serve uploaded attachments
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // --- Routes ---
 app.get('/', (req, res) => {
   res.send('BusBuzz Backend API is running!');
@@ -31,6 +35,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', require('./routes/auth')); // All routes are in auth.js for now
 app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api/attachments', require('./routes/attachments'));
 // --- Server Startup ---
 async function startServer() {
   try {
