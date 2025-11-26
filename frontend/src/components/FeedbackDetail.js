@@ -184,49 +184,21 @@ function FeedbackDetail() {
                             const att = feedback.attachments[0];
                             const rawUrl = att.url || '';
                             const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : `${API_BASE}${rawUrl}`;
-                            const name = att.name || feedback.attachmentName || 'Attachment';
-                            const ext = (name || '').split('.').pop().toLowerCase();
-
                             return (
                                 <div>
-                                    <p><strong>Attachment:</strong> {name}</p>
                                     <div className="attachment-preview">
-                                        {['png','jpg','jpeg','gif','webp'].includes(ext) && (
-                                            <img src={url} alt={name} style={{maxWidth: '320px', borderRadius: 6}} />
-                                        )}
-                                        {['mp4','webm','ogg'].includes(ext) && (
-                                            <video src={url} controls style={{maxWidth: '320px'}} />
-                                        )}
-                                        {['pdf'].includes(ext) && (
-                                            <iframe src={url} title={name} style={{width: '320px', height: '420px', border: 'none'}} />
-                                        )}
-                                        {(!['png','jpg','jpeg','gif','webp','mp4','webm','ogg','pdf'].includes(ext)) && (
-                                            <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open attachment</a>
-                                        )}
-                                        <div style={{marginTop:8}}>
-                                            <button type="button" className="attachment-btn" onClick={() => setModal({ url, name })}>Open Preview</button>
-                                        </div>
+                                        <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open Attachment</a>
                                     </div>
                                 </div>
                             );
                         })()
                     ) : feedback.attachmentName ? (
-                        // Fallback for older records that only have attachmentName
                         (() => {
                             const url = `${API_BASE}/uploads/${feedback.attachmentName}`;
-                            const name = feedback.attachmentName;
-                            const ext = (name || '').split('.').pop().toLowerCase();
                             return (
                                 <div>
-                                    <p><strong>Attachment:</strong> {name}</p>
                                     <div className="attachment-preview">
-                                        {['png','jpg','jpeg','gif','webp'].includes(ext) && (<img src={url} alt={name} style={{maxWidth: '320px', borderRadius: 6}} />)}
-                                        {['mp4','webm','ogg'].includes(ext) && (<video src={url} controls style={{maxWidth: '320px'}} />)}
-                                        {['pdf'].includes(ext) && (<iframe src={url} title={name} style={{width: '320px', height: '420px', border: 'none'}} />)}
-                                        {(!['png','jpg','jpeg','gif','webp','mp4','webm','ogg','pdf'].includes(ext)) && (<a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open attachment</a>)}
-                                        <div style={{marginTop:8}}>
-                                            <button type="button" className="attachment-btn" onClick={() => setModal({ url, name })}>Open Preview</button>
-                                        </div>
+                                        <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open Attachment</a>
                                     </div>
                                 </div>
                             );

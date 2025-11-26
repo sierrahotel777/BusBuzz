@@ -9,7 +9,11 @@ import { submitFeedback, uploadAttachment, getRoutes } from "../services/api";
 // Helper to fetch buses; falls back to direct fetch if no API helper exists
 async function fetchBuses() {
   try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/buses`);
+    const rawBase = process.env.REACT_APP_API_URL || '';
+    // Normalize base URL: remove trailing /api to avoid /api/api duplication
+    const base = rawBase.replace(/\/+$/, '').replace(/\/api\/?$/, '');
+    const url = `${base}/api/buses`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to load buses');
     return await res.json();
   } catch (e) {

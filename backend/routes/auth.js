@@ -296,11 +296,12 @@ router.put('/profile/:userId', writeLimiter, async (req, res) => {
       { returnDocument: 'after' }
     );
     
-    if (!result.value) {
+    // MongoDB driver returns the updated document directly, not in a .value property
+    if (!result) {
       return res.status(404).json({ message: 'User not found.' });
     }
     
-    res.json({ message: 'Profile updated successfully.', user: result.value });
+    res.json({ message: 'Profile updated successfully.', user: result });
   } catch (err) {
     console.error('Error updating profile:', err);
     res.status(500).json({ message: 'Error updating profile.' });

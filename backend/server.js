@@ -8,8 +8,13 @@ const app = express();
 // Use port 5000 inside the container, as configured in Azure App Settings (WEBSITES_PORT=5000)
 const port = process.env.PORT || 8080; 
 const path = require('path');
+const fs = require('fs');
+const { getDb } = require('./db/mongo');
 
 // --- Configuration ---
+// Trust proxy - required for Azure App Service and rate limiting
+app.set('trust proxy', 1);
+
 // Configure CORS to allow access from local host and deployed frontend
 const allowedOrigins = [
     'http://localhost:3000', 
@@ -24,6 +29,38 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Fallback for legacy attachments: serve from disk if exists, else from MongoDB Attachments
+app.get('/uploads/:filename', async (req, res, next) => {
+  try {
+    const filename = req.params.filename;
+    const uploadsDir = path.join(__dirname, 'uploads');
+    const filePath = path.join(uploadsDir, filename);
+
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+
+    // Try fetching from MongoDB Attachments by originalName
+    const col = getDb().collection('Attachments');
+    const doc = await col.findOne({ originalName: filename });
+    if (!doc || !doc.data) {
+      // Not found anywhere; let static handler or error fallback handle
+      return res.status(410).json({ message: 'Legacy attachment no longer available.' });
+    }
+
+    res.setHeader('Content-Type', doc.mimetype || 'application/octet-stream');
+    res.setHeader('Content-Length', doc.size || (doc.data?.length || undefined));
+    // Content-Disposition inline for common preview types, attachment otherwise
+    const inlineTypes = ['image/', 'video/', 'application/pdf'];
+    const disp = inlineTypes.some(p => (doc.mimetype || '').startsWith(p)) ? 'inline' : 'attachment';
+    res.setHeader('Content-Disposition', `${disp}; filename="${encodeURIComponent(doc.originalName || filename)}"`);
+    return res.end(doc.data.buffer || doc.data);
+  } catch (err) {
+    console.error('Legacy uploads fallback error:', err);
+    next();
+  }
+});
 
 // Serve uploaded attachments
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

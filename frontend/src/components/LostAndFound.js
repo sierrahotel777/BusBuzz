@@ -21,6 +21,8 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
     const [itemToDelete, setItemToDelete] = useState(null);
     const [adminSearchTerm, setAdminSearchTerm] = useState('');
     const [routes, setRoutes] = useState([]);
+    const [routeSearch, setRouteSearch] = useState('');
+    const [showRouteDropdown, setShowRouteDropdown] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -86,6 +88,22 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const filteredRoutes = useMemo(() => 
+        routes.filter(r => r.name.toLowerCase().includes(routeSearch.toLowerCase())),
+        [routes, routeSearch]
+    );
+
+    const handleRouteInputChange = (e) => {
+        setRouteSearch(e.target.value);
+        setShowRouteDropdown(true);
+    };
+
+    const handleRouteSelect = (routeName) => {
+        setFormData(prev => ({ ...prev, route: routeName }));
+        setRouteSearch(routeName);
+        setShowRouteDropdown(false);
     };
 
     const handleFileChange = (e) => {
@@ -285,20 +303,62 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                             <label htmlFor="item-name">Item Name <span style={{ color: 'red' }}>*</span></label>
                             <input type="text" name="item" placeholder="What was the item? (e.g., Black Notebook)" value={formData.item} onChange={handleChange} required />
                         </div>
-                                                <div className="form-group">
-                                                        <label htmlFor="bus-route">Bus Route <span style={{ color: 'red' }}>*</span></label>
-                                                        <select
-                                                            name="route"
-                                                            value={formData.route}
-                                                            onChange={handleChange}
-                                                            required
-                                                        >
-                                                            <option value="" disabled>Select a route</option>
-                                                            {routes.map(r => (
-                                                                <option key={r._id || r.name} value={r.name}>{r.name}</option>
-                                                            ))}
-                                                        </select>
-                                                </div>
+                        <div className="form-group" style={{ position: 'relative' }}>
+                            <label htmlFor="bus-route">Bus Route <span style={{ color: 'red' }}>*</span></label>
+                            <input
+                                type="text"
+                                name="route"
+                                placeholder="Search or select a route..."
+                                value={routeSearch}
+                                onChange={handleRouteInputChange}
+                                onFocus={() => setShowRouteDropdown(true)}
+                                autoComplete="off"
+                                required
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: 'var(--border-radius)',
+                                    fontSize: '1rem',
+                                    backgroundColor: 'var(--card-bg)',
+                                    color: 'var(--text-color)'
+                                }}
+                            />
+                            {showRouteDropdown && filteredRoutes.length > 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    backgroundColor: 'var(--surface-color)',
+                                    border: '1.5px solid var(--border-color)',
+                                    borderRadius: '6px',
+                                    marginTop: '4px',
+                                    zIndex: 1000,
+                                    boxShadow: '0 4px 8px var(--shadow-color)'
+                                }}>
+                                    {filteredRoutes.map(r => (
+                                        <div
+                                            key={r._id || r.name}
+                                            onClick={() => handleRouteSelect(r.name)}
+                                            style={{
+                                                padding: '12px',
+                                                cursor: 'pointer',
+                                                borderBottom: '1px solid var(--border-color)',
+                                                color: 'var(--text-color)',
+                                                transition: 'background-color 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--subtle-bg)'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            {r.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="description">Description <span style={{ color: 'red' }}>*</span></label>
