@@ -10,7 +10,7 @@ RUN npm install --only=production
 COPY . .
 
 # Ensure the app listens on the correct port
-EXPOSE 5000 
+EXPOSE 8080 
 USER node
 
 CMD [ "node", "server.js" ]
