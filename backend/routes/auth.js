@@ -280,9 +280,19 @@ router.put('/profile/:userId', writeLimiter, async (req, res) => {
       return res.status(400).json({ message: 'No valid fields to update.' });
     }
     
+    // Remove old fields if we're updating to new schema
+    const unsetFields = {};
+    if (updates.assignedBusRouteNo) unsetFields.busRoute = '';
+    if (updates.boardingPoint) unsetFields.favoriteStop = '';
+    
+    const updateOp = { $set: updates };
+    if (Object.keys(unsetFields).length > 0) {
+      updateOp.$unset = unsetFields;
+    }
+    
     const result = await usersCol().findOneAndUpdate(
       { _id: new ObjectId(userId) },
-      { $set: updates },
+      updateOp,
       { returnDocument: 'after' }
     );
     
