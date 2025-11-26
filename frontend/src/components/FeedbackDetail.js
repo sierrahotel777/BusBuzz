@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { getFeedbackById, uploadAttachment, addConversationEntry, deleteFeedback } from '../services/api';
+import { getFeedbackById, uploadAttachment, addConversationEntry, deleteFeedback, updateFeedbackStatus } from '../services/api';
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
@@ -106,25 +106,45 @@ function FeedbackDetail() {
 
     return (
         <div className="feedback-detail-container">
-            <div className="feedback-detail-header">
+                <div className="feedback-detail-header">
                 <h2>Feedback Details (ID: {feedbackId})</h2>
                 <div className="header-actions">
                     <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
-                    {(user?.role === 'admin' || feedback.userId === user?.id) && (
+                    <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                      <div style={{fontSize: '0.9rem', color: 'var(--muted-color, #666)'}}>Ref: {feedback.referenceId || 'N/A'}</div>
+                      {(user?.role === 'admin' || feedback.userId === user?.id) && (
+                          <button
+                              className="danger-btn"
+                              onClick={async () => {
+                                  if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
+                                  try {
+                                      await deleteFeedback(feedbackId);
+                                      showNotification('Feedback deleted.', 'success');
+                                      navigate(user && user.role === 'admin' ? '/admin/feedback' : '/student');
+                                  } catch (err) {
+                                      showNotification(err.message || 'Failed to delete feedback.', 'error');
+                                  }
+                              }}
+                          >Delete</button>
+                      )}
+                      {/* Mark Resolved button - visible to admin or owner when not already resolved */}
+                      {(user?.role === 'admin' || feedback.userId === user?.id) && feedback.status !== 'Resolved' && (
                         <button
-                            className="danger-btn"
-                            onClick={async () => {
-                                if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
-                                try {
-                                    await deleteFeedback(feedbackId);
-                                    showNotification('Feedback deleted.', 'success');
-                                    navigate(user && user.role === 'admin' ? '/admin/feedback' : '/student');
-                                } catch (err) {
-                                    showNotification(err.message || 'Failed to delete feedback.', 'error');
-                                }
-                            }}
-                        >Delete</button>
-                    )}
+                          className="btn-secondary"
+                          onClick={async () => {
+                            const resolution = window.prompt('Enter a short resolution note (optional):', feedback.resolution || '');
+                            if (resolution === null) return; // cancelled
+                            try {
+                              await updateFeedbackStatus(feedbackId, 'Resolved', resolution || '');
+                              setFeedback(prev => ({ ...prev, status: 'Resolved', resolution }));
+                              showNotification('Feedback marked as resolved.', 'success');
+                            } catch (err) {
+                              showNotification(err.message || 'Failed to update feedback status.', 'error');
+                            }
+                          }}
+                        >Mark Resolved</button>
+                      )}
+                    </div>
                 </div>
             </div>
 
@@ -142,12 +162,12 @@ function FeedbackDetail() {
                     <p><strong>Issue:</strong> {feedback.issue || 'N/A'}</p>
                     {(feedback.attachments && feedback.attachments.length > 0) ? (
                         <p><strong>Attachment:</strong>
-                            <a href={feedback.attachments[0].url} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
+                            <button type="button" className="attachment-btn" onClick={() => setModal({ url: feedback.attachments[0].url, name: feedback.attachments[0].name || feedback.attachmentName || 'Attachment' })}>View / Preview</button>
                         </p>
                     ) : feedback.attachmentName ? (
                         // Fallback for older records that only have attachmentName
                         <p><strong>Attachment:</strong>
-                            <a href={`/uploads/${feedback.attachmentName}`} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
+                            <button type="button" className="attachment-btn" onClick={() => setModal({ url: `${window.location.origin}/uploads/${feedback.attachmentName}`, name: feedback.attachmentName })}>View / Preview</button>
                         </p>
                     ) : null}
                 </div>

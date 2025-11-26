@@ -88,9 +88,16 @@ router.post('/', writeLimiter, async (req, res) => {
     
     if (error) return res.status(400).json({ message: error.message });
 
-    const doc = { ...value, submittedOn: new Date(), status: 'Pending' };
+    const now = new Date();
+    // Generate a human-friendly reference ID: YYYYDD-XXXXXX (year + day + short token)
+    const year = now.getFullYear();
+    const day = String(now.getDate()).padStart(2, '0');
+    const shortToken = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const referenceId = `${year}${day}-${shortToken}`;
+
+    const doc = { ...value, submittedOn: now, status: 'Pending', referenceId };
     console.log('DEBUG: Document to be inserted:', JSON.stringify(doc, null, 2));
-    
+
     const result = await col().insertOne(doc);
     res.status(201).json({ message: 'Feedback submitted successfully!', feedback: { ...doc, id: result.insertedId } });
   } catch (error) {
