@@ -6,7 +6,7 @@ const cors = require('cors');
 const { connectToDatabase } = require('./db/mongo');
 const app = express();
 // Use port 5000 inside the container, as configured in Azure App Settings (WEBSITES_PORT=5000)
-const port = process.env.PORT || 8080; 
+const port = process.env.PORT || 5000; 
 const path = require('path');
 
 // --- Configuration ---
@@ -50,5 +50,7 @@ async function startServer() {
   }
 }
 
-
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 startServer();

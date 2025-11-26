@@ -71,10 +71,9 @@ jobs:
       # 1. Inject API URL (Using 'sed' fix for bare domain)
       - name: Create Frontend .env File
         run: |
-          # Strips any trailing /api suffix for the base URL
-          BASE_URL=$(echo "${{ secrets.BACKEND_API_URL }}" | sed 's|/api$||')
-          echo "REACT_APP_API_URL=${BASE_URL}" > .env.production
+          echo "REACT_APP_API_URL=${{ secrets.BACKEND_API_URL }}" > .env.production
         working-directory: ./frontend
+
         
       # 2. Install dependencies and Build Artifacts (Creating the 'build' folder)
       - name: Install dependencies and Build
