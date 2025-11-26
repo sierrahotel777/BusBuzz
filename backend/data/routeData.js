@@ -1,4 +1,4 @@
-export const routeData = {
+const routeData = {
   '1: Ennore': {
     stops: {
       'Ennore Bus Stand': '05:04 AM',
@@ -1511,4 +1511,6 @@ export const routeData = {
   },
 };
 
-export const routeNames = Object.keys(routeData);
+const routeNames = Object.keys(routeData);
+
+module.exports = { routeData, routeNames };

@@ -33,6 +33,8 @@ function Feedback({ setFeedbackData }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [routes, setRoutes] = useState([]);
   const [buses, setBuses] = useState([]);
+  const [routeSearch, setRouteSearch] = useState("");
+  const [showRouteDropdown, setShowRouteDropdown] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showNotification } = useNotification();
@@ -76,6 +78,21 @@ function Feedback({ setFeedbackData }) {
       setBusNo('');
     }
   }, [route, buses]);
+
+  const filteredRoutes = routes.filter(r => 
+    r.name.toLowerCase().includes(routeSearch.toLowerCase())
+  );
+
+  const handleRouteInputChange = (e) => {
+    setRouteSearch(e.target.value);
+    setShowRouteDropdown(true);
+  };
+
+  const handleRouteSelect = (routeName) => {
+    setRoute(routeName);
+    setRouteSearch(routeName);
+    setShowRouteDropdown(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -162,22 +179,55 @@ function Feedback({ setFeedbackData }) {
       <div className="dashboard-card full-width-card">
         <h3>Feedback Form</h3>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-          <label htmlFor="route">Route Number</label>
-          <select
+          <div className="form-group" style={{ position: 'relative' }}>
+          <label htmlFor="route">Route Number <span style={{ color: 'red' }}>*</span></label>
+          <input
             id="route"
-            value={route}
-            onChange={(e) => setRoute(e.target.value)}
+            type="text"
+            placeholder="Type to search route..."
+            value={routeSearch}
+            onChange={handleRouteInputChange}
+            onFocus={() => setShowRouteDropdown(true)}
+            onBlur={() => setTimeout(() => setShowRouteDropdown(false), 200)}
             required
-          >
-            <option value="" disabled>Select a route</option>
-            {routes.map((r) => (
-              <option key={r._id || r.name} value={r.name}>{r.name}</option>
-            ))}
-          </select>
+          />
+          {showRouteDropdown && filteredRoutes.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              maxHeight: '200px',
+              overflowY: 'auto',
+              backgroundColor: 'var(--surface-color)',
+              border: '1.5px solid var(--border-color)',
+              borderRadius: '6px',
+              marginTop: '4px',
+              zIndex: 1000,
+              boxShadow: '0 4px 8px var(--shadow-color)'
+            }}>
+              {filteredRoutes.map((r) => (
+                <div
+                  key={r._id || r.name}
+                  onClick={() => handleRouteSelect(r.name)}
+                  style={{
+                    padding: '12px',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid var(--border-color)',
+                    color: 'var(--text-color)',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--subtle-bg)'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                >
+                  {r.name}
+                </div>
+              ))}
+            </div>
+          )}
           </div>
           <div className="form-group">
-          <label htmlFor="busNo">Bus Number</label>
+          <label htmlFor="busNo">Bus Number <span style={{ color: 'red' }}>*</span></label>
           <input
             id="busNo"
             type="text"
@@ -190,7 +240,7 @@ function Feedback({ setFeedbackData }) {
           </div>
 
           <div className="form-group">
-          <label htmlFor="issueCategory">Primary Issue Category</label>
+          <label htmlFor="issueCategory">Primary Issue Category <span style={{ color: 'red' }}>*</span></label>
           <select id="issueCategory" value={issueCategory} onChange={(e) => setIssueCategory(e.target.value)} required>
             <option value="" disabled>Select a category</option>
             <option value="Punctuality">Punctuality</option>

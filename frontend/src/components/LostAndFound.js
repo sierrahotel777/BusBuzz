@@ -282,11 +282,11 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                     </div>
                     <div className="form-group-inline">
                         <div className="form-group">
-                            <label htmlFor="item-name">Item Name</label>
+                            <label htmlFor="item-name">Item Name <span style={{ color: 'red' }}>*</span></label>
                             <input type="text" name="item" placeholder="What was the item? (e.g., Black Notebook)" value={formData.item} onChange={handleChange} required />
                         </div>
                                                 <div className="form-group">
-                                                        <label htmlFor="bus-route">Bus Route</label>
+                                                        <label htmlFor="bus-route">Bus Route <span style={{ color: 'red' }}>*</span></label>
                                                         <select
                                                             name="route"
                                                             value={formData.route}
@@ -301,7 +301,7 @@ function LostAndFound({ items = [], setItems, isAdminPage = false }) {
                                                 </div>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="description">Description</label>
+                        <label htmlFor="description">Description <span style={{ color: 'red' }}>*</span></label>
                         <textarea name="description" rows="3" placeholder="Provide a brief description, like color, brand, or where you last saw it..." value={formData.description} onChange={handleChange} required></textarea>
                     </div>
                     <div className="form-group">
