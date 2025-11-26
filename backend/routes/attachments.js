@@ -58,7 +58,8 @@ router.post('/', upload.single('file'), (req, res) => {
   }
 
   console.log('DEBUG: Returning response - url:', urlPath, 'filename:', filename);
-  res.status(201).json({ filename, url: urlPath, originalName: req.file.originalname });
+  const safeOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  res.status(201).json({ filename, url: urlPath, originalName: safeOriginalName });
 });
 
 // GET /api/attachments/:filename - retrieve file (for memory storage)
@@ -69,6 +70,8 @@ router.get('/:filename', (req, res) => {
   // Sanitize filename and quote to avoid header injection / reflected XSS
   const safeFilename = String(filename).replace(/[^a-zA-Z0-9_.\-]/g, '_');
   res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.status(200).send(buffer);
 });
 
