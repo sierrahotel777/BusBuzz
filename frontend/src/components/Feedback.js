@@ -30,10 +30,18 @@ function Feedback({ setFeedbackData }) {
     // If a file is selected, upload it first and attach the returned URL
     let attachments = null;
     if (attachmentFile) {
-      const upload = await uploadAttachment(attachmentFile);
-      attachments = [{ url: upload.url, name: upload.originalName }];
-      // store filename for backward compatibility display
-      setAttachmentName(upload.filename || attachmentFile.name);
+      console.log('Uploading attachment:', attachmentFile.name);
+      try {
+        const upload = await uploadAttachment(attachmentFile);
+        console.log('Upload result:', upload);
+        attachments = [{ url: upload.url, name: upload.originalName }];
+        // store filename for backward compatibility display
+        setAttachmentName(upload.filename || attachmentFile.name);
+      } catch (uploadError) {
+        console.error('Attachment upload failed:', uploadError);
+        showNotification('Warning: Attachment upload failed, but feedback can still be submitted without it.', 'warning');
+        // Continue without attachment
+      }
     }
 
     const newFeedback = {

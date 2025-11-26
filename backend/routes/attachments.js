@@ -38,6 +38,9 @@ const attachmentStore = new Map();
 
 // POST /api/attachments - upload single file under field 'file'
 router.post('/', upload.single('file'), (req, res) => {
+  console.log('DEBUG: File upload request received');
+  console.log('DEBUG: File object:', req.file ? { name: req.file.originalname, size: req.file.size } : 'NO FILE');
+  
   if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
   let filename, urlPath;
@@ -47,11 +50,14 @@ router.post('/', upload.single('file'), (req, res) => {
     filename = unique + '-' + req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
     attachmentStore.set(filename, req.file.buffer);
     urlPath = `/api/attachments/${filename}`;
+    console.log('DEBUG: Stored in memory - filename:', filename);
   } else {
     filename = req.file.filename;
     urlPath = `/uploads/${filename}`;
+    console.log('DEBUG: Stored on disk - filename:', filename);
   }
 
+  console.log('DEBUG: Returning response - url:', urlPath, 'filename:', filename);
   res.status(201).json({ filename, url: urlPath, originalName: req.file.originalname });
 });
 

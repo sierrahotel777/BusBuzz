@@ -156,6 +156,7 @@ export const getFeedbackById = async (id) => {
 };
 
 export const uploadAttachment = async (file) => {
+  console.log('uploadAttachment: Starting upload for file:', file.name, 'Size:', file.size);
   const form = new FormData();
   form.append('file', file);
   const response = await fetch(`${API_URL}/attachments`, {
@@ -163,6 +164,7 @@ export const uploadAttachment = async (file) => {
     body: form,
   });
   const data = await response.json();
+  console.log('uploadAttachment: Response status:', response.status, 'Data:', data);
   if (!response.ok) throw new Error(data.message || 'Failed to upload attachment.');
   // Normalize returned URL to absolute so frontend links always work
   if (data && data.url) {
@@ -171,6 +173,7 @@ export const uploadAttachment = async (file) => {
       data.url = `${API_BASE}${data.url}`;
     }
   }
+  console.log('uploadAttachment: Final returned data:', data);
   return data; // { filename, url, originalName }
 };
 
