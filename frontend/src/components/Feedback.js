@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 import "./Form.css";
 import "./Feedback.css";
 import { useNotification } from "./NotificationContext";
-import { submitFeedback } from "../services/api";
+import { submitFeedback, uploadAttachment } from "../services/api";
 
 function Feedback({ setFeedbackData }) {
   const [route, setRoute] = useState("");
@@ -14,6 +14,7 @@ function Feedback({ setFeedbackData }) {
   const [cleanliness, setCleanliness] = useState("");
   const [issueCategory, setIssueCategory] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState(null);
   const [comments, setComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -25,6 +26,15 @@ function Feedback({ setFeedbackData }) {
     // Attachment and rating fields are optional now — do not block submission
 
     setIsSubmitting(true);
+
+    // If a file is selected, upload it first and attach the returned URL
+    let attachments = null;
+    if (attachmentFile) {
+      const upload = await uploadAttachment(attachmentFile);
+      attachments = [{ url: upload.url, name: upload.originalName }];
+      // store filename for backward compatibility display
+      setAttachmentName(upload.filename || attachmentFile.name);
+    }
 
     const newFeedback = {
       route,
@@ -38,6 +48,7 @@ function Feedback({ setFeedbackData }) {
         cleanliness,
       },
       attachmentName: attachmentName,
+      attachments: attachments,
       userId: user.id,
       userName: user.name,
     };
@@ -65,6 +76,7 @@ function Feedback({ setFeedbackData }) {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setAttachmentName(e.target.files[0].name);
+      setAttachmentFile(e.target.files[0]);
     }
   };
 

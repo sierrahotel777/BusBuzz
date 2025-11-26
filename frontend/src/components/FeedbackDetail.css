@@ -55,7 +55,7 @@
 .detail-card p {
   margin: 8px 0;
   line-height: 1.6;
-  color: var(--text-color);
+  color: inherit;
 }
 
 .detail-card p strong {

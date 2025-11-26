@@ -141,4 +141,22 @@ router.post('/:id/conversation', writeLimiter, async (req, res) => {
   }
 });
 
+// Delete a feedback (admin)
+router.delete('/:id', writeLimiter, async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid feedback ID.' });
+  }
+  try {
+    const result = await col().deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Feedback not found.' });
+    }
+    res.status(204).end();
+  } catch (error) {
+    console.error('Error deleting feedback:', error);
+    res.status(500).json({ message: 'An error occurred while deleting feedback.' });
+  }
+});
+
 module.exports = router;

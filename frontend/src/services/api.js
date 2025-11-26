@@ -1,5 +1,6 @@
-// Default to local backend for development; allow override with REACT_APP_API_URL
-const API_URL = 'https://busbuzz-api-live-eus.azurewebsites.net/api';
+// Default API base; allow override with REACT_APP_API_URL
+export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+export const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 export const registerUser = async (userData) => {
   const response = await fetch(`${API_URL}/auth/register`, {
@@ -40,7 +41,7 @@ export const getAllUsers = async () => {
 };
 
 export const getMyFeedback = async (userId) => { 
-  const response = await fetch(`${API_URL}/auth/feedback/?userId=${userId}`);
+  const response = await fetch(`${API_URL}/feedback?userId=${userId}`);
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to fetch your feedback.');
   return data;
@@ -48,7 +49,7 @@ export const getMyFeedback = async (userId) => {
 
 export const getFeedback = async () => { 
   try {
-    const response = await fetch(`${API_URL}/auth/feedback`);
+    const response = await fetch(`${API_URL}/feedback`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -100,12 +101,13 @@ export const importUsers = async (users) => {
 
 export const updateFeedbackStatus = async (feedbackId, newStatus, notes) => { 
   try {
-    const response = await fetch(`${API_URL}/auth/feedback/${feedbackId}`, {
-      method: 'PATCH',
+    // Backend expects { status, resolution } and uses PUT for update
+    const response = await fetch(`${API_URL}/feedback/${feedbackId}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ newStatus, notes }),
+      body: JSON.stringify({ status: newStatus, resolution: notes }),
     });
 
     const data = await response.json();
@@ -123,7 +125,7 @@ export const updateFeedbackStatus = async (feedbackId, newStatus, notes) => {
 
 export const submitFeedback = async (feedbackData) => { 
   try {
-    const response = await fetch(`${API_URL}/auth/feedback`, {
+    const response = await fetch(`${API_URL}/feedback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(feedbackData),
@@ -147,7 +149,7 @@ export const submitFeedback = async (feedbackData) => {
 };
 
 export const getFeedbackById = async (id) => { 
-  const response = await fetch(`${API_URL}/auth/feedback/${id}`);
+  const response = await fetch(`${API_URL}/feedback/${id}`);
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to fetch feedback.');
   return data;
@@ -162,6 +164,13 @@ export const uploadAttachment = async (file) => {
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to upload attachment.');
+  // Normalize returned URL to absolute so frontend links always work
+  if (data && data.url) {
+    if (!/^https?:\/\//i.test(data.url)) {
+      // If the URL is relative (e.g. /uploads/.. or /api/attachments/..), prefix with API base
+      data.url = `${API_BASE}${data.url}`;
+    }
+  }
   return data; // { filename, url, originalName }
 };
 
@@ -174,4 +183,13 @@ export const addConversationEntry = async (feedbackId, entry) => {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to add conversation entry.');
   return data;
+};
+
+export const deleteFeedback = async (feedbackId) => {
+  const response = await fetch(`${API_URL}/feedback/${feedbackId}`, {
+    method: 'DELETE',
+  });
+  if (response.status === 204) return true;
+  const data = await response.json();
+  throw new Error(data.message || 'Failed to delete feedback.');
 };

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { getFeedbackById, uploadAttachment, addConversationEntry } from '../services/api';
+import { getFeedbackById, uploadAttachment, addConversationEntry, deleteFeedback } from '../services/api';
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
     const { feedbackId } = useParams();
     const { user } = useAuth();
     const { showNotification } = useNotification();
+    const navigate = useNavigate();
 
     const [feedback, setFeedback] = useState(null);
     const [comment, setComment] = useState('');
@@ -106,7 +107,24 @@ function FeedbackDetail() {
         <div className="feedback-detail-container">
             <div className="feedback-detail-header">
                 <h2>Feedback Details (ID: {feedbackId})</h2>
-                <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
+                <div className="header-actions">
+                    <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
+                    {(user?.role === 'admin' || feedback.userId === user?.id) && (
+                        <button
+                            className="danger-btn"
+                            onClick={async () => {
+                                if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
+                                try {
+                                    await deleteFeedback(feedbackId);
+                                    showNotification('Feedback deleted.', 'success');
+                                    navigate(user && user.role === 'admin' ? '/admin/feedback' : '/student');
+                                } catch (err) {
+                                    showNotification(err.message || 'Failed to delete feedback.', 'error');
+                                }
+                            }}
+                        >Delete</button>
+                    )}
+                </div>
             </div>
 
             <div className="feedback-grid">
@@ -121,11 +139,16 @@ function FeedbackDetail() {
                     <h3>Bus Details</h3>
                     <p><strong>Bus No:</strong> {feedback.busNo}</p>
                     <p><strong>Issue:</strong> {feedback.issue}</p>
-                    {feedback.attachmentName && (
+                    {(feedback.attachments && feedback.attachments.length > 0) ? (
                         <p><strong>Attachment:</strong>
-                            <a href={`http://localhost:5000/uploads/${feedback.attachmentName}`} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
+                            <a href={feedback.attachments[0].url} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
                         </p>
-                    )}
+                    ) : feedback.attachmentName ? (
+                        // Fallback for older records that only have attachmentName
+                        <p><strong>Attachment:</strong>
+                            <a href={`/uploads/${feedback.attachmentName}`} target="_blank" rel="noopener noreferrer" className="attachment-link">View/Download</a>
+                        </p>
+                    ) : null}
                 </div>
 
                 <div className="detail-card ratings-info">
