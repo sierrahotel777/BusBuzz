@@ -258,4 +258,36 @@ router.get('/feedback/:id', readLimiter, async (req, res) => {
   }
 });
 
+// PUT /api/auth/profile/:userId - update user profile (busRoute, favoriteStop, etc.)
+router.put('/profile/:userId', writeLimiter, async (req, res) => {
+  const { userId } = req.params;
+  if (!ObjectId.isValid(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
+  
+  try {
+    assertNoMongoOperators(req.body);
+    // Only allow specific fields to be updated
+    const allowed = ['busRoute', 'favoriteStop', 'name', 'favoriteStopName'];
+    const updates = pick(req.body, allowed);
+    
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update.' });
+    }
+    
+    const result = await usersCol().findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $set: updates },
+      { returnDocument: 'after' }
+    );
+    
+    if (!result.value) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    
+    res.json({ message: 'Profile updated successfully.', user: result.value });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ message: 'Error updating profile.' });
+  }
+});
+
 module.exports = router;

@@ -40,6 +40,22 @@ export const getAllUsers = async () => {
   }
 };
 
+export const updateUserProfile = async (userId, profileData) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/profile/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to update profile.');
+    return data;
+  } catch (error) {
+    console.error('API Error (updateUserProfile):', error);
+    throw error;
+  }
+};
+
 export const getMyFeedback = async (userId) => { 
   const response = await fetch(`${API_URL}/feedback?userId=${userId}`);
   const data = await response.json();

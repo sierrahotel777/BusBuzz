@@ -46,10 +46,7 @@ const initialCommendations = [
 ];
 
 
-const initialLostAndFound = [
-    { id: 1, type: 'found', item: 'Blue Water Bottle', route: 'S5', date: '2023-11-10T10:00:00Z', description: 'Found near the front seat. Gave it to the driver.', user: 'Anonymous', status: 'unclaimed' },
-    { id: 2, type: 'lost', item: 'Black Notebook', route: 'S2', date: '2023-11-09T18:00:00Z', description: 'Has a university logo on the cover.', user: 'Priya S.' }
-];
+const initialLostAndFound = [];
 
 const initialCrowdednessData = [
     { route: 'S1: VALASARAVAKKAM', level: 'empty', timestamp: new Date().toISOString() }

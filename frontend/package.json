@@ -45,5 +45,8 @@
     "modulePaths": [
       "<rootDir>/src"
     ]
+  },
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.8.31"
   }
 }

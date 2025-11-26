@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { getFeedbackById, uploadAttachment, addConversationEntry, deleteFeedback, updateFeedbackStatus } from '../services/api';
+import { getFeedbackById, uploadAttachment, addConversationEntry, deleteFeedback, updateFeedbackStatus, API_BASE } from '../services/api';
 import './FeedbackDetail.css';
 
 function FeedbackDetail() {
@@ -17,6 +17,7 @@ function FeedbackDetail() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [modal, setModal] = useState(null);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         if (!feedbackId) {
@@ -106,45 +107,63 @@ function FeedbackDetail() {
 
     return (
         <div className="feedback-detail-container">
-                <div className="feedback-detail-header">
-                <h2>Feedback Details (ID: {feedbackId})</h2>
-                <div className="header-actions">
-                    <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
-                    <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                      <div style={{fontSize: '0.9rem', color: 'var(--muted-color, #666)'}}>Ref: {feedback.referenceId || 'N/A'}</div>
-                      {(user?.role === 'admin' || feedback.userId === user?.id) && (
-                          <button
-                              className="danger-btn"
-                              onClick={async () => {
-                                  if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
-                                  try {
-                                      await deleteFeedback(feedbackId);
-                                      showNotification('Feedback deleted.', 'success');
-                                      navigate(user && user.role === 'admin' ? '/admin/feedback' : '/student');
-                                  } catch (err) {
-                                      showNotification(err.message || 'Failed to delete feedback.', 'error');
-                                  }
-                              }}
-                          >Delete</button>
-                      )}
-                      {/* Mark Resolved button - visible to admin or owner when not already resolved */}
-                      {(user?.role === 'admin' || feedback.userId === user?.id) && feedback.status !== 'Resolved' && (
+            <div className="feedback-detail-header">
+                <div className="header-left">
+                    <h2>Feedback Details</h2>
+                    <div className="ref-block">
+                        <span className="ref-label">Ref:</span>
+                        <span className="ref-id">{feedback.referenceId || 'N/A'}</span>
                         <button
-                          className="btn-secondary"
-                          onClick={async () => {
-                            const resolution = window.prompt('Enter a short resolution note (optional):', feedback.resolution || '');
-                            if (resolution === null) return; // cancelled
-                            try {
-                              await updateFeedbackStatus(feedbackId, 'Resolved', resolution || '');
-                              setFeedback(prev => ({ ...prev, status: 'Resolved', resolution }));
-                              showNotification('Feedback marked as resolved.', 'success');
-                            } catch (err) {
-                              showNotification(err.message || 'Failed to update feedback status.', 'error');
-                            }
-                          }}
-                        >Mark Resolved</button>
-                      )}
+                            type="button"
+                            className="copy-btn"
+                            onClick={async () => {
+                                try {
+                                    const text = feedback.referenceId || '';
+                                    if (!text) throw new Error('No reference ID available');
+                                    await navigator.clipboard.writeText(text);
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 1400);
+                                    showNotification('Reference ID copied to clipboard.', 'success');
+                                } catch (err) {
+                                    showNotification(err.message || 'Failed to copy reference ID.', 'error');
+                                }
+                            }}
+                        >{copied ? 'Copied' : 'Copy'}</button>
                     </div>
+                </div>
+                <div className="header-right">
+                    <Link to={user && user.role === 'admin' ? '/admin/feedback' : '/student'} className="back-link">← Back</Link>
+                    {(user?.role === 'admin' || feedback.userId === user?.id) && (
+                        <button
+                            className="danger-btn"
+                            onClick={async () => {
+                                if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
+                                try {
+                                    await deleteFeedback(feedbackId);
+                                    showNotification('Feedback deleted.', 'success');
+                                    navigate(user && user.role === 'admin' ? '/admin/feedback' : '/student', { state: { refresh: Date.now() } });
+                                } catch (err) {
+                                    showNotification(err.message || 'Failed to delete feedback.', 'error');
+                                }
+                            }}
+                        >Delete</button>
+                    )}
+                    {(user?.role === 'admin' || feedback.userId === user?.id) && feedback.status !== 'Closed' && (
+                        <button
+                            className="btn-secondary"
+                            onClick={async () => {
+                                const resolution = window.prompt('Enter a short resolution note (optional):', feedback.resolution || '');
+                                if (resolution === null) return; // cancelled
+                                try {
+                                    await updateFeedbackStatus(feedbackId, 'Closed', resolution || '');
+                                    setFeedback(prev => ({ ...prev, status: 'Closed', resolution, resolutionBy: user?.name || 'Admin', resolutionOn: new Date().toISOString() }));
+                                    showNotification('Feedback marked as closed.', 'success');
+                                } catch (err) {
+                                    showNotification(err.message || 'Failed to update feedback status.', 'error');
+                                }
+                            }}
+                        >Mark Resolved</button>
+                    )}
                 </div>
             </div>
 
@@ -161,14 +180,57 @@ function FeedbackDetail() {
                     <p><strong>Bus No:</strong> {feedback.busNo || 'N/A'}</p>
                     <p><strong>Issue:</strong> {feedback.issue || 'N/A'}</p>
                     {(feedback.attachments && feedback.attachments.length > 0) ? (
-                        <p><strong>Attachment:</strong>
-                            <button type="button" className="attachment-btn" onClick={() => setModal({ url: feedback.attachments[0].url, name: feedback.attachments[0].name || feedback.attachmentName || 'Attachment' })}>View / Preview</button>
-                        </p>
+                        (() => {
+                            const att = feedback.attachments[0];
+                            const rawUrl = att.url || '';
+                            const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : `${API_BASE}${rawUrl}`;
+                            const name = att.name || feedback.attachmentName || 'Attachment';
+                            const ext = (name || '').split('.').pop().toLowerCase();
+
+                            return (
+                                <div>
+                                    <p><strong>Attachment:</strong> {name}</p>
+                                    <div className="attachment-preview">
+                                        {['png','jpg','jpeg','gif','webp'].includes(ext) && (
+                                            <img src={url} alt={name} style={{maxWidth: '320px', borderRadius: 6}} />
+                                        )}
+                                        {['mp4','webm','ogg'].includes(ext) && (
+                                            <video src={url} controls style={{maxWidth: '320px'}} />
+                                        )}
+                                        {['pdf'].includes(ext) && (
+                                            <iframe src={url} title={name} style={{width: '320px', height: '420px', border: 'none'}} />
+                                        )}
+                                        {(!['png','jpg','jpeg','gif','webp','mp4','webm','ogg','pdf'].includes(ext)) && (
+                                            <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open attachment</a>
+                                        )}
+                                        <div style={{marginTop:8}}>
+                                            <button type="button" className="attachment-btn" onClick={() => setModal({ url, name })}>Open Preview</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()
                     ) : feedback.attachmentName ? (
                         // Fallback for older records that only have attachmentName
-                        <p><strong>Attachment:</strong>
-                            <button type="button" className="attachment-btn" onClick={() => setModal({ url: `${window.location.origin}/uploads/${feedback.attachmentName}`, name: feedback.attachmentName })}>View / Preview</button>
-                        </p>
+                        (() => {
+                            const url = `${API_BASE}/uploads/${feedback.attachmentName}`;
+                            const name = feedback.attachmentName;
+                            const ext = (name || '').split('.').pop().toLowerCase();
+                            return (
+                                <div>
+                                    <p><strong>Attachment:</strong> {name}</p>
+                                    <div className="attachment-preview">
+                                        {['png','jpg','jpeg','gif','webp'].includes(ext) && (<img src={url} alt={name} style={{maxWidth: '320px', borderRadius: 6}} />)}
+                                        {['mp4','webm','ogg'].includes(ext) && (<video src={url} controls style={{maxWidth: '320px'}} />)}
+                                        {['pdf'].includes(ext) && (<iframe src={url} title={name} style={{width: '320px', height: '420px', border: 'none'}} />)}
+                                        {(!['png','jpg','jpeg','gif','webp','mp4','webm','ogg','pdf'].includes(ext)) && (<a href={url} target="_blank" rel="noopener noreferrer" className="attachment-link">Open attachment</a>)}
+                                        <div style={{marginTop:8}}>
+                                            <button type="button" className="attachment-btn" onClick={() => setModal({ url, name })}>Open Preview</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()
                     ) : null}
                 </div>
 
@@ -184,6 +246,18 @@ function FeedbackDetail() {
                     <p>{feedback.comments || feedback.message || 'No additional comments.'}</p>
                 </div>
 
+                {feedback.status === 'Closed' && (
+                    <div className="detail-card resolution-info full-width-card">
+                        <h3>Resolution</h3>
+                        <p>{feedback.resolution || 'No resolution note provided.'}</p>
+                        <p style={{marginTop:8, fontSize:'0.9rem', color:'var(--muted-color)'}}>
+                            <strong>Status:</strong> Closed
+                            {feedback.resolutionBy ? ` • Resolved by ${feedback.resolutionBy}` : ''}
+                            {feedback.resolutionOn ? ` • ${new Date(feedback.resolutionOn).toLocaleString()}` : ''}
+                        </p>
+                    </div>
+                )}
+
                 <div className="detail-card conversation-section full-width-card">
                     <h3>Conversation</h3>
                     <div className="conversation-thread">
@@ -194,42 +268,42 @@ function FeedbackDetail() {
                                     <span className="message-timestamp">{new Date(entry.timestamp).toLocaleString()}</span>
                                 </div>
                                 {entry.message && <p>{entry.message}</p>}
-                                                {entry.attachment && (
-                                                    <div className="message-attachment">
-                                                        <button type="button" className="attachment-btn" onClick={() => setModal({ url: entry.attachment.url, name: entry.attachment.name })}>📎 {entry.attachment.name}</button>
-                                                    </div>
-                                                )}
+                                {entry.attachment && (
+                                    <div className="message-attachment">
+                                        {(() => {
+                                            const raw = entry.attachment.url || '';
+                                            const url = /^https?:\/\//i.test(raw) ? raw : `${API_BASE}${raw}`;
+                                            const name = entry.attachment.name || 'Attachment';
+                                            return (
+                                                <button type="button" className="attachment-btn" onClick={() => setModal({ url, name })}>📎 {name}</button>
+                                            );
+                                        })()}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
+                    
+                    <div className="comment-form">
+                        {feedback.status === 'Closed' ? (
+                            <div className="closed-note">
+                                <p>This feedback has been closed. Comments are disabled.</p>
+                                <p style={{fontSize:'0.95rem', color:'var(--muted-color)'}}><strong>Resolution:</strong> {feedback.resolution || 'No resolution provided.'}</p>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleCommentSubmit}>
+                                <label htmlFor="comment">Add a comment or attachment</label>
+                                <textarea id="comment" value={comment} onChange={(e) => setComment(e.target.value)} rows={3} placeholder="Write a reply..." />
+                                <input type="file" onChange={handleFileChange} />
+                                {selectedFile && (
+                                    <div className="selected-file">Selected: {selectedFile.name}</div>
+                                )}
+                                <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Posting...' : 'Post Comment'}</button>
+                            </form>
+                        )}
+                    </div>
                 </div>
 
-                <div className="detail-card comment-form full-width-card">
-                    <h3>Add Comment</h3>
-                    <form onSubmit={handleCommentSubmit}>
-                        <div className="form-group">
-                            <textarea
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                placeholder="Add your comment here..."
-                                rows="4"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="comment-attachment">Attach a file (optional):</label>
-                            <input
-                                id="comment-attachment"
-                                type="file"
-                                onChange={handleFileChange}
-                                accept="image/*,video/*,.pdf,.doc,.docx"
-                            />
-                            {selectedFile && <p className="selected-file">Selected: {selectedFile.name}</p>}
-                        </div>
-                        <button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Posting...' : 'Post Comment'}
-                        </button>
-                    </form>
-                </div>
             </div>
 
             {modal && (

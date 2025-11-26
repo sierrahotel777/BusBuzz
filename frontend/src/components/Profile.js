@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { useNotification } from "./NotificationContext";
 import "./Profile.css"; 
 import { routeData, routeNames } from './routeData';
+import { updateUserProfile } from '../services/api';
 
 function formatTimeAgo(isoString) {
     if (!isoString) return 'never';
@@ -51,11 +52,27 @@ function Profile() {
     setIsEditing(false);
   };
 
-  const handleSaveClick = () => {
-    updateUser(profileData);
-    setOriginalProfileData(profileData); 
-    setIsEditing(false);
-    showNotification("Profile updated successfully!");
+  const handleSaveClick = async () => {
+    try {
+      // Update in the database
+      const updates = {
+        name: profileData.name,
+        busRoute: profileData.busRoute,
+        favoriteStop: profileData.favoriteStop,
+      };
+      
+      const response = await updateUserProfile(user.id, updates);
+      
+      // Update local auth context
+      updateUser(profileData);
+      
+      // Update original data to prevent unsaved changes on next edit
+      setOriginalProfileData(profileData);
+      setIsEditing(false);
+      showNotification("Profile updated successfully!");
+    } catch (error) {
+      showNotification(error.message || 'Failed to update profile.', 'error');
+    }
   };
 
   const handleChange = (e) => {
@@ -75,6 +92,10 @@ function Profile() {
 
   return (
     <div className="profile-container">
+      <div className="dashboard-header">
+        <h2>My Profile</h2>
+        <p>View and manage your personal information and preferences.</p>
+      </div>
       <div className="profile-card">
         <div className="profile-header">
           <div className="profile-avatar">
@@ -85,10 +106,6 @@ function Profile() {
                 <input id="avatar-input" type="file" accept="image/*" disabled />
               </div>
             )}
-          </div>
-          <div className="profile-title">
-            <h2>My Profile</h2>
-            <p>View and manage your personal information and preferences.</p>
           </div>
         </div>
         <div className="profile-details">
@@ -111,9 +128,9 @@ function Profile() {
           </div>
           <div className="profile-field half-width">
             <label>College ID</label>
-            <p>{profileData.collegeId || user.collegeId}</p>
+            <p>{profileData.email?.split('@')[0] || user.email?.split('@')[0] || 'N/A'}</p>
           </div>
-          <div className="profile-field half-width">
+          <div className="profile-field half-width" style="">
             <label>Role</label>
             <p>{profileData.role}</p>
           </div>

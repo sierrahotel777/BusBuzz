@@ -1,3 +1,57 @@
+/* Container and header styles */
+.lost-and-found-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    padding: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.lost-and-found-container .dashboard-header {
+    grid-column: 1 / -1;
+    background: var(--primary-color);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.lost-and-found-container .dashboard-header h2 {
+    margin: 0;
+    color: white;
+}
+
+.lost-and-found-container .dashboard-header p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+.lost-and-found-container .dashboard-card {
+    background: var(--surface-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.lost-and-found-container .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--shadow-color);
+}
+
+.lost-and-found-container .dashboard-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.lost-and-found-container .full-width-card {
+    grid-column: 1 / -1;
+}
+
 /* Override the max-width from form-container to allow full-width expansion */
 .report-form-card {
     max-width: 100%;
@@ -7,24 +61,37 @@
     display: flex;
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: none;
     margin-bottom: 20px;
+    gap: 10px;
 }
 
 .report-type-selector label {
     flex: 1;
-    padding: 12px;
+    padding: 14px;
     text-align: center;
     cursor: pointer;
     background-color: var(--subtle-bg);
     color: var(--text-color-light);
-    transition: background-color 0.2s, color 0.2s;
-    font-weight: bold;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.report-type-selector label:hover {
+    border-color: var(--primary-color);
 }
 
 .report-type-selector label.active {
     background-color: var(--primary-color);
     color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
 }
 
 .report-type-selector input[type="radio"] {
@@ -37,25 +104,105 @@
     gap: 20px;
 }
 
+/* Form field styling for Lost & Found */
+.lost-and-found-container .form-group {
+    margin-bottom: 18px;
+}
+
+.lost-and-found-container input[type="text"],
+.lost-and-found-container input[type="file"],
+.lost-and-found-container select,
+.lost-and-found-container textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border-color);
+    box-sizing: border-box;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease-in-out;
+}
+
+.lost-and-found-container input[type="file"]::file-selector-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+}
+
+.lost-and-found-container input[type="file"]::file-selector-button:hover {
+    background: var(--primary-color-dark);
+}
+
+.lost-and-found-container input::placeholder,
+.lost-and-found-container textarea::placeholder {
+    color: var(--text-color-light);
+    opacity: 0.6;
+}
+
+.lost-and-found-container input[type="text"]:focus,
+.lost-and-found-container input[type="file"]:focus,
+.lost-and-found-container select:focus,
+.lost-and-found-container textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    background-color: var(--surface-color);
+}
+
+.lost-and-found-container label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.selected-file {
+    font-size: 0.85rem;
+    color: var(--success-text);
+    background-color: var(--success-bg);
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-top: 6px;
+    display: inline-block;
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 25px;
+    gap: 10px;
 }
 
 .btn-submit-report {
-    padding: 12px 25px;
+    padding: 12px 30px;
     background: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2);
 }
 
 .btn-submit-report:hover {
     background: var(--primary-color-dark);
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-submit-report:active {
+    transform: translateY(0);
 }
 
 .items-column {
@@ -115,6 +262,30 @@
     font-size: 0.9rem;
 }
 
+.item-card {
+    word-break: break-word;
+    overflow: hidden;
+}
+
+.item-card img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 10px;
+    border-radius: 6px;
+}
+
+.attachment-row { margin-top: 10px; }
+.attachment-btn { background: transparent; border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+
+/* Modal for previewing attachments */
+.attachment-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+.attachment-modal-content { background: var(--bg); width: 90%; max-width: 900px; max-height: 90vh; overflow: auto; border-radius: 8px; }
+.attachment-modal-header { display:flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+.attachment-modal-body { padding: 16px; }
+.attachment-modal-body img, .attachment-modal-body video, .attachment-modal-body iframe { width: 100%; height: auto; }
+.close-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+
 .item-footer {
     display: flex;
     justify-content: space-between;
@@ -138,3 +309,55 @@
 
 [data-theme='dark'] .item-status.unclaimed { background-color: rgba(214, 158, 46, 0.2); color: #d69e2e; }
 [data-theme='dark'] .item-status.claimed { background-color: rgba(72, 187, 120, 0.2); color: #48bb78; }
+
+@media (max-width: 768px) {
+    .lost-and-found-container {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .lost-and-found-container .dashboard-header {
+        padding: 15px;
+    }
+    
+    .lost-and-found-container .dashboard-card {
+        padding: 15px;
+    }
+
+    .form-group-inline {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        justify-content: stretch;
+    }
+
+    .btn-submit-report {
+        width: 100%;
+    }
+
+    .item-card {
+        padding: 12px;
+    }
+
+    .item-footer {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .report-type-selector {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .report-type-selector label {
+        padding: 12px;
+    }
+
+    .lost-and-found-container textarea {
+        min-height: 80px;
+    }
+}

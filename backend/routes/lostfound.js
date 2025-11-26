@@ -16,8 +16,12 @@ const createSchema = Joi.object({
   route: Joi.string().trim().required(),
   description: Joi.string().trim().required(),
   user: Joi.string().trim().optional(),
+  userId: Joi.string().trim().optional(),
   date: Joi.string().isoDate().optional(),
   status: Joi.string().trim().optional(),
+  // Attachments support (optional)
+  attachmentName: Joi.string().trim().optional(),
+  attachments: Joi.array().items(Joi.object({ url: Joi.string().uri().required(), name: Joi.string().optional() })).optional(),
 });
 
 // GET /api/lostfound

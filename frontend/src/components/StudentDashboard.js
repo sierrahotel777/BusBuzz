@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css'; 
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
@@ -30,7 +30,29 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     [lostAndFoundItems, user.name]);
 
   const [selectedRoute, setSelectedRoute] = useState(initialRoute);
+  const [selectedStop, setSelectedStop] = useState(initialStop);
+  const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
+  const [notificationSent, setNotificationSent] = useState(false);
+  const [isCommendationModalOpen, setIsCommendationModalOpen] = useState(false);
 
+  const location = useLocation();
+
+  // Update selected route and stop when user profile changes (e.g., after editing in Profile page)
+  useEffect(() => {
+    if (user.busRoute && user.busRoute !== selectedRoute) {
+      setSelectedRoute(user.busRoute);
+      const stopsForRoute = routeData[user.busRoute]?.stops || {};
+      const stopToSet = user.favoriteStop && stopsForRoute[user.favoriteStop]
+        ? user.favoriteStop
+        : Object.keys(stopsForRoute)[0];
+      setSelectedStop(stopToSet);
+      const newEta = routeData[user.busRoute].stops[stopToSet];
+      setEta(newEta);
+    }
+  }, [user.busRoute, user.favoriteStop]);
+
+  // Fetch user's feedback
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     async function fetchFeedback() {
       setIsLoadingFeedback(true);
@@ -43,11 +65,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       setIsLoadingFeedback(false);
     }
     if (user?.id) fetchFeedback(); 
-  }, [user?.id, showNotification]); 
-  const [selectedStop, setSelectedStop] = useState(initialStop);
-  const [eta, setEta] = useState(routeData[initialRoute].stops[initialStop]);
-  const [notificationSent, setNotificationSent] = useState(false);
-  const [isCommendationModalOpen, setIsCommendationModalOpen] = useState(false);
+  }, [user?.id, showNotification, location.state?.refresh]);
 
   const unclaimedFoundItems = useMemo(() => 
     (lostAndFoundItems || []).filter(item => item.type === 'found' && item.status === 'unclaimed'), 
@@ -85,6 +103,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
     setCrowdednessData(prev => [newReport, ...prev]);
     showNotification(`Overcrowding reported for route ${selectedRoute}. Thank you for helping!`, 'info');
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setNotificationSent(false);
   }, [selectedRoute, selectedStop]);
@@ -151,6 +170,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
             <thead>
               <tr>
                 <th>Submitted On</th>
+                <th>Ref ID</th>
                 <th>Route</th>
                 <th>Status</th>
               </tr>
@@ -159,6 +179,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
               {myFeedback.map(fb => (
                 <tr key={fb.id} onClick={() => navigate(`/feedback/${fb.id}`)} className="clickable-row">
                   <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
+                  <td data-label="Ref ID">{fb.referenceId || 'N/A'}</td>
                   <td data-label="Route">{fb.route || 'N/A'}</td>
                   <td data-label="Status"><span className={`status ${fb.status.toLowerCase().replace(' ', '-')}`}>{fb.status}</span></td>
                 </tr>

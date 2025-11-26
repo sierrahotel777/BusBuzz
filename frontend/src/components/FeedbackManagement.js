@@ -25,6 +25,7 @@ function FeedbackManagement({ feedbackData }) {
             <thead>
               <tr>
                 <th>Submitted On</th>
+                <th>Ref ID</th>
                 <th>User</th>
                 <th>Route</th>
                 <th>Issue</th>
@@ -36,6 +37,7 @@ function FeedbackManagement({ feedbackData }) {
               {sortedFeedback.map(fb => (
                 <tr key={fb._id} onClick={() => handleRowClick(fb._id)} className="clickable-row">
                   <td data-label="Submitted On">{new Date(fb.submittedOn).toLocaleDateString()}</td>
+                  <td data-label="Ref ID">{fb.referenceId || 'N/A'}</td>
                   <td data-label="User">{fb.userName || 'N/A'}</td>
                   <td data-label="Route">{fb.route || 'N/A'}</td>
                   <td data-label="Issue">{fb.issue || 'N/A'}</td>

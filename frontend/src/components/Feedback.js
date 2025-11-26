@@ -102,7 +102,8 @@ function Feedback({ setFeedbackData }) {
         <h2>Submit Feedback</h2>
         <p>Report an issue or share your experience with us.</p>
       </div>
-      <div className="form-container">
+      <div className="dashboard-card full-width-card">
+        <h3>Feedback Form</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
           <label htmlFor="route">Route Number</label>

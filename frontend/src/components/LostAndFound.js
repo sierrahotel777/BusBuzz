@@ -1,94 +1,82 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
-import { getLostAndFound, postLostAndFound, updateLostAndFound, deleteLostAndFound } from '../services/api';
+import { getLostAndFound, postLostAndFound, updateLostAndFound, deleteLostAndFound, uploadAttachment } from '../services/api';
 import ConfirmationModal from './ConfirmationModal';
 import './LostAndFound.css';
 import './Form.css';
 import './LostAndFoundAdmin.css';
 
-function LostAndFound({ items, setItems, isAdminPage = false }) {
+function LostAndFound({ items = [], setItems, isAdminPage = false }) {
     const { user, awardPoints } = useAuth();
     const { showNotification } = useNotification();
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ type: 'lost', item: '', route: '', description: '' });
+    const [attachmentFile, setAttachmentFile] = useState(null);
+    const [attachmentName, setAttachmentName] = useState('');
+    const [modal, setModal] = useState(null);
     const [lostSearchTerm, setLostSearchTerm] = useState('');
     const [foundSearchTerm, setFoundSearchTerm] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-
     const [adminSearchTerm, setAdminSearchTerm] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
 
-    const filteredAndSortedItems = useMemo(() => {
-        let filtered = [...items];
+    // Compute filtered items for student view
+    const lostItems = useMemo(() => 
+        items.filter(item => item.type === 'lost' && item.item.toLowerCase().includes(lostSearchTerm.toLowerCase())) || [],
+        [items, lostSearchTerm]
+    );
 
-        if (isAdminPage && adminSearchTerm) {
-            const lowercasedTerm = adminSearchTerm.toLowerCase();
-            filtered = items.filter(item =>
-                Object.values(item).some(val =>
-                    String(val).toLowerCase().includes(lowercasedTerm)
-                )
-            );
-        }
+    const foundItems = useMemo(() => 
+        items.filter(item => item.type === 'found' && item.item.toLowerCase().includes(foundSearchTerm.toLowerCase())) || [],
+        [items, foundSearchTerm]
+    );
 
-        return filtered.sort((a, b) => {
-            if (a[sortConfig.key] < b[sortConfig.key]) {
-                return sortConfig.direction === 'ascending' ? -1 : 1;
-            }
-            if (a[sortConfig.key] > b[sortConfig.key]) {
-                return sortConfig.direction === 'ascending' ? 1 : -1;
-            }
-            return 0;
-        });
-    }, [items, isAdminPage, adminSearchTerm, sortConfig]);
+    // Compute filtered items for admin view
+    const filteredAdminItems = useMemo(() => 
+        items.filter(item => 
+            item.item.toLowerCase().includes(adminSearchTerm.toLowerCase()) ||
+            item.description.toLowerCase().includes(adminSearchTerm.toLowerCase())
+        ) || [],
+        [items, adminSearchTerm]
+    );
 
-    const lostItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'lost' && (i.item.toLowerCase().includes(lostSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(lostSearchTerm.toLowerCase()))), [filteredAndSortedItems, lostSearchTerm]);
-    const foundItems = useMemo(() => filteredAndSortedItems.filter(i => i.type === 'found' && (i.item.toLowerCase().includes(foundSearchTerm.toLowerCase()) || i.description.toLowerCase().includes(foundSearchTerm.toLowerCase()))), [filteredAndSortedItems, foundSearchTerm]);
-
-    const itemsPerPage = 10;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredAndSortedItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage);
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-        setSortConfig({ key, direction });
-        setCurrentPage(1);
-    };
-
-    const getSortIndicator = (key) => {
-        if (sortConfig.key !== key) return '';
-        return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
-    };
-
-    // Fetch items when the component mounts if items are empty (so data syncs with backend)
+    // Fetch items from backend on component mount or when user changes
     useEffect(() => {
         let mounted = true;
-        if (!items || items.length === 0) {
-            getLostAndFound().then(data => {
-                if (!mounted) return;
-                // normalize id field
-                const mapped = data.map(d => ({ ...d, id: d.id || d._id }));
-                setItems(mapped);
-            }).catch(err => {
-                // keep using local data if backend is unreachable
-                console.warn('Failed to load lost & found from backend:', err.message);
-            });
-        }
+        const fetchItems = async () => {
+            setIsLoading(true);
+            try {
+                // Students see only their own items; admins see all items
+                const query = isAdminPage ? {} : { userId: user?.id };
+                const data = await getLostAndFound(query);
+                // Normalize id field for consistency
+                const mapped = (data || []).map(d => ({ ...d, id: d.id || d._id }));
+                if (mounted) {
+                    setItems(mapped);
+                }
+            } catch (err) {
+                console.error('Failed to fetch lost & found from backend:', err.message);
+                showNotification('Failed to load lost & found items.', 'error');
+                if (mounted) setItems([]);
+            } finally {
+                if (mounted) setIsLoading(false);
+            }
+        };
+        if (user?.id) fetchItems();
         return () => { mounted = false; };
-    }, [items, setItems]);
+    }, [user?.id, isAdminPage, setItems, showNotification]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setAttachmentFile(e.target.files[0]);
+            setAttachmentName(e.target.files[0].name);
+        }
     };
 
 
@@ -132,15 +120,28 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
             return;
         }
         try {
-            const payload = { ...formData, user: user.name };
+            const payload = { ...formData, user: user.name, userId: user.id };
+            // If attachment present, upload first
+            if (attachmentFile) {
+                try {
+                    const up = await uploadAttachment(attachmentFile);
+                    payload.attachments = [{ url: up.url, name: up.originalName }];
+                    payload.attachmentName = up.filename || attachmentFile.name;
+                } catch (upErr) {
+                    console.error('Attachment upload failed:', upErr);
+                    showNotification('Attachment upload failed; posting report without attachment.', 'warning');
+                }
+            }
             const created = await postLostAndFound(payload);
             // backend returns { ...doc, id }
-            setItems(prev => [{ ...created, id: created.id }, ...prev]);
+            setItems(prev => [{ ...created, id: created.id || created._id }, ...prev]);
             if (created.type === 'found') {
                 awardPoints(20);
             }
             showNotification(`Your ${formData.type} item report has been posted!`);
             setFormData({ type: 'lost', item: '', route: '', description: '' });
+            setAttachmentFile(null);
+            setAttachmentName('');
         } catch (err) {
             showNotification(err.message || 'Failed to post report.', 'error');
         }
@@ -166,29 +167,17 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                <th onClick={() => requestSort('item')} className="sortable-header">
-                                    Item {getSortIndicator('item')}
-                                </th>
-                                <th onClick={() => requestSort('type')} className="sortable-header">
-                                    Type {getSortIndicator('type')}
-                                </th>
-                                <th onClick={() => requestSort('route')} className="sortable-header">
-                                    Route {getSortIndicator('route')}
-                                </th>
-                                <th onClick={() => requestSort('user')} className="sortable-header">
-                                    Reported By {getSortIndicator('user')}
-                                </th>
-                                <th onClick={() => requestSort('date')} className="sortable-header">
-                                    Date {getSortIndicator('date')}
-                                </th>
-                                <th onClick={() => requestSort('status')} className="sortable-header">
-                                    Status {getSortIndicator('status')}
-                                </th>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Route</th>
+                                <th>Reported By</th>
+                                <th>Date</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {currentItems.map(item => (
+                            {filteredAdminItems.map(item => (
                                 <tr key={item.id}>
                                     <td data-label="Item">{item.item}</td>
                                     <td data-label="Type"><span className={`item-type-badge ${item.type}`}>{item.type}</span></td>
@@ -208,19 +197,6 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                             ))}
                         </tbody>
                     </table>
-                    {totalPages > 1 && (
-                        <div className="pagination-container">
-                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                &laquo; Previous
-                            </button>
-                            <span>
-                                Page {currentPage} of {totalPages}
-                            </span>
-                            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                                Next &raquo;
-                            </button>
-                        </div>
-                    )}
                 </div>
                 <ConfirmationModal
                     show={showDeleteModal}
@@ -238,6 +214,18 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
             <h4>{item.item}</h4>
             <p><strong>{item.type === 'lost' ? 'Last Seen on:' : 'Found on:'}</strong> Route {item.route}</p>
             <p>{item.description}</p>
+            {item.attachments && item.attachments.length > 0 && (
+                <div className="attachment-row">
+                    {(() => {
+                        const raw = item.attachments[0].url || '';
+                        const url = /^https?:\/\//i.test(raw) ? raw : `${process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace(/\/api\/?$/,'') : ''}${raw}`;
+                        const name = item.attachments[0].name || 'Attachment';
+                        return (
+                            <button className="attachment-btn" onClick={() => setModal({ url, name })}>View Attachment</button>
+                        );
+                    })()}
+                </div>
+            )}
             <div className="item-footer">
                 <span>Posted by {item.user}</span>
                 {item.status && <span className={`item-status ${item.status}`}>{item.status}</span>}
@@ -248,14 +236,17 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
     
 
     return (
-        <div className="dashboard-grid">
+        <>
+        <div className="lost-and-found-container">
             <div className="dashboard-header">
                 <h2>Lost & Found</h2>
                 <p>Report or find lost items on the bus.</p>
             </div>
 
-            <div className="form-container report-form-card">
-                <h2>Report an Item</h2>
+            {isLoading && <div className="dashboard-card full-width-card"><p>Loading items...</p></div>}
+
+            <div className="dashboard-card full-width-card report-form-card">
+                <h3>Report an Item</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <div className="report-type-selector">
@@ -283,47 +274,75 @@ function LostAndFound({ items, setItems, isAdminPage = false }) {
                         <label htmlFor="description">Description</label>
                         <textarea name="description" rows="3" placeholder="Provide a brief description, like color, brand, or where you last saw it..." value={formData.description} onChange={handleChange} required></textarea>
                     </div>
+                    <div className="form-group">
+                        <label htmlFor="attachment">Attach a photo (optional)</label>
+                        <input type="file" id="attachment" accept="image/*,video/*,.pdf" onChange={handleFileChange} />
+                        {attachmentName && <p className="selected-file">Selected: {attachmentName}</p>}
+                    </div>
                     <div className="form-actions">
                         <button type="submit" className="btn-submit-report">Post Report</button>
                     </div>
                 </form>
             </div>
 
-            <div className="dashboard-card full-width-card">
-                <div className="items-column">
-                    <h3><span className="column-icon">🔍</span>Recently Lost</h3>
-                    <div className="search-bar-container">
-                        <input
-                            type="text"
-                            placeholder="Search lost items by name or description..."
-                            value={lostSearchTerm}
-                            onChange={(e) => setLostSearchTerm(e.target.value)}
-                            className="item-search"
-                        />
-                    </div>
-                    <div className="items-list">
-                        {lostItems.length > 0 ? lostItems.map(item => <ItemCard key={item.id} item={item} />) : <p>No lost items reported.</p>}
-                    </div>
-                </div>
-            </div>
-            <div className="dashboard-card full-width-card">
-                <div className="items-column">
-                    <h3><span className="column-icon">🎁</span>Recently Found</h3>
-                    <div className="search-bar-container">
-                        <input
-                            type="text"
-                            placeholder="Search found items by name or description..."
-                            value={foundSearchTerm}
-                            onChange={(e) => setFoundSearchTerm(e.target.value)}
-                            className="item-search"
-                        />
-                    </div>
-                    <div className="items-list">
-                        {foundItems.length > 0 ? foundItems.map(item => <ItemCard key={item.id} item={item} />) : <p>No found items reported.</p>}
+            {!isLoading && (
+                <>
+                <div className="dashboard-card full-width-card">
+                    <div className="items-column">
+                        <h3><span className="column-icon">🔍</span>Recently Lost</h3>
+                        <div className="search-bar-container">
+                            <input
+                                type="text"
+                                placeholder="Search lost items by name or description..."
+                                value={lostSearchTerm}
+                                onChange={(e) => setLostSearchTerm(e.target.value)}
+                                className="item-search"
+                            />
+                        </div>
+                        <div className="items-list">
+                            {lostItems.length > 0 ? lostItems.map(item => <ItemCard key={item.id} item={item} />) : <p>No lost items reported.</p>}
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div className="dashboard-card full-width-card">
+                    <div className="items-column">
+                        <h3><span className="column-icon">🎁</span>Recently Found</h3>
+                        <div className="search-bar-container">
+                            <input
+                                type="text"
+                                placeholder="Search found items by name or description..."
+                                value={foundSearchTerm}
+                                onChange={(e) => setFoundSearchTerm(e.target.value)}
+                                className="item-search"
+                            />
+                        </div>
+                        <div className="items-list">{foundItems.length > 0 ? foundItems.map(item => <ItemCard key={item.id} item={item} />) : <p>No found items reported.</p>}</div>
+                    </div>
+                </div>
+                </>
+            )}
         </div>
+        {modal && (
+            <div className="attachment-modal" onClick={() => setModal(null)}>
+                <div className="attachment-modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="attachment-modal-header">
+                        <strong>{modal.name}</strong>
+                        <button className="close-btn" onClick={() => setModal(null)}>✕</button>
+                    </div>
+                    <div className="attachment-modal-body">
+                        {(() => {
+                            const url = modal.url;
+                            const ext = (modal.name || '').split('.').pop().toLowerCase();
+                            if (['png','jpg','jpeg','gif','webp'].includes(ext)) return <img src={url} alt={modal.name} />;
+                            if (['mp4','webm','ogg'].includes(ext)) return <video src={url} controls />;
+                            if (['pdf'].includes(ext)) return <iframe src={url} title={modal.name} />;
+                            return <a href={url} target="_blank" rel="noopener noreferrer">Open attachment</a>;
+                        })()}
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
 

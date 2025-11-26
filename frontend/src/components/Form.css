@@ -50,25 +50,30 @@
 .form-container select,
 .form-container textarea {
   width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-color);
   box-sizing: border-box;
-  /* Underline animation setup */
   background-color: var(--surface-color);
   color: var(--text-color);
-  background-image: linear-gradient(var(--primary-color), var(--primary-color));
-  background-size: 0 2px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  transition: background-size 0.3s ease-in-out;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-container input::placeholder,
+.form-container select::placeholder,
+.form-container textarea::placeholder {
+  color: var(--text-color-light);
+  opacity: 0.6;
 }
 
 .form-container input:focus,
 .form-container select:focus,
 .form-container textarea:focus {
   outline: none;
-  background-size: 100% 2px;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  background-color: var(--surface-color);
 }
 
 .form-container button[type="submit"] {
@@ -136,17 +141,25 @@
 .file-input-wrapper {
   position: relative;
   width: 100%;
-  height: 40px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
+  height: 44px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--surface-color);
+  overflow: hidden;
 }
 
 .file-input-wrapper:hover {
   border-color: var(--primary-color);
+  background-color: rgba(66, 133, 244, 0.05);
+}
+
+.file-input-wrapper:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
 .file-input-wrapper input[type="file"] {
@@ -158,11 +171,34 @@
 }
 
 .file-input-label {
-  padding: 0 10px;
+  padding: 0 12px;
   color: var(--text-color-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+/* Generic file input styling for all components */
+input[type="file"] {
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--primary-color-dark);
 }
 
 .form-links {
