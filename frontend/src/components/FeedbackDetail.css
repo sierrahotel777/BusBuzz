@@ -79,6 +79,50 @@
   font-weight: bold;
 }
 
+.attachment-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.attachment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.attachment-modal-content {
+  background: var(--bg, #fff);
+  color: var(--text, #111);
+  width: 80%;
+  max-width: 900px;
+  max-height: 85%;
+  overflow: auto;
+  border-radius: 8px;
+  padding: 12px;
+}
+.attachment-modal-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.attachment-modal-body img, .attachment-modal-body video, .attachment-modal-body iframe {
+  width: 100%;
+  height: auto;
+}
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
 .resolution-info {
   background-color: var(--success-bg);
   border-left: 4px solid var(--success-text);

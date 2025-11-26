@@ -16,6 +16,7 @@ function FeedbackDetail() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [modal, setModal] = useState(null);
 
     useEffect(() => {
         if (!feedbackId) {
@@ -173,11 +174,11 @@ function FeedbackDetail() {
                                     <span className="message-timestamp">{new Date(entry.timestamp).toLocaleString()}</span>
                                 </div>
                                 {entry.message && <p>{entry.message}</p>}
-                                {entry.attachment && (
-                                    <div className="message-attachment">
-                                        <a href={entry.attachment.url} target="_blank" rel="noopener noreferrer">📎 {entry.attachment.name}</a>
-                                    </div>
-                                )}
+                                                {entry.attachment && (
+                                                    <div className="message-attachment">
+                                                        <button type="button" className="attachment-btn" onClick={() => setModal({ url: entry.attachment.url, name: entry.attachment.name })}>📎 {entry.attachment.name}</button>
+                                                    </div>
+                                                )}
                             </div>
                         ))}
                     </div>
@@ -210,6 +211,27 @@ function FeedbackDetail() {
                     </form>
                 </div>
             </div>
+
+            {modal && (
+                <div className="attachment-modal" onClick={() => setModal(null)}>
+                    <div className="attachment-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="attachment-modal-header">
+                            <strong>{modal.name}</strong>
+                            <button className="close-btn" onClick={() => setModal(null)}>✕</button>
+                        </div>
+                        <div className="attachment-modal-body">
+                            {(() => {
+                                const url = modal.url;
+                                const ext = (modal.name || '').split('.').pop().toLowerCase();
+                                if (['png','jpg','jpeg','gif','webp'].includes(ext)) return <img src={url} alt={modal.name} />;
+                                if (['mp4','webm','ogg'].includes(ext)) return <video src={url} controls />;
+                                if (['pdf'].includes(ext)) return <iframe src={url} title={modal.name} />;
+                                return <a href={url} target="_blank" rel="noopener noreferrer">Open attachment</a>;
+                            })()}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

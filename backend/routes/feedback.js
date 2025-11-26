@@ -32,13 +32,30 @@ function assertNoMongoOperators(obj, path = '') {
   }
 }
 const createSchema = Joi.object({
+  // Core text
   subject: Joi.string().trim().max(200).optional(),
   message: Joi.string().trim().min(1).max(2000).required(),
+  comments: Joi.string().trim().max(2000).optional(),
+  // Categorisation
   category: Joi.string().trim().max(100).optional(),
+  issue: Joi.string().trim().max(100).optional(),
+  // Bus / route fields
+  route: Joi.string().trim().optional(),
+  busNo: Joi.string().trim().optional(),
   busRouteNo: Joi.alternatives(Joi.string(), Joi.number()).optional(),
+  // Ratings/details
+  details: Joi.object({
+    punctuality: Joi.string().allow('', null),
+    driverBehavior: Joi.string().allow('', null),
+    cleanliness: Joi.string().allow('', null),
+  }).optional(),
+  // Attachments
+  attachmentName: Joi.string().trim().optional(),
+  attachments: Joi.array().items(Joi.object({ url: Joi.string().uri().required(), name: Joi.string().optional() })).optional(),
+  // User info
   userId: Joi.string().trim().optional(),
+  userName: Joi.string().trim().optional(),
   priority: Joi.string().valid('Low', 'Medium', 'High').optional(),
-  attachments: Joi.array().items(Joi.object()).optional(),
 });
 const updateSchema = Joi.object({
   status: Joi.string().valid('Pending', 'In Progress', 'Resolved', 'Rejected').required(),

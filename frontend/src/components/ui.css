@@ -1,0 +1,73 @@
+/* Shared UI styles for buttons and common elements */
+:root{
+  --primary-color: #0078d4;
+  --primary-contrast: #fff;
+  --danger-color: #d9534f;
+  --muted-color: #6b7280;
+  --bg: #ffffff;
+  --text: #111827;
+  --border-radius: 6px;
+  --btn-padding: 8px 14px;
+}
+
+/* Base button */
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: var(--btn-padding);
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  background: var(--primary-color);
+  color: var(--primary-contrast);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: rgba(0,0,0,0.08);
+}
+
+.btn-danger, .danger-btn, .btn-confirm-delete {
+  background: var(--danger-color);
+  color: var(--primary-contrast);
+  border-color: transparent;
+}
+
+.btn-ghost, .btn-cancel, .cancel-btn {
+  background: transparent;
+  color: var(--muted-color);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.attachment-btn, .close-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.back-link, .action-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+.back-link:hover, .action-link:hover {
+  text-decoration: underline;
+}
+
+/* Map various existing component-specific classes to consistent sizing */
+.btn-submit-report, .user-form-modal .btn-save, .profile-actions button.save-btn, .profile-actions button.cancel-btn, .btn-save {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* Small utility */
+.text-muted { color: var(--muted-color); }
+
+/* Ensure links inside modals look consistent */
+.attachment-modal-content a { color: var(--primary-color); }

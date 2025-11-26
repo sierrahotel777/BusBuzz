@@ -17,6 +17,7 @@ function FeedbackThread({ feedbackData, setFeedbackData }) {
 
     const [reply, setReply] = useState('');
     const [newStatus, setNewStatus] = useState(feedback ? feedback.status : '');
+    const [attachmentModal, setAttachmentModal] = useState(null);
 
     const handleReplySubmit = (e) => {
         e.preventDefault();
@@ -96,9 +97,35 @@ function FeedbackThread({ feedbackData, setFeedbackData }) {
                                 <span className="message-timestamp">{new Date(entry.timestamp).toLocaleString()}</span>
                             </div>
                             <p>{entry.message}</p>
+                            {entry.attachment && (
+                                <div className="message-attachment">
+                                    <button type="button" className="attachment-btn" onClick={() => setAttachmentModal({ url: entry.attachment.url, name: entry.attachment.name })}>📎 {entry.attachment.name}</button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
+
+                {attachmentModal && (
+                    <div className="attachment-modal" onClick={() => setAttachmentModal(null)}>
+                        <div className="attachment-modal-content" onClick={(e) => e.stopPropagation()}>
+                            <div className="attachment-modal-header">
+                                <strong>{attachmentModal.name}</strong>
+                                <button className="close-btn" onClick={() => setAttachmentModal(null)}>✕</button>
+                            </div>
+                            <div className="attachment-modal-body">
+                                {(() => {
+                                    const url = attachmentModal.url;
+                                    const ext = (attachmentModal.name || '').split('.').pop().toLowerCase();
+                                    if (['png','jpg','jpeg','gif','webp'].includes(ext)) return <img src={url} alt={attachmentModal.name} />;
+                                    if (['mp4','webm','ogg'].includes(ext)) return <video src={url} controls />;
+                                    if (['pdf'].includes(ext)) return <iframe src={url} title={attachmentModal.name} />;
+                                    return <a href={url} target="_blank" rel="noopener noreferrer">Open attachment</a>;
+                                })()}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="reply-section">
                     <h3>Your Reply</h3>
