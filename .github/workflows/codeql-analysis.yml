@@ -1,0 +1,43 @@
+# .github/workflows/codeql-analysis.yml
+name: CodeQL Security Scan
+
+on:
+  push:
+    branches: [ main ] # Runs scan on every push to the main branch
+  pull_request:
+    branches: [ main ] # Runs scan when a Pull Request targets main
+  schedule:
+    - cron: '30 1 * * 0' # Also runs a deep scan weekly (Sunday at 01:30 UTC)
+
+jobs:
+  analyze:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # CRITICAL: Allows the action to upload results to the Security tab
+      actions: read
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Fetch history for accurate security analysis
+        fetch-depth: 0 
+
+    # 1. Initialize CodeQL
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: 'javascript' # Specify JavaScript/Node.js analysis
+
+    # 2. Autobuild (Standard step for compiled languages, but included for completeness)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+      with:
+        # Specify the directory where build tools should run (your backend)
+        working-directory: backend 
+
+    # 3. Perform Analysis and Upload Results
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3

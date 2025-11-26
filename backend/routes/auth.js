@@ -1,241 +1,258 @@
-// feedbackRoutes.js
+// auth.js
 const express = require('express');
 const router = express.Router();
-const Feedback = require('../db/feedback');
 const { ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Parser } = require('json2csv');
 const { getDb } = require('../db/mongo');
+const rateLimit = require('express-rate-limit');
+const Joi = require('joi');
 
+// ---------- DB helpers ----------
+const usersCol = () => getDb().collection('Users');
+const feedbackCol = () => getDb().collection('Feedback');
 
-const getFeedbackCollection = () => getDb().collection('Feedback');
-
-// A function to get the 'Users' collection from the database
-const getUsersCollection = () => getDb().collection('Users');
-
-// User Registration Route
-router.post('/register', async (req, res) => {
-  const { name, email, password, rollNumberOrStaffId, role, assignedBusRouteNo, boardingPoint } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required.' });
-  }
-
-  try {
-    const usersCollection = getUsersCollection();
-
-    // Check if a user with the same email already exists
-    const existingUser = await usersCollection.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: 'User with this email already exists.' });
+// ---------- Security helpers ----------
+function assertNoMongoOperators(obj, path = '') {
+  if (obj && typeof obj === 'object') {
+    for (const k of Object.keys(obj)) {
+      if (k.startsWith('$') || k.includes('.')) {
+        throw new Error(`Disallowed key "${path + k}"`);
+      }
+      assertNoMongoOperators(obj[k], `${path + k}.`);
     }
+  }
+}
+function pick(src, allowed) {
+  const out = {};
+  for (const k of allowed) if (Object.prototype.hasOwnProperty.call(src, k)) out[k] = src[k];
+  return out;
+}
+function csvSafe(v) {
+  if (typeof v !== 'string') return v;
+  return /^[=+\-@]/.test(v) ? `'${v}` : v;
+}
 
-    // Hash the password for security
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+// ---------- Validation ----------
+const registerSchema = Joi.object({
+  name: Joi.string().trim().max(100).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).max(128).required(),
+  rollNumberOrStaffId: Joi.string().allow('', null),
+  role: Joi.string().valid('student', 'staff', 'admin').default('student'),
+  assignedBusRouteNo: Joi.alternatives(Joi.string(), Joi.number()).optional(),
+  boardingPoint: Joi.string().allow('', null),
+});
 
-    // Create the new user document
-    const newUser = {
-      name,
-      email,
-      password: hashedPassword,
-      rollNumberOrStaffId,
-      role: role || 'student', // Default role to 'student' if not provided
-      assignedBusRouteNo,
-      boardingPoint,
-      createdAt: new Date(),
-    };
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
 
-    // Insert the new user into the database
-    await usersCollection.insertOne(newUser);
+const importUserSchema = Joi.object({
+  name: Joi.string().trim().max(100).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).max(128).required(),
+  rollNumberOrStaffId: Joi.string().allow('', null),
+  role: Joi.string().valid('student', 'staff', 'admin').default('student'),
+  assignedBusRouteNo: Joi.alternatives(Joi.string(), Joi.number()).optional(),
+  boardingPoint: Joi.string().allow('', null),
+});
 
+// ---------- Rate limiters ----------
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many login attempts. Try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const readLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const exportLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// ---------- Routes ----------
+
+// Register
+router.post('/register', authLimiter, async (req, res) => {
+  try {
+    assertNoMongoOperators(req.body);
+    const { value, error } = registerSchema.validate(req.body, { stripUnknown: true });
+    if (error) return res.status(400).json({ message: error.message });
+
+    const col = usersCol();
+    const existing = await col.findOne({ email: value.email });
+    if (existing) return res.status(409).json({ message: 'User with this email already exists.' });
+
+    const hashedPassword = await bcrypt.hash(value.password, 10);
+    const newUser = { ...value, password: hashedPassword, createdAt: new Date() };
+    await col.insertOne(newUser);
     res.status(201).json({ message: 'User registered successfully!' });
-
-  } catch (error) {
-    console.error('Error during user registration:', error);
+  } catch (err) {
+    console.error('Error during registration:', err);
     res.status(500).json({ message: 'An error occurred during registration.' });
   }
 });
 
-// User Login Route
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required.' });
-  }
-
+// Login
+router.post('/login', loginLimiter, async (req, res) => {
   try {
-    const usersCollection = getUsersCollection();
-    // Find the user by their email
-    const user = await usersCollection.findOne({ email });
+    const { value, error } = loginSchema.validate(req.body, { stripUnknown: true });
+    if (error) return res.status(400).json({ message: error.message });
 
-    // If no user is found, return an error
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
-    }
+    const col = usersCol();
+    const user = await col.findOne({ email: value.email });
+    if (!user) return res.status(401).json({ message: 'Invalid credentials.' });
 
-    // Compare the provided password with the hashed password in the database
-    const isMatch = await bcrypt.compare(password, user.password);
+    const ok = await bcrypt.compare(value.password, user.password);
+    if (!ok) return res.status(401).json({ message: 'Invalid credentials.' });
 
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
-    }
+    const token = jwt.sign(
+      { user: { id: user._id, email: user.email, role: user.role } },
+      process.env.JWT_SECRET || 'dev-secret',
+      { expiresIn: '1h' }
+    );
 
-    // Passwords match. Generate a JWT.
-    const payload = {
-      user: {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-      },
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Login successful!',
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
-
-  } catch (error) {
-    console.error('Error during user login:', error);
+  } catch (err) {
+    console.error('Error during login:', err);
     res.status(500).json({ message: 'An error occurred during login.' });
   }
 });
 
-// Get all users
-router.get('/users', async (req, res) => {
+// List users (no passwords) — rate limited
+router.get('/users', readLimiter, async (_req, res) => {
   try {
-    const usersCollection = getUsersCollection();
-    // Find all users, but don't include their passwords in the response
-    const users = await usersCollection.find({}, { projection: { password: 0 } }).toArray();
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
+    const list = await usersCol().find({}, { projection: { password: 0 } }).toArray();
+    res.status(200).json(list);
+  } catch (err) {
+    console.error('Error fetching users:', err);
     res.status(500).json({ message: 'An error occurred while fetching users.' });
   }
 });
 
-// Export users to CSV
-router.get('/users/export', async (req, res) => {
+// Export users CSV — rate limited + CSV injection safe
+router.get('/users/export', exportLimiter, async (_req, res) => {
   try {
-    const usersCollection = getUsersCollection();
-    const users = await usersCollection.find({}, { projection: { password: 0 } }).toArray();
-
-    // Define the fields for the CSV
+    const list = await usersCol().find({}, { projection: { password: 0 } }).toArray();
+    const safeList = list.map(u => {
+      const o = { ...u };
+      for (const k of Object.keys(o)) o[k] = csvSafe(o[k]);
+      return o;
+    });
     const fields = ['_id', 'name', 'email', 'role', 'rollNumberOrStaffId', 'assignedBusRouteNo', 'boardingPoint', 'createdAt'];
-    const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(users);
-
+    const csv = new Parser({ fields }).parse(safeList);
     res.header('Content-Type', 'text/csv');
     res.attachment('users.csv');
     res.status(200).send(csv);
-
-  } catch (error) {
-    console.error('Error exporting users:', error);
+  } catch (err) {
+    console.error('Error exporting users:', err);
     res.status(500).json({ message: 'An error occurred while exporting users.' });
   }
 });
 
-// Import users from CSV
-router.post('/users/import', async (req, res) => {
-  const usersToImport = req.body.users;
-
-  if (!usersToImport || !Array.isArray(usersToImport) || usersToImport.length === 0) {
+// Import users — validated/sanitized + rate limited
+router.post('/users/import', writeLimiter, async (req, res) => {
+  const usersToImport = req.body?.users;
+  if (!Array.isArray(usersToImport) || usersToImport.length === 0) {
     return res.status(400).json({ message: 'No users data provided.' });
   }
 
   try {
-    const usersCollection = getUsersCollection();
+    const col = usersCol();
     const saltRounds = 10;
-    let successfulImports = 0;
+    let successful = 0;
     const errors = [];
 
-    for (const user of usersToImport) {
-      if (!user.email || !user.password) {
-        errors.push({ email: user.email || 'N/A', reason: 'Missing email or password.' });
-        continue;
+    for (const raw of usersToImport) {
+      try {
+        assertNoMongoOperators(raw);
+        const { value, error } = importUserSchema.validate(raw, { stripUnknown: true });
+        if (error) throw new Error(error.message);
+
+        const existing = await col.findOne({ email: value.email });
+        if (existing) throw new Error('User with this email already exists.');
+
+        const hashedPassword = await bcrypt.hash(value.password, saltRounds);
+        const newUser = { ...value, password: hashedPassword, createdAt: new Date() };
+        await col.insertOne(newUser);
+        successful++;
+      } catch (e) {
+        errors.push({ email: raw?.email || 'N/A', reason: e.message || 'Invalid data' });
       }
-
-      const existingUser = await usersCollection.findOne({ email: user.email });
-      if (existingUser) {
-        errors.push({ email: user.email, reason: 'User with this email already exists.' });
-        continue;
-      }
-
-      // This check is now more robust. If password is not a string, hashing will fail.
-      if (typeof user.password !== 'string' || user.password.length === 0) {
-        errors.push({ email: user.email, reason: 'Password is missing or invalid.' });
-        continue;
-      }
-
-      const hashedPassword = await bcrypt.hash(user.password, saltRounds);
-      const newUser = {
-        ...user,
-        password: hashedPassword,
-        role: user.role || 'student',
-        createdAt: new Date(),
-      };
-
-      await usersCollection.insertOne(newUser);
-      successfulImports++;
     }
 
-    res.status(201).json({ message: `Import complete. Successfully imported ${successfulImports} users.`, errors });
-  } catch (error) {
-    console.error('Error importing users:', error);
+    res.status(201).json({ message: `Import complete. Successfully imported ${successful} users.`, errors });
+  } catch (err) {
+    console.error('Error importing users:', err);
     res.status(500).json({ message: 'An error occurred during the import process.' });
   }
 });
 
-// --- Feedback Routes ---
-
-// Get all feedback
-router.get('/feedback', async (req, res) => {
+// Feedback (read) — rate limited
+router.get('/feedback', readLimiter, async (_req, res) => {
   try {
-    const feedbackCollection = getFeedbackCollection();
-    const feedback = await feedbackCollection.find({}).sort({ submittedOn: -1 }).toArray();
-    // Map _id to id for frontend compatibility
-    const formattedFeedback = feedback.map(item => ({ ...item, id: item._id }));
-    res.status(200).json(formattedFeedback);
-  } catch (error) {
-    console.error('Error fetching feedback:', error);
+    const feedback = await feedbackCol().find({}).sort({ submittedOn: -1 }).toArray();
+    const formatted = feedback.map(item => ({ ...item, id: item._id }));
+    res.status(200).json(formatted);
+  } catch (err) {
+    console.error('Error fetching feedback:', err);
     res.status(500).json({ message: 'An error occurred while fetching feedback.' });
   }
 });
 
-// Submit new feedback
-router.post('/feedback', async (req, res) => {
+// Submit feedback — sanitized + rate limited
+router.post('/feedback', writeLimiter, async (req, res) => {
   try {
-    const feedbackCollection = getFeedbackCollection();
-    const newFeedback = {
-      ...req.body,
-      submittedOn: new Date(),
-      status: 'Pending',
-    };
-    const result = await feedbackCollection.insertOne(newFeedback);
-    res.status(201).json({ message: 'Feedback submitted successfully!', feedback: { ...newFeedback, id: result.insertedId } });
-  } catch (error) {
-    console.error('Error submitting feedback:', error);
+    assertNoMongoOperators(req.body);
+    const allowed = ['subject', 'message', 'category', 'busRouteNo', 'userId', 'attachments', 'priority'];
+    const newFeedback = pick(req.body, allowed);
+    if (!newFeedback.message || typeof newFeedback.message !== 'string') {
+      return res.status(400).json({ message: 'Feedback "message" is required.' });
+    }
+    const doc = { ...newFeedback, submittedOn: new Date(), status: 'Pending' };
+    const result = await feedbackCol().insertOne(doc);
+    res.status(201).json({ message: 'Feedback submitted successfully!', feedback: { ...doc, id: result.insertedId } });
+  } catch (err) {
+    console.error('Error submitting feedback:', err);
     res.status(500).json({ message: 'An error occurred while submitting feedback.' });
   }
 });
 
-// Update feedback (for admin)
-router.get('/feedback/:id', async (req, res) => {
+// Get one feedback by id — rate limited
+router.get('/feedback/:id', readLimiter, async (req, res) => {
   const { id } = req.params;
+  if (!ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid feedback ID.' });
   try {
-    const feedback = await Feedback.findById(id);
-    if (!feedback) return res.status(404).json({ message: 'Feedback not found.' });
-    res.json(feedback);
+    const fb = await feedbackCol().findOne({ _id: new ObjectId(id) });
+    if (!fb) return res.status(404).json({ message: 'Feedback not found.' });
+    res.json(fb);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching feedback.' });
   }
