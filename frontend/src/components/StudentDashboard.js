@@ -49,7 +49,7 @@ function StudentDashboard({ feedbackData, announcements, setCommendations, lostA
       const newEta = routeData[user.busRoute].stops[stopToSet];
       setEta(newEta);
     }
-  }, [user.busRoute, user.favoriteStop]);
+  }, [user.busRoute, user.favoriteStop, selectedRoute]);
 
   // Fetch user's feedback
   // eslint-disable-next-line react-hooks/exhaustive-deps

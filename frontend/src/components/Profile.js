@@ -61,7 +61,7 @@ function Profile() {
         favoriteStop: profileData.favoriteStop,
       };
       
-      const response = await updateUserProfile(user.id, updates);
+      await updateUserProfile(user.id, updates);
       
       // Update local auth context
       updateUser(profileData);
@@ -130,7 +130,7 @@ function Profile() {
             <label>College ID</label>
             <p>{profileData.email?.split('@')[0] || user.email?.split('@')[0] || 'N/A'}</p>
           </div>
-          <div className="profile-field half-width" style="">
+          <div className="profile-field half-width">
             <label>Role</label>
             <p>{profileData.role}</p>
           </div>
